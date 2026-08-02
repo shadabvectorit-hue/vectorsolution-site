@@ -251,12 +251,37 @@
     if (!form.hidden) input.focus();
   });
 
+  // The launcher looks like a WhatsApp link but opens this panel, so screen
+  // readers must be told what it really does.
+  launcher.setAttribute("role", "button");
+  launcher.setAttribute("aria-haspopup", "dialog");
+  launcher.setAttribute("aria-expanded", "false");
+  launcher.setAttribute("aria-label", "Open chat — English, Roman Urdu or اردو");
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "Chat with VectorIT");
+  panel.setAttribute("tabindex", "-1");
+
+  function setOpen(open) {
+    panel.classList.toggle("open", open);
+    launcher.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+      // Focus the panel itself, not the first control: the language buttons are
+      // rendered on a timer and do not exist yet at this point.
+      panel.focus();
+      start();
+    } else {
+      launcher.focus();
+    }
+  }
+
   launcher.addEventListener("click", function (e) {
     e.preventDefault();
-    var open = panel.classList.toggle("open");
-    if (open) start();
+    setOpen(!panel.classList.contains("open"));
   });
   panel.querySelector(".bot-close").addEventListener("click", function () {
-    panel.classList.remove("open");
+    setOpen(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && panel.classList.contains("open")) setOpen(false);
   });
 })();

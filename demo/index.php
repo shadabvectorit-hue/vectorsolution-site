@@ -7,6 +7,11 @@
  * logout, so every visitor gets a clean company.
  */
 declare(strict_types=1);
+// Own cookie name: the public sandbox must not share a session with the private
+// inbox, so logging out here can never log the owner out of inquiries.php.
+ini_set('session.use_strict_mode', '1');
+session_name('VDEMOSESS');
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => true]);
 session_start();
 
 const DEMO_USER = 'demo';
@@ -36,6 +41,7 @@ function demoTrack(string $event, string $page = ''): void {
 if (isset($_GET['logout'])) { session_destroy(); header('Location: index.php'); exit; }
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['user'])) {
     if ($_POST['user'] === DEMO_USER && ($_POST['pass'] ?? '') === DEMO_PASS) {
+        session_regenerate_id(true);
         $_SESSION['demo_ok'] = true;
         demoTrack('demo_login');
         header('Location: index.php'); exit;
@@ -46,8 +52,14 @@ $authed = !empty($_SESSION['demo_ok']);
 
 /* ---------- interactive bits (session only) ---------- */
 if ($authed && isset($_GET['pay'])) {
-    $_SESSION['paid'][(string)$_GET['pay']] = true;
-    header('Location: index.php?p=invoices&done=' . urlencode((string)$_GET['pay'])); exit;
+    // Only a real invoice number may be marked paid — otherwise every made-up
+    // ?pay= value would add another entry to the session file, without limit.
+    $payNo = (string)$_GET['pay'];
+    $known = array_column(array_merge($_SESSION['custom_invoices'] ?? [], $DATA['invoices']), 'no');
+    if (in_array($payNo, $known, true)) {
+        $_SESSION['paid'][$payNo] = true;
+    }
+    header('Location: index.php?p=invoices&done=' . urlencode($payNo)); exit;
 }
 $paid = $_SESSION['paid'] ?? [];
 

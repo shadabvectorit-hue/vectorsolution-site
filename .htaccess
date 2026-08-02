@@ -12,6 +12,17 @@ RewriteRule ^(.*)$ https://vectorsolution.it/$1 [R=301,L]
 # Custom error page
 ErrorDocument 404 /404.html
 
+# Security headers
+<IfModule mod_headers.c>
+  # Browsers remember to use HTTPS, so the first plain-http request can't be
+  # intercepted. No includeSubDomains — cpanel/webmail hosts are out of scope.
+  Header always set Strict-Transport-Security "max-age=15552000"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
 # Basic caching for static assets
 <IfModule mod_expires.c>
   ExpiresActive On

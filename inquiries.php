@@ -2,6 +2,10 @@
 // VectorIT — private inquiries inbox. Password lives in /home/<user>/_private/admin_pass.txt
 // (outside the webroot, never in this public repository).
 declare(strict_types=1);
+// Reject session IDs the server never issued, and keep the cookie away from
+// JavaScript and cross-site requests.
+ini_set('session.use_strict_mode', '1');
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => true]);
 session_start();
 header('X-Robots-Tag: noindex, nofollow');
 
@@ -14,11 +18,32 @@ if (isset($_GET['logout'])) {
     exit;
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
-    if ($storedPass !== '' && hash_equals($storedPass, (string)$_POST['pass'])) {
-        $_SESSION['inq_ok'] = true;
+    // One password is the only gate on every lead's contact details, so cap the
+    // guesses: 10 per IP per 15 minutes. Failures are recorded *before* the
+    // comparison, otherwise parallel requests would never be counted.
+    $lockDir = dirname(__DIR__) . '/_private/ratelimit';
+    if (!is_dir($lockDir)) {
+        @mkdir($lockDir, 0700, true);
+    }
+    $lockFile = $lockDir . '/login_' . substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-login'), 0, 20) . '.json';
+    $tries = is_file($lockFile) ? (json_decode((string)@file_get_contents($lockFile), true) ?: []) : [];
+    $tries = array_values(array_filter($tries, static fn($ts) => is_int($ts) && $ts > time() - 900));
+
+    if (count($tries) >= 10) {
+        $err = 'Too many attempts. Try again in 15 minutes.';
     } else {
-        $err = true;
-        sleep(1); // slow brute force a little
+        $tries[] = time();
+        @file_put_contents($lockFile, json_encode($tries), LOCK_EX);
+        if ($storedPass !== '' && hash_equals($storedPass, (string)$_POST['pass'])) {
+            // New ID on login: any session the browser was carrying beforehand
+            // (possibly planted by someone else) cannot become an admin session.
+            session_regenerate_id(true);
+            $_SESSION['inq_ok'] = true;
+            @unlink($lockFile);
+        } else {
+            $err = 'Wrong password.';
+            sleep(1);
+        }
     }
 }
 $authed = !empty($_SESSION['inq_ok']);
@@ -109,7 +134,7 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
     <?php if ($storedPass === ''): ?>
       <p class="err">Setup needed: create the file <code>_private/admin_pass.txt</code> (one line — your password) in your home directory via cPanel File Manager.</p>
     <?php else: ?>
-      <?php if (!empty($err)): ?><p class="err">Wrong password.</p><?php endif; ?>
+      <?php if (!empty($err)): ?><p class="err"><?= $e($err) ?></p><?php endif; ?>
       <input type="password" name="pass" placeholder="Password" autofocus>
       <button type="submit">Open inbox</button>
     <?php endif; ?>

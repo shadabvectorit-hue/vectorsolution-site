@@ -24,26 +24,52 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://vectorsolution.it/#organization",
+    "name": "VectorIT",
+    "url": "https://vectorsolution.it/",
+    "logo": "https://vectorsolution.it/assets/logo-square.png",
+    "image": "https://vectorsolution.it/assets/og-image.jpg",
+    "description": "Software house building VectorERP, custom software, websites and mobile apps for businesses in Pakistan and internationally.",
+    "founder": { "@type": "Person", "name": "Muhammad Shadab" },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "5900 Balcones Drive Suite 100",
+      "addressLocality": "Austin",
+      "addressRegion": "TX",
+      "postalCode": "78731",
+      "addressCountry": "US"
+    },
+    "areaServed": ["PK", "US", "AE", "GB"],
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+92-336-3138686",
+        "email": "shadab@vectorsolution.it",
+        "areaServed": "PK",
+        "availableLanguage": ["en", "ur"]
+      },
+      {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+1-512-355-5462",
+        "email": "shadab@vectorsolution.it",
+        "areaServed": "US",
+        "availableLanguage": "en"
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "VectorERP",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "offers": { "@type": "Offer", "price": "1999", "priceCurrency": "PKR" },
-    "publisher": {
-      "@type": "Organization",
-      "name": "VectorIT",
-      "url": "https://vectorsolution.it",
-      "email": "shadab@vectorsolution.it",
-      "telephone": "+1-512-355-5462",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "5900 Balcones Drive Suite 100",
-        "addressLocality": "Austin",
-        "addressRegion": "TX",
-        "postalCode": "78731",
-        "addressCountry": "US"
-      }
-    }
+    "publisher": { "@id": "https://vectorsolution.it/#organization" }
   }
   </script>
 </head>
@@ -479,7 +505,7 @@
           <h2>How VectorERP compares</h2>
           <p class="lede">Odoo, ERPNext, and the others are good software — we'll even implement them for you if they fit better. Here's where VectorERP wins for businesses in Pakistan.</p>
         </div>
-        <div class="compare-scroll reveal">
+        <div class="compare-scroll reveal" tabindex="0" role="region" aria-label="VectorERP compared with Odoo, ERPNext, SuiteCRM, Dolibarr and Tryton">
           <table class="compare">
             <thead>
               <tr>

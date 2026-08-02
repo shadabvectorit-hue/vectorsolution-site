@@ -730,7 +730,9 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #25D366;
+  /* Deeper than WhatsApp's #25D366: white label text needs 4.5:1, and the
+     brand green only reaches ~2:1. */
+  background: #0B8043;
   color: #FFFFFF;
   font-family: var(--font-display);
   font-weight: 600;
@@ -933,7 +935,7 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
 }
 .bot-panel.open { display: flex; }
 .bot-head {
-  background: linear-gradient(135deg, #178A50, #25D366);
+  background: linear-gradient(135deg, #075E36, #0B8043);
   color: #fff;
   padding: 14px 18px;
   display: flex;
@@ -1028,7 +1030,7 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #25D366;
+  background: #0B8043;
   color: #fff !important;
   font-weight: 700;
   border-radius: 999px;
