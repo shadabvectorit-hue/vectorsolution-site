@@ -136,7 +136,21 @@ tbody tr:hover{background:var(--paper)}
 .toast{background:#DCF5E7;border:1px solid #9ADFBB;color:#14713F;border-radius:11px;padding:12px 16px;margin-bottom:16px;font-weight:600;font-size:.9rem}
 .qr{width:74px;height:74px;border-radius:6px;background:repeating-linear-gradient(0deg,#0F1B33 0 4px,transparent 4px 8px),repeating-linear-gradient(90deg,#0F1B33 0 4px,#fff 4px 8px);opacity:.9}
 .note{color:var(--muted);font-size:.84rem;margin-top:10px}
-@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}}
+/* save-my-demo lead capture */
+.save-panel{background:linear-gradient(155deg,#12224A,#0F1B33);border:0;color:#fff}
+.save-lede{color:rgba(233,238,249,.82);font-size:.92rem;margin-bottom:16px;max-width:62ch}
+.save-lede b{color:#fff}
+.save-form{display:flex;gap:10px;flex-wrap:wrap}
+.save-form input{flex:1;min-width:170px;padding:11px 15px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.10);color:#fff}
+.save-form input::placeholder{color:rgba(233,238,249,.55)}
+.save-form input:focus{outline:none;border-color:#5B8CFF;background:rgba(255,255,255,.16)}
+.save-form button{background:#25D366;color:#fff;border:0;border-radius:999px;padding:11px 24px;font-weight:700;cursor:pointer;white-space:nowrap}
+.save-form button:hover{background:#1FBA59}
+.save-form button:disabled{opacity:.65;cursor:default}
+.save-done{background:rgba(37,211,102,.16);border:1px solid rgba(37,211,102,.45);border-radius:11px;padding:13px 16px;font-size:.92rem}
+.save-alt{margin-top:14px;font-size:.86rem;color:rgba(233,238,249,.65)}
+.save-alt a{color:#7BE49E;font-weight:600}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}.save-form input{min-width:100%}.save-form button{width:100%}}
 @media(max-width:700px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;padding:8px;align-items:center}.side .logo{border:0;margin:0;padding:0 12px}.side .foot{display:none}.side a{white-space:nowrap;padding:8px 12px}.side a.on{border-left:0;border-bottom:2px solid #5B8CFF;padding-left:12px}}
 </style>
 </head>
@@ -145,6 +159,7 @@ tbody tr:hover{background:var(--paper)}
 <div class="demo-bar">
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
   <a href="../index.html">← Back to vectorsolution.it</a>
+  <?php if ($authed): ?><a href="#save" style="background:#25D366;border-color:#25D366">💾 Save my demo data</a><?php endif; ?>
   <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP demo dekha hai — mujhe apne business ke liye baat karni hai') ?>" target="_blank" rel="noopener">Ye mere business ke liye chahiye →</a>
 </div>
 
@@ -351,12 +366,44 @@ tbody tr:hover{background:var(--paper)}
         </div>
       <?php endif; ?>
 
-      <div class="panel" style="background:linear-gradient(155deg,#12224A,#0F1B33);border:0;color:#fff">
-        <h2 style="color:#fff">Apne business ka data is mein dekhna chahte hain? <span style="color:#9DBAFF">free demo</span></h2>
-        <p style="color:rgba(233,238,249,.8);font-size:.92rem;margin-bottom:16px">We set up a demo with your own products and parties — so you see your business, not a sample company.</p>
-        <a class="btn-sm" style="background:#25D366;padding:11px 20px;font-size:.9rem" href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP ka demo dekha hai. Mujhe apne business ke liye setup karwana hai.') ?>" target="_blank" rel="noopener">WhatsApp par baat karein →</a>
-        <a class="btn-sm" style="background:rgba(255,255,255,.14);padding:11px 20px;font-size:.9rem;margin-left:8px" href="../contact.html">Contact form bharein</a>
+      <div class="panel save-panel" id="save">
+        <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF">apne business ke liye</span></h2>
+        <p class="save-lede">Leave your name and WhatsApp number — we'll set VectorERP up with <b>your own</b> products, parties and opening balances, and send you a private login. Free, no obligation.</p>
+        <form class="save-form" id="save-form" autocomplete="on">
+          <input type="text" name="website" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px">
+          <input name="name" placeholder="Aap ka naam / Your name" required aria-label="Your name">
+          <input name="whatsapp" placeholder="WhatsApp — 03xx xxxxxxx" required aria-label="WhatsApp number">
+          <input name="company" placeholder="Business ka naam (optional)" aria-label="Business name">
+          <button type="submit">Save my demo →</button>
+        </form>
+        <p class="save-done" id="save-done" hidden>✓ <b>Shukriya!</b> Your details are saved. We'll WhatsApp you a private demo set up with your own data — usually the same day.</p>
+        <p class="save-alt">Prefer to talk right now?
+          <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP ka demo dekha hai. Mujhe apne business ke liye setup karwana hai.') ?>" target="_blank" rel="noopener">WhatsApp par baat karein →</a>
+        </p>
       </div>
+
+      <script>
+      (function () {
+        var f = document.getElementById('save-form');
+        if (!f) return;
+        f.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (f.website.value) return;                    // honeypot
+          var btn = f.querySelector('button');
+          btn.disabled = true; btn.textContent = 'Saving…';
+          var d = new FormData(f);
+          d.append('source', 'demo-save');
+          d.append('service', 'VectorERP — set up with my own data');
+          d.append('message', 'Requested "Save my demo data" from the live demo at /demo');
+          fetch('../contact-submit.php', { method: 'POST', body: d, headers: { Accept: 'application/json' } })
+            .catch(function () {})
+            .then(function () {
+              f.hidden = true;
+              document.getElementById('save-done').hidden = false;
+            });
+        });
+      })();
+      </script>
     </main>
   </div>
 <?php endif; ?>
