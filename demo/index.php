@@ -7,6 +7,9 @@
  * logout, so every visitor gets a clean company.
  */
 declare(strict_types=1);
+require_once dirname(__DIR__) . '/lib/guard.php';
+
+@ini_set('display_errors', '0');
 // Own cookie name: the public sandbox must not share a session with the private
 // inbox, so logging out here can never log the owner out of inquiries.php.
 ini_set('session.use_strict_mode', '1');
@@ -22,19 +25,22 @@ $DATA = require __DIR__ . '/data.php';
 
 /** Server-side analytics: same file the site beacon writes to. Never blocks the page. */
 function demoTrack(string $event, string $page = ''): void {
-    $dir = dirname(__DIR__, 2) . '/_private';
-    if (!is_dir($dir)) { @mkdir($dir, 0700, true); }
-    $file = $dir . '/analytics.jsonl';
-    if (is_file($file) && filesize($file) > 50 * 1024 * 1024) { return; }
     $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
     if (preg_match('/bot|crawl|spider|preview|whatsapp|curl|python|headless/i', $ua)) { return; }
+    // Same throttle as the site beacon: this writes to the same shared log, so
+    // leaving it open would simply move the flooding problem here.
+    if (!vit_rate_allow('beacon', 120, 600)) { return; }
+    $dir = VIT_PRIVATE;
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) { return; }
+    $file = $dir . '/analytics.jsonl';
+    if (is_file($file) && (int)@filesize($file) > 40 * 1024 * 1024) { @rename($file, $file . '.1'); }
     $row = [
         't' => date('Y-m-d H:i:s'), 'e' => $event, 'p' => $page ?: '/demo/',
-        'v' => substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-a7x|' . date('Y-m-d')), 0, 12),
+        'v' => vit_visitor_hash(),
         'r' => substr((string)($_SERVER['HTTP_REFERER'] ?? ''), 0, 160),
         'm' => preg_match('/Mobile|Android|iPhone/i', $ua) ? 1 : 0,
     ];
-    @file_put_contents($file, json_encode($row, JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX);
+    @file_put_contents($file, (string)json_encode($row, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) . "\n", FILE_APPEND | LOCK_EX);
 }
 
 /* ---------- auth ---------- */
@@ -76,6 +82,9 @@ if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '
     $uoms  = (array)($_POST['iuom'] ?? []);
     $qtys  = (array)($_POST['iqty'] ?? []);
     $rates = (array)($_POST['irate'] ?? []);
+    // The form offers a handful of rows; the cap stops a crafted post from
+    // pushing thousands of lines into the session file on disk.
+    $descs = array_slice($descs, 0, 25, true);
     foreach ($descs as $k => $d) {
         $d = trim(mb_substr((string)$d, 0, 90));
         $qty = min(max((float)($qtys[$k] ?? 0), 0), 9_999_999);

@@ -4,7 +4,9 @@
 // and emails a copy. Serves the contact form (redirect back), the chat bot and the
 // demo's "save my demo data" form (JSON).
 declare(strict_types=1);
+require_once __DIR__ . '/lib/guard.php';
 
+@ini_set('display_errors', '0');
 header('X-Robots-Tag: noindex');
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     header('Location: contact.html');
@@ -18,20 +20,10 @@ if (!empty($_POST['website'])) {
 }
 
 // Rate limit: max 5 submissions per IP per hour — enough for any genuine visitor,
-// a wall for a spam script. State lives outside the webroot.
-$rlDir = dirname(__DIR__) . '/_private/ratelimit';
-if (!is_dir($rlDir)) {
-    @mkdir($rlDir, 0700, true);
-}
-$rlFile = $rlDir . '/' . substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-rl'), 0, 20) . '.json';
-$hits = [];
-if (is_file($rlFile)) {
-    $hits = json_decode((string)@file_get_contents($rlFile), true) ?: [];
-}
-$hits = array_values(array_filter($hits, static fn($ts) => is_int($ts) && $ts > time() - 3600));
-if (count($hits) >= 5) {
-    $tooMany = str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
-    if ($tooMany) {
+// a wall for a spam script. The limiter holds one lock across read and write, so
+// a burst of parallel posts cannot each read the same count and slip through.
+if (!vit_rate_allow('lead', 5, 3600)) {
+    if (str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json')) {
         header('Content-Type: application/json');
         echo json_encode(['ok' => false, 'error' => 'too many requests — please try again later']);
     } else {
@@ -39,8 +31,6 @@ if (count($hits) >= 5) {
     }
     exit;
 }
-$hits[] = time();
-@file_put_contents($rlFile, json_encode($hits), LOCK_EX);
 
 /** Strips control characters so nothing user-typed can forge an email header. */
 $clean = static function (string $v, int $max): string {
@@ -85,10 +75,15 @@ if ($lead['name'] === '' || ($lead['whatsapp'] === '' && $lead['email'] === ''))
 }
 
 // ---- store (source of truth) ----
-$dir = dirname(__DIR__) . '/_private';
+$dir = VIT_PRIVATE;
 if (!is_dir($dir)) {
     @mkdir($dir, 0700, true);
 }
+// The lead store is the one file with no ceiling. 40 MB is far beyond any
+// plausible volume of real inquiries; past it, keep mailing but stop appending
+// so the account's disk quota can never be filled through this endpoint.
+$leadFile = $dir . '/inquiries.jsonl';
+$storeFull = is_file($leadFile) && (int)@filesize($leadFile) > 40 * 1024 * 1024;
 $json = json_encode($lead, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 if ($json === false) {
     // Never write a blank line — a lead with odd bytes must still be readable.
@@ -97,8 +92,8 @@ if ($json === false) {
         $lead
     ));
 }
-$stored = $json !== false
-    && @file_put_contents($dir . '/inquiries.jsonl', $json . "\n", FILE_APPEND | LOCK_EX) !== false;
+$stored = !$storeFull && $json !== false
+    && @file_put_contents($leadFile, $json . "\n", FILE_APPEND | LOCK_EX) !== false;
 
 // ---- email copies ----
 $subject = 'New inquiry — ' . ($lead['name'] !== '' ? $lead['name'] : 'website visitor')

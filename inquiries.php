@@ -2,6 +2,10 @@
 // VectorIT — private inquiries inbox. Password lives in /home/<user>/_private/admin_pass.txt
 // (outside the webroot, never in this public repository).
 declare(strict_types=1);
+require_once __DIR__ . '/lib/guard.php';
+
+// Never print a stack trace to the browser: it would disclose the server path.
+@ini_set('display_errors', '0');
 // Reject session IDs the server never issued, and keep the cookie away from
 // JavaScript and cross-site requests.
 ini_set('session.use_strict_mode', '1');
@@ -9,41 +13,70 @@ session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => 
 session_start();
 header('X-Robots-Tag: noindex, nofollow');
 
-$passFile = dirname(__DIR__) . '/_private/admin_pass.txt';
+const INQ_IDLE = 43200;   // 12 h without a request ends the session
+const INQ_ABSOLUTE = 604800; // 7 days, however active
+
+$passFile = VIT_PRIVATE . '/admin_pass.txt';
 $storedPass = is_file($passFile) ? trim((string)file_get_contents($passFile)) : '';
 
+/** Wipe every trace of the session, not just the flag. */
+$endSession = static function (): void {
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], (bool)$p['secure'], (bool)$p['httponly']);
+    }
+    session_destroy();
+};
+
 if (isset($_GET['logout'])) {
-    unset($_SESSION['inq_ok']);
+    // Token-checked so a third-party page cannot log the owner out by embedding
+    // this URL; falls back to simply clearing the flag if no token is present.
+    if (!empty($_SESSION['inq_csrf']) && hash_equals((string)$_SESSION['inq_csrf'], (string)($_GET['t'] ?? ''))) {
+        $endSession();
+    } else {
+        unset($_SESSION['inq_ok']);
+    }
     header('Location: inquiries.php');
     exit;
 }
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
-    // One password is the only gate on every lead's contact details, so cap the
-    // guesses: 10 per IP per 15 minutes. Failures are recorded *before* the
-    // comparison, otherwise parallel requests would never be counted.
-    $lockDir = dirname(__DIR__) . '/_private/ratelimit';
-    if (!is_dir($lockDir)) {
-        @mkdir($lockDir, 0700, true);
-    }
-    $lockFile = $lockDir . '/login_' . substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-login'), 0, 20) . '.json';
-    $tries = is_file($lockFile) ? (json_decode((string)@file_get_contents($lockFile), true) ?: []) : [];
-    $tries = array_values(array_filter($tries, static fn($ts) => is_int($ts) && $ts > time() - 900));
 
-    if (count($tries) >= 10) {
-        $err = 'Too many attempts. Try again in 15 minutes.';
+// Expire an idle or over-age session before it can be used.
+if (!empty($_SESSION['inq_ok'])) {
+    $seen = (int)($_SESSION['inq_seen'] ?? 0);
+    $born = (int)($_SESSION['inq_born'] ?? 0);
+    if (($seen && time() - $seen > INQ_IDLE) || ($born && time() - $born > INQ_ABSOLUTE)) {
+        $endSession();
+        session_start();
+        $err = 'Session expired. Please sign in again.';
     } else {
-        $tries[] = time();
-        @file_put_contents($lockFile, json_encode($tries), LOCK_EX);
-        if ($storedPass !== '' && hash_equals($storedPass, (string)$_POST['pass'])) {
-            // New ID on login: any session the browser was carrying beforehand
-            // (possibly planted by someone else) cannot become an admin session.
-            session_regenerate_id(true);
-            $_SESSION['inq_ok'] = true;
-            @unlink($lockFile);
-        } else {
-            $err = 'Wrong password.';
-            sleep(1);
-        }
+        $_SESSION['inq_seen'] = time();
+    }
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
+    // One password is the only gate on every lead's contact details. The limiter
+    // holds its lock across read and write, so parallel guesses cannot each read
+    // the same pre-image and multiply the budget.
+    $submitted = is_string($_POST['pass']) ? $_POST['pass'] : '';
+
+    if (!vit_rate_allow('login', 10, 900)) {
+        $err = 'Too many attempts. Try again in 15 minutes.';
+        vit_audit('admin_login_throttled');
+    } elseif ($storedPass !== '' && $submitted !== '' && hash_equals($storedPass, $submitted)) {
+        // New ID on login: any session the browser was carrying beforehand
+        // (possibly planted by someone else) cannot become an admin session.
+        session_regenerate_id(true);
+        $_SESSION['inq_ok'] = true;
+        $_SESSION['inq_born'] = time();
+        $_SESSION['inq_seen'] = time();
+        $_SESSION['inq_csrf'] = bin2hex(random_bytes(16));
+        vit_rate_clear('login');
+        vit_audit('admin_login_ok');
+    } else {
+        $err = 'Wrong password.';
+        vit_audit('admin_login_failed');
+        sleep(1);
     }
 }
 $authed = !empty($_SESSION['inq_ok']);
@@ -51,10 +84,12 @@ $authed = !empty($_SESSION['inq_ok']);
 $stats = null;
 if ($authed) {
     // ---- traffic stats from the first-party analytics log ----
-    $af = dirname(__DIR__) . '/_private/analytics.jsonl';
+    $af = VIT_PRIVATE . '/analytics.jsonl';
     $stats = ['pv7' => 0, 'pv30' => 0, 'uniq7' => [], 'wa7' => 0, 'demo7' => 0, 'inv7' => 0, 'pdf7' => 0, 'pages' => [], 'mobile' => 0, 'total7' => 0];
     if (is_file($af)) {
-        $rows = file($af, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        // Bounded read: pulling the whole log into an array would let anyone who
+        // can grow it exhaust PHP's memory and lock the owner out of this page.
+        $rows = vit_tail_lines($af);
         if (count($rows) > 50000) $rows = array_slice($rows, -50000);
         $d7  = date('Y-m-d', strtotime('-7 days'));
         $d30 = date('Y-m-d', strtotime('-30 days'));
@@ -81,15 +116,39 @@ if ($authed) {
         arsort($stats['pages']);
         $stats['pages'] = array_slice($stats['pages'], 0, 8, true);
     }
+
+    // ---- security: who has been trying to get in ----
+    $sec = ['failed' => 0, 'throttled' => 0, 'ok' => 0, 'ips' => [], 'last' => ''];
+    $auditFile = VIT_PRIVATE . '/audit.jsonl';
+    if (is_file($auditFile)) {
+        $cut = gmdate('Y-m-d H:i:s', time() - 7 * 86400);
+        foreach (vit_tail_lines($auditFile, 4194304) as $line) {
+            $r = json_decode($line, true);
+            if (!is_array($r) || (string)($r['t'] ?? '') < $cut) continue;
+            $ev = (string)($r['e'] ?? '');
+            if ($ev === 'admin_login_failed') {
+                $sec['failed']++;
+                $ip = (string)($r['ip'] ?? '');
+                if ($ip !== '') $sec['ips'][$ip] = ($sec['ips'][$ip] ?? 0) + 1;
+            } elseif ($ev === 'admin_login_throttled') {
+                $sec['throttled']++;
+            } elseif ($ev === 'admin_login_ok') {
+                $sec['ok']++;
+                $sec['last'] = (string)($r['t'] ?? '');
+            }
+        }
+        arsort($sec['ips']);
+        $sec['ips'] = array_slice($sec['ips'], 0, 5, true);
+    }
 }
 
 $leads = [];
 if ($authed) {
-    $file = dirname(__DIR__) . '/_private/inquiries.jsonl';
+    $file = VIT_PRIVATE . '/inquiries.jsonl';
     if (is_file($file)) {
         $seen = [];
         // Newest first; a completed chat supersedes its own earlier partial save.
-        foreach (array_reverse(file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) as $line) {
+        foreach (array_reverse(vit_tail_lines($file, 41943040)) as $line) {
             $row = json_decode($line, true);
             if (!is_array($row)) continue;
             $id = (string)($row['leadId'] ?? '');
@@ -143,7 +202,7 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
   <div class="wrap">
     <div class="top">
       <h1>Inquiries <small><?= count($leads) ?> total</small></h1>
-      <a href="?logout=1">Log out</a>
+      <a href="?logout=1&amp;t=<?= $e($_SESSION['inq_csrf'] ?? '') ?>">Log out</a>
     </div>
 
     <?php if ($stats): ?>
@@ -164,6 +223,26 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
       </div>
       <?php endif; ?>
     </div>
+
+    <?php if (!empty($sec)): ?>
+    <div class="card" style="margin-bottom:18px;<?= $sec['failed'] >= 20 ? 'border-color:#E4B7B7;background:#FFF7F7' : '' ?>">
+      <b style="font-size:1.05rem">Security — last 7 days</b>
+      <div class="meta" style="margin-top:8px">
+        <?= (int)$sec['ok'] ?> successful sign-in<?= $sec['ok'] === 1 ? '' : 's' ?><?php if ($sec['last']): ?>
+          (most recent <?= $e($sec['last']) ?> UTC)<?php endif; ?> ·
+        <strong style="color:<?= $sec['failed'] ? '#B32222' : '#178A50' ?>"><?= (int)$sec['failed'] ?></strong> failed
+        <?php if ($sec['throttled']): ?> · <strong style="color:#B32222"><?= (int)$sec['throttled'] ?></strong> blocked by rate limit<?php endif; ?>
+      </div>
+      <?php if ($sec['ips']): ?>
+      <div class="meta">Most failed attempts from:
+        <?php foreach ($sec['ips'] as $ip => $n): ?><span class="tag"><?= $e($ip) ?> · <?= (int)$n ?></span><?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+      <?php if ($sec['failed'] >= 20): ?>
+      <div class="meta" style="color:#B32222"><strong>Worth a look.</strong> That is a lot of failed attempts — consider changing the password in <code>_private/admin_pass.txt</code> to a long random passphrase.</div>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
     <?php endif; ?>
     <?php if (!$leads): ?>
       <div class="card empty">No inquiries yet. They will appear here the moment someone submits the contact form or finishes the chat bot.</div>
