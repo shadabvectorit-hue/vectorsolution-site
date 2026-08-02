@@ -882,6 +882,14 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   .trust-strip { grid-template-columns: 1fr; }
 }
 
+/* corporate credentials bar */
+@media (max-width: 900px) {
+  .wrap[style*="repeat(4,1fr)"] { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 520px) {
+  .wrap[style*="repeat(4,1fr)"] { grid-template-columns: 1fr !important; }
+}
+
 /* ---------- chat bot ---------- */
 .bot-panel {
   position: fixed;

@@ -161,7 +161,7 @@ tbody tr:hover{background:var(--paper)}
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
   <a href="../index.html">← Back to vectorsolution.it</a>
   <?php if ($authed): ?><a href="#save" style="background:#25D366;border-color:#25D366">💾 Save my demo data</a><?php endif; ?>
-  <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP demo dekha hai — mujhe apne business ke liye baat karni hai') ?>" target="_blank" rel="noopener">Ye mere business ke liye chahiye →</a>
+  <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like to discuss it for my business.') ?>" target="_blank" rel="noopener">Discuss this for my business →</a>
 </div>
 
 <?php if (!$authed): ?>
@@ -368,22 +368,22 @@ tbody tr:hover{background:var(--paper)}
       <?php endif; ?>
 
       <div class="panel save-panel" id="save">
-        <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF">apne business ke liye</span></h2>
+        <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF">— set up with your own business</span></h2>
         <p class="save-lede">Leave your name and WhatsApp number — we'll set VectorERP up with <b>your own</b> products, parties and opening balances, and send you a private login. Free, no obligation.</p>
         <form class="save-form" id="save-form" action="../contact-submit.php" method="post" autocomplete="on">
           <input type="text" name="website" tabindex="-1" aria-hidden="true" autocomplete="off" style="position:absolute;left:-9999px">
           <input type="hidden" name="source" value="demo-save">
           <input type="hidden" name="service" value="VectorERP — set up with my own data">
           <input type="hidden" name="message" value="Requested &quot;Save my demo data&quot; from the live demo at /demo">
-          <input name="name" placeholder="Aap ka naam / Your name" required aria-label="Your name">
+          <input name="name" placeholder="Your name" required aria-label="Your name">
           <input name="whatsapp" placeholder="WhatsApp — 03xx xxxxxxx" required aria-label="WhatsApp number">
-          <input name="company" placeholder="Business ka naam (optional)" aria-label="Business name">
+          <input name="company" placeholder="Company name (optional)" aria-label="Company name">
           <button type="submit">Save my demo →</button>
         </form>
-        <p class="save-done" id="save-done" hidden>✓ <b>Shukriya!</b> Your details are saved. We'll WhatsApp you a private demo set up with your own data — usually the same day.</p>
+        <p class="save-done" id="save-done" hidden>✓ <b>Thank you.</b> Your details are saved. We'll WhatsApp you a private demo set up with your own data — usually the same day.</p>
         <p class="save-warn" id="save-warn" hidden>Couldn't save just now — please add your name and full WhatsApp number, or message us directly on WhatsApp below.</p>
         <p class="save-alt">Prefer to talk right now?
-          <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP ka demo dekha hai. Mujhe apne business ke liye setup karwana hai.') ?>" target="_blank" rel="noopener">WhatsApp par baat karein →</a>
+          <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like it set up for my business.') ?>" target="_blank" rel="noopener">Message us on WhatsApp →</a>
         </p>
       </div>
 
