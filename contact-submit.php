@@ -66,10 +66,12 @@ foreach (['time', 'source', 'name', 'whatsapp', 'email', 'company', 'service', '
     }
 }
 $body = implode("\n", $bodyLines) . "\n\nView all inquiries: https://vectorsolution.it/inquiries.php";
-$headers = "From: VectorIT Website <noreply@vectorsolution.it>\r\n"
+$headers = "From: VectorIT Website <website@vectorsolution.it>\r\n"
          . ($lead['email'] !== '' ? "Reply-To: {$lead['email']}\r\n" : '');
-foreach (['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'] as $to) {
-    @mail($to, $subject, $body, $headers);
+// website@ is a real cPanel mailbox on this server (read via Webmail);
+// the Gmail copy is the off-server backup.
+foreach (['website@vectorsolution.it', 'shadabvectorit@gmail.com'] as $to) {
+    @mail($to, $subject, $body, $headers, '-f website@vectorsolution.it');
 }
 
 if ($isBot) {
