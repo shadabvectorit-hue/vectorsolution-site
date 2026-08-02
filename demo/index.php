@@ -33,6 +33,53 @@ if ($authed && isset($_GET['pay'])) {
 }
 $paid = $_SESSION['paid'] ?? [];
 
+/* Visitor-created invoices live in the session only — every visitor gets a clean company. */
+$custom      = $_SESSION['custom_invoices'] ?? [];
+$customLines = $_SESSION['custom_lines'] ?? [];
+$allInvoices = array_merge($custom, $DATA['invoices']);
+
+if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '') === 'new_invoice') {
+    $party = trim(mb_substr((string)($_POST['party'] ?? ''), 0, 80));
+    $items = [];
+    $descs = (array)($_POST['idesc'] ?? []);
+    $hss   = (array)($_POST['ihs'] ?? []);
+    $uoms  = (array)($_POST['iuom'] ?? []);
+    $qtys  = (array)($_POST['iqty'] ?? []);
+    $rates = (array)($_POST['irate'] ?? []);
+    foreach ($descs as $k => $d) {
+        $d = trim(mb_substr((string)$d, 0, 90));
+        $qty = min(max((float)($qtys[$k] ?? 0), 0), 9_999_999);
+        $rate = min(max((float)($rates[$k] ?? 0), 0), 99_999_999);
+        if ($d !== '' && $qty > 0 && $rate > 0) {
+            $items[] = [
+                'item' => $d,
+                'hs'   => trim(mb_substr((string)($hss[$k] ?? ''), 0, 12)) ?: '0000.0000',
+                'uom'  => trim(mb_substr((string)($uoms[$k] ?? ''), 0, 16)) ?: 'Unit',
+                'qty'  => $qty,
+                'rate' => $rate,
+            ];
+        }
+    }
+    if ($party === '' || !$items) {
+        header('Location: index.php?p=new_invoice&err=1'); exit;
+    }
+    if (count($custom) >= 10) {
+        header('Location: index.php?p=invoices&full=1'); exit;
+    }
+    $excl = 0; foreach ($items as $it) { $excl += $it['qty'] * $it['rate']; }
+    $excl = (int)round($excl);
+    $no = 'INV-' . (2042 + count($custom));
+    $inv = [
+        'no' => $no, 'date' => date('d M Y'), 'party' => $party,
+        'excl' => $excl, 'tax' => (int)round($excl * 0.18), 'status' => 'due',
+        'fbr' => '7000007DI' . substr((string)(int)(microtime(true) * 1000), -13),
+    ];
+    array_unshift($custom, $inv);
+    $_SESSION['custom_invoices'] = $custom;
+    $_SESSION['custom_lines'][$no] = $items;
+    header('Location: index.php?p=invoices&created=' . urlencode($no)); exit;
+}
+
 $p = $_GET['p'] ?? 'dashboard';
 $e = static fn($v): string => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 $rs = static fn($n): string => 'Rs ' . number_format((float)$n);
@@ -116,9 +163,9 @@ if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
     if ($p === 'print_invoice') {
         $no = (string)($_GET['no'] ?? 'INV-2041');
         $inv = null;
-        foreach ($DATA['invoices'] as $i) { if ($i['no'] === $no) { $inv = $i; break; } }
+        foreach ($allInvoices as $i) { if ($i['no'] === $no) { $inv = $i; break; } }
         if (!$inv) { $inv = $DATA['invoices'][0]; $no = $inv['no']; }
-        $lines = $DATA['invoice_lines'][$no] ?? [
+        $lines = $customLines[$no] ?? $DATA['invoice_lines'][$no] ?? [
             ['item' => 'Goods as per delivery challan ' . str_replace('INV', 'DC', $no), 'hs' => '5208.1100', 'uom' => 'Lot', 'qty' => 1, 'rate' => $inv['excl']],
         ];
         $subtotal = 0; foreach ($lines as $l) { $subtotal += $l['qty'] * $l['rate']; }
@@ -197,14 +244,14 @@ if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
       <table>
         <thead><tr><th style="width:12%">Date</th><th style="width:13%">Invoice</th><th>Customer</th><th class="num" style="width:14%">Excl. Tax</th><th class="num" style="width:13%">Tax 18%</th><th class="num" style="width:15%">Total (PKR)</th></tr></thead>
         <tbody>
-          <?php foreach ($DATA['invoices'] as $iv): $tExcl += $iv['excl']; $tTax += $iv['tax']; ?>
+          <?php foreach ($allInvoices as $iv): $tExcl += $iv['excl']; $tTax += $iv['tax']; ?>
           <tr><td><?= $e($iv['date']) ?></td><td><b><?= $e($iv['no']) ?></b></td><td><?= $e($iv['party']) ?></td>
               <td class="num"><?= number_format($iv['excl']) ?></td><td class="num"><?= number_format($iv['tax']) ?></td>
               <td class="num"><?= number_format($iv['excl'] + $iv['tax']) ?></td></tr>
           <?php endforeach; ?>
         </tbody>
         <tfoot>
-          <tr class="grand"><td colspan="3">TOTAL — <?= count($DATA['invoices']) ?> INVOICES</td>
+          <tr class="grand"><td colspan="3">TOTAL — <?= count($allInvoices) ?> INVOICES</td>
               <td class="num"><?= number_format($tExcl) ?></td><td class="num"><?= number_format($tTax) ?></td>
               <td class="num"><?= number_format($tExcl + $tTax) ?></td></tr>
         </tfoot>
@@ -372,7 +419,7 @@ tbody tr:hover{background:var(--paper)}
     <main class="main">
       <div class="head">
         <div>
-          <h1><?= $e($NAV[$p][0] ?? 'Dashboard') ?></h1>
+          <h1><?= $e($p === 'new_invoice' ? 'New Invoice' : ($NAV[$p][0] ?? 'Dashboard')) ?></h1>
           <p class="co"><?= $e($DATA['company']['name']) ?> · STRN <?= $e($DATA['company']['strn']) ?> · FY <?= $e($DATA['company']['fy']) ?></p>
         </div>
         <div class="user"><span class="av">DM</span> Demo User · Administrator</div>
@@ -380,6 +427,12 @@ tbody tr:hover{background:var(--paper)}
 
       <?php if (isset($_GET['done'])): ?>
         <div class="toast">✓ <?= $e((string)$_GET['done']) ?> marked as paid — the ledger and receivables updated instantly. (Demo only: this resets when you sign out.)</div>
+      <?php endif; ?>
+      <?php if (isset($_GET['created'])): ?>
+        <div class="toast">✓ Invoice <?= $e((string)$_GET['created']) ?> created with its FBR number — now click <b>PDF</b> on it to see the printed sales tax invoice. (Your session only: it resets when you sign out.)</div>
+      <?php endif; ?>
+      <?php if (isset($_GET['full'])): ?>
+        <div class="toast" style="background:#FFF0D9;border-color:#F2CE8E;color:#925E10">The demo allows up to 10 invoices per session — sign out and back in for a fresh company.</div>
       <?php endif; ?>
 
       <?php if ($p === 'dashboard'): ?>
@@ -393,7 +446,7 @@ tbody tr:hover{background:var(--paper)}
           <table>
             <thead><tr><th>Invoice</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr></thead>
             <tbody>
-            <?php foreach (array_slice($DATA['invoices'], 0, 4) as $inv):
+            <?php foreach (array_slice($allInvoices, 0, 4) as $inv):
               $st = isset($paid[$inv['no']]) ? 'paid' : $inv['status']; ?>
               <tr>
                 <td><a href="?p=invoices" style="color:var(--blue);font-weight:600"><?= $e($inv['no']) ?></a></td>
@@ -419,11 +472,15 @@ tbody tr:hover{background:var(--paper)}
 
       <?php elseif ($p === 'invoices'): ?>
         <div class="panel">
-          <h2>Sales tax invoices <span>every invoice registered with FBR</span></h2>
+          <h2>Sales tax invoices
+            <span style="display:inline-flex;gap:10px;align-items:center">every invoice registered with FBR
+              <a class="btn-sm" style="background:var(--signal);padding:7px 16px;font-size:.82rem" href="?p=new_invoice">+ New Invoice</a>
+            </span>
+          </h2>
           <table>
             <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Sales tax 18%</th><th class="num">Total</th><th>Status</th><th></th><th></th></tr></thead>
             <tbody>
-            <?php foreach ($DATA['invoices'] as $inv):
+            <?php foreach ($allInvoices as $inv):
               $st = isset($paid[$inv['no']]) ? 'paid' : $inv['status']; ?>
               <tr>
                 <td><b><?= $e($inv['no']) ?></b></td>
@@ -464,6 +521,84 @@ tbody tr:hover{background:var(--paper)}
             </div>
           </div>
         </div>
+
+      <?php elseif ($p === 'new_invoice'): ?>
+        <?php if (isset($_GET['err'])): ?>
+          <div class="toast" style="background:#FDE3E3;border-color:#F0A9A9;color:#B32222">Please give a customer name and at least one line with description, quantity and rate.</div>
+        <?php endif; ?>
+        <form class="panel" method="post" action="?p=new_invoice" id="niForm">
+          <h2>Create a sales tax invoice <span>FBR number assigned on save</span></h2>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:16px">
+            <div>
+              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Customer</label>
+              <input name="party" list="ni-parties" required placeholder="Type or pick a customer"
+                     style="width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;background:#fff">
+              <datalist id="ni-parties">
+                <?php foreach (array_unique(array_column($allInvoices, 'party')) as $pt): ?><option value="<?= $e($pt) ?>"><?php endforeach; ?>
+              </datalist>
+            </div>
+            <div>
+              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Date</label>
+              <input value="<?= $e(date('d M Y')) ?>" disabled style="width:100%;padding:10px 14px;border:1.5px solid var(--line-soft);border-radius:9px;background:var(--paper);color:var(--muted)">
+            </div>
+            <div>
+              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Invoice No.</label>
+              <input value="INV-<?= 2042 + count($custom) ?> (auto)" disabled style="width:100%;padding:10px 14px;border:1.5px solid var(--line-soft);border-radius:9px;background:var(--paper);color:var(--muted)">
+            </div>
+          </div>
+          <table id="niTable">
+            <thead><tr><th style="width:34%">Description</th><th style="width:13%">HS code</th><th style="width:11%">UoM</th><th class="num" style="width:11%">Qty</th><th class="num" style="width:14%">Rate (Rs)</th><th class="num" style="width:17%">Line total</th></tr></thead>
+            <tbody>
+              <?php for ($r = 0; $r < 3; $r++): ?>
+              <tr>
+                <td><input name="idesc[]" placeholder="e.g. Cotton fabric — 40s count" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px"></td>
+                <td><input name="ihs[]" placeholder="5208.1100" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:.8rem"></td>
+                <td><input name="iuom[]" placeholder="Than" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px"></td>
+                <td><input name="iqty[]" type="number" min="0" step="any" placeholder="0" class="ni-qty" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;text-align:right"></td>
+                <td><input name="irate[]" type="number" min="0" step="any" placeholder="0" class="ni-rate" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;text-align:right"></td>
+                <td class="num ni-line" style="font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
+              </tr>
+              <?php endfor; ?>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="5" class="num" style="color:var(--muted);border-bottom:0">Value excluding sales tax</td><td class="num" id="niSub" style="border-bottom:0">Rs 0</td></tr>
+              <tr><td colspan="5" class="num" style="color:var(--muted);border-bottom:0">Sales tax @ 18%</td><td class="num" id="niTax" style="border-bottom:0">Rs 0</td></tr>
+              <tr><td colspan="5" class="num" style="border-bottom:0"><b>Total payable</b></td><td class="num" id="niTot" style="border-bottom:0"><b>Rs 0</b></td></tr>
+            </tfoot>
+          </table>
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+            <button type="button" class="btn-sm" style="background:var(--paper);color:var(--ink);border:1px solid var(--line)" id="niAdd">+ Add line</button>
+            <button type="submit" class="btn-sm" style="background:var(--signal);padding:8px 22px;font-size:.86rem">Save invoice &amp; assign FBR number</button>
+            <a class="btn-sm" style="background:var(--paper);color:var(--muted);border:1px solid var(--line)" href="?p=invoices">Cancel</a>
+          </div>
+          <p class="note">Fill any lines you like — totals and tax calculate as you type. On save the invoice appears in your list with its FBR number, ready to print as PDF.</p>
+        </form>
+        <script>
+        (function () {
+          var tbody = document.querySelector('#niTable tbody');
+          function fmt(n) { return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
+          function recalc() {
+            var sub = 0;
+            tbody.querySelectorAll('tr').forEach(function (tr) {
+              var q = parseFloat(tr.querySelector('.ni-qty').value) || 0;
+              var r = parseFloat(tr.querySelector('.ni-rate').value) || 0;
+              var line = q * r;
+              tr.querySelector('.ni-line').textContent = line > 0 ? fmt(line) : '—';
+              sub += line;
+            });
+            document.getElementById('niSub').textContent = fmt(sub);
+            document.getElementById('niTax').textContent = fmt(sub * 0.18);
+            document.getElementById('niTot').innerHTML = '<b>' + fmt(sub * 1.18) + '</b>';
+          }
+          tbody.addEventListener('input', recalc);
+          document.getElementById('niAdd').addEventListener('click', function () {
+            var row = tbody.querySelector('tr').cloneNode(true);
+            row.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+            row.querySelector('.ni-line').textContent = '—';
+            tbody.appendChild(row);
+          });
+        })();
+        </script>
 
       <?php elseif ($p === 'inventory'): ?>
         <div class="panel">
