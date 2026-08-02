@@ -60,38 +60,96 @@
     <section class="section" style="padding-top: 24px">
       <div class="wrap case-grid">
 
-        <!-- ============ GENCOM ============ -->
+        <!-- ============ GENCOM PORTAL ERP ============ -->
         <article class="case-card reveal" id="gencom">
           <div class="case-copy">
-            <p class="fig">Industrial — Oil &amp; Gas Services <span class="fig-dim">— Karachi · Dubai</span></p>
-            <h2>100+ compressor service histories, one searchable system</h2>
-            <p><strong style="color:var(--ink)">GenCom Compression Services</strong> — an ISO 9001:2015 gas-compression services firm serving OGDC, PPL, Engro and Fauji Fertilizer across five countries from Karachi and Dubai — ran two decades of field operations on paper job cards and Excel.</p>
-            <p>We built their digital operations backbone: per-compressor service history down to serial level, field job cards engineers fill on a phone, ISO-compliant service documentation, and multi-currency parts quoting for Pakistan and Gulf operations — plus their corporate web presence.</p>
+            <p class="fig">Flagship — Dual-entity ERP <span class="fig-dim">— Karachi · Dubai</span></p>
+            <h2>A complete ERP for a two-country oil &amp; gas business — built from scratch</h2>
+            <p><strong style="color:var(--ink)">GenCom Compression Services</strong> runs gas-compression packages for OGDC, PPL, Engro, Fauji Fertilizer and Mari Energies, operating as an ISO 9001:2015 company in <strong style="color:var(--ink)">Karachi</strong> and as an FZCO in <strong style="color:var(--ink)">Dubai</strong>. Both entities ran on Excel workbooks.</p>
+            <p>We built the <strong style="color:var(--ink)">GenCom Work Portal</strong>: an ERP covering the entire business in six workspaces — Sales &amp; Distribution, Field Services, Finance &amp; Accounts, HR &amp; Payroll, an AI Workbench, and Settings — with strict separation between the Pakistani and Dubai entities, each on its own chart of accounts, tax regime and fiscal calendar.</p>
+            <p>It is not a set of forms over a database. The full export document chain runs inside it (Quotation → Proforma → Commercial Invoice → Packing List → Delivery Note), driven by <strong style="color:var(--ink)">six Incoterm-aware workflows of 14–21 stages</strong> each; a real double-entry general ledger sits underneath with eleven voucher types, trial balance, P&amp;L and balance sheet; and multi-authority tax handling covers SRB, PRA, KPRA, federal GST and zero-rated foreign remittance — printing the formal nine-column tax invoice Pakistani law requires so buyers can claim input tax.</p>
             <div class="case-stats">
-              <div class="case-stat"><b>100+</b><span>Units tracked</span></div>
-              <div class="case-stat"><b>5</b><span>Countries served</span></div>
-              <div class="case-stat"><b>ISO</b><span>9001 doc control</span></div>
-              <div class="case-stat"><b>24/7</b><span>Field ops support</span></div>
+              <div class="case-stat"><b>2</b><span>Legal entities</span></div>
+              <div class="case-stat"><b>6</b><span>Workspaces</span></div>
+              <div class="case-stat"><b>~120</b><span>GL accounts</span></div>
+              <div class="case-stat"><b>4</b><span>Tax authorities</span></div>
             </div>
           </div>
           <div class="case-visual" aria-hidden="true">
             <div class="browser">
-              <div class="browser-top"><i></i><i></i><i></i><span class="browser-url"><b>🔒</b> portal.gencom — service history</span></div>
-              <div style="padding:12px;background:#F7F9FC">
+              <div class="browser-top"><i></i><i></i><i></i><span class="browser-url"><b>🔒</b> GenCom Work Portal — Finance &amp; Accounts</span></div>
+              <div class="app" style="min-height:auto">
+                <div class="app-side" style="padding:10px 0">
+                  <span class="app-logo" style="font-size:11px">GenCom Portal</span>
+                  <span class="side-item">Sales &amp; Distribution</span>
+                  <span class="side-item">Field Services</span>
+                  <span class="side-item active">Finance &amp; Accounts</span>
+                  <span class="side-item">HR &amp; Payroll</span>
+                  <span class="side-item">AI Workbench</span>
+                </div>
+                <div class="app-main" style="padding:12px">
+                  <div class="app-topbar">
+                    <div><div class="t-title" style="font-size:12px">Trial Balance</div><div class="t-sub">FY JUL–JUN · PAKISTAN ENTITY</div></div>
+                    <div class="app-user"><span class="pill paid">Balanced</span></div>
+                  </div>
+                  <div class="panel">
+                    <table class="mini-table">
+                      <thead><tr><th>Code</th><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+                      <tbody>
+                        <tr><td>1110</td><td>Bank — Faysal</td><td class="num">✦✦✦</td><td class="num">—</td></tr>
+                        <tr><td>1120</td><td>Accounts Receivable</td><td class="num">✦✦✦</td><td class="num">—</td></tr>
+                        <tr><td>2110</td><td>SRB Sales Tax Payable</td><td class="num">—</td><td class="num">✦✦✦</td></tr>
+                        <tr><td>4120</td><td>Technical Service Revenue</td><td class="num">—</td><td class="num">✦✦✦</td></tr>
+                        <tr><td>5101</td><td>Field Salaries (COGS)</td><td class="num">✦✦✦</td><td class="num">—</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="panel">
+                    <div class="p-title">Entity <span>Pakistan · FZCO</span></div>
+                    <div style="font-size:10px;color:var(--muted);line-height:1.7">Separate COA, tax regime and fiscal year per entity · figures withheld for client confidentiality</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ============ GENCOM — DEPTH ============ -->
+        <article class="case-card flip reveal" id="gencom-detail">
+          <div class="case-copy">
+            <p class="fig">Inside the build <span class="fig-dim">— what it actually took</span></p>
+            <h2>The parts that make it a real system, not a demo</h2>
+            <p>Accounting software is easy to fake and hard to finish. These are the pieces that decide whether a business can actually close its books on it:</p>
+            <ul class="f-points" style="margin-top:18px">
+              <li><strong style="color:var(--ink)">Two fiscal calendars</strong> — Pakistan's July–June year and the Dubai entity's calendar year, with document numbering that rolls on the tax year automatically</li>
+              <li><strong style="color:var(--ink)">Money in local terms</strong> — amounts written in lakh and crore for PKR documents, international notation for USD</li>
+              <li><strong style="color:var(--ink)">Field Cashier mobile app</strong> — outdoor staff photograph a receipt on site; it is read automatically, then an accountant approves it and the expense posts to the ledger against that person's cash float</li>
+              <li><strong style="color:var(--ink)">Long-term contract billing</strong> — signed rate annexures stored per contract, so a release order is invoiced by picking agreed rates instead of retyping prices</li>
+              <li><strong style="color:var(--ink)">Shipment tracking</strong> — one click to the live tracking page across eighteen airlines, couriers and shipping lines</li>
+              <li><strong style="color:var(--ink)">Auditor-ready printing</strong> — every statement prints to A4 with the correct letterhead for whichever entity issued it</li>
+            </ul>
+            <p style="margin-top:20px">A full year of historical accounting was migrated out of spreadsheets and reconciled until the trial balance agreed to the rupee.</p>
+          </div>
+          <div class="case-visual" aria-hidden="true">
+            <div class="browser">
+              <div class="browser-top"><i></i><i></i><i></i><span class="browser-url"><b>🔒</b> Field Cashier — receipt submitted</span></div>
+              <div style="padding:14px;background:#F7F9FC">
                 <div class="panel">
-                  <div class="p-title">Compressor JGK/4 — S/N AR-88214 <span>Mari Field</span></div>
+                  <div class="p-title">Imprest expense <span>awaiting approval</span></div>
                   <table class="mini-table">
-                    <thead><tr><th>Job</th><th>Type</th><th>Engineer</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Holder</th><th>Category</th><th class="num">Amount</th><th>Status</th></tr></thead>
                     <tbody>
-                      <tr><td>JC-1182</td><td>Vibration analysis</td><td>Imran K.</td><td><span class="pill paid">Closed</span></td></tr>
-                      <tr><td>JC-1178</td><td>Top-end overhaul</td><td>Salman R.</td><td><span class="pill paid">Closed</span></td></tr>
-                      <tr><td>JC-1191</td><td>PM — 8,000 hrs</td><td>Imran K.</td><td><span class="pill due">Scheduled</span></td></tr>
+                      <tr><td>Field engineer</td><td>Site travel</td><td class="num">Rs 8,400</td><td><span class="pill due">Submitted</span></td></tr>
+                      <tr><td>Field engineer</td><td>Consumables</td><td class="num">Rs 3,150</td><td><span class="pill paid">Posted</span></td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="panel">
-                  <div class="p-title">Parts quotation <span>PKR / USD / AED</span></div>
-                  <div style="font-size:10.5px;color:var(--muted);line-height:1.8">QT-0451 — Ariel gasket kit + valves · <b style="color:var(--blue)">USD 4,180</b> · awaiting client PO</div>
+                  <div class="p-title">On approval <span>posts to GL</span></div>
+                  <div style="font-size:10.5px;color:var(--muted);line-height:1.9">
+                    Dr &nbsp;Site Travel Expense<br>
+                    Cr &nbsp;Employee Imprest Float
+                  </div>
                 </div>
               </div>
             </div>
