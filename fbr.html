@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FBR Digital Invoicing Integration — VectorIT | Sales Tax e-Invoicing Pakistan</title>
+  <meta name="description" content="Get your business integrated with FBR digital invoicing. VectorIT connects your ERP, POS, or custom software to FBR's e-invoicing system — or gives you VectorERP with FBR built in. Sandbox to go-live, handled.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://vectorsolution.it/fbr.html">
+  <meta property="og:title" content="FBR Digital Invoicing — integrated for you">
+  <meta property="og:description" content="We connect your ERP, POS, or custom software to FBR's digital invoicing system. Sandbox to go-live, handled.">
+  <meta property="og:url" content="https://vectorsolution.it/fbr.html">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/product.css">
+  <style>
+    .steps-rail { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; background: var(--card); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .rail-step { padding: 30px 22px 34px; border-right: 1px solid var(--line-soft); }
+    .rail-step:last-child { border-right: none; }
+    .rail-step .r-num { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; color: var(--signal); display: block; margin-bottom: 12px; }
+    .rail-step h3 { font-size: 1.02rem; margin-bottom: 8px; }
+    .rail-step p { color: var(--muted); font-size: .88rem; line-height: 1.55; }
+    .offer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .deadline-scroll { overflow-x: auto; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); }
+    .deadline-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    .deadline-table th { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); text-align: left; padding: 14px 18px; border-bottom: 1.5px solid var(--line); }
+    .deadline-table td { padding: 15px 18px; border-bottom: 1px solid var(--line-soft); font-size: .94rem; }
+    .deadline-table tr:last-child td { border-bottom: none; }
+    .urgent-band { background: linear-gradient(155deg, #3A1206, #4A1A08); border-radius: calc(var(--radius) + 8px); color: #FCEDE6; padding: clamp(36px, 5vw, 56px); box-shadow: var(--shadow-lg); display: grid; grid-template-columns: 1.4fr 1fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+    .urgent-band h2 { color: #fff; margin-bottom: 12px; }
+    .urgent-band p { color: rgba(252, 237, 230, .8); }
+    .urgent-band .u-side { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-sm); padding: 22px 24px; font-size: .92rem; }
+    .urgent-band .u-side b { display: block; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #FFB59A; margin-bottom: 10px; }
+    .urgent-band .u-side ul { list-style: none; display: grid; gap: 8px; color: rgba(252, 237, 230, .85); }
+    .urgent-band .u-side li { display: flex; gap: 9px; }
+    .urgent-band .u-side li::before { content: "▸"; color: #FF8A5C; }
+    @media (max-width: 1020px) { .steps-rail { grid-template-columns: 1fr 1fr; } .rail-step { border-bottom: 1px solid var(--line-soft); } .offer-grid { grid-template-columns: 1fr; } .urgent-band { grid-template-columns: 1fr; } }
+    @media (max-width: 560px) { .steps-rail { grid-template-columns: 1fr; } .rail-step { border-right: none; } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap nav-bar">
+      <a class="brand" href="index.html" aria-label="VectorIT home">
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 32 v-16 h16" stroke="#2E5BDB" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+          <path d="M108 88 v16 h-16" stroke="#2E5BDB" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="30" cy="34" r="8" fill="#2E5BDB"/>
+          <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB" stroke="#2E5BDB" stroke-width="6" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-name">Vector<em>ERP</em></span>
+      </a>
+      <nav aria-label="Main">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html#modules">Modules</a></li>
+          <li><a href="fbr.html" aria-current="page">FBR Invoicing</a></li>
+          <li><a href="index.html#pricing">Pricing</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li class="nav-cta"><a class="btn btn-primary btn-sm" href="contact.html">Get FBR-ready</a></li>
+        </ul>
+      </nav>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="p-hero">
+      <div class="wrap p-hero-grid">
+        <div>
+          <p class="hero-eyebrow"><span class="dot"></span> FBR Digital Invoicing · Integration Service</p>
+          <h1>FBR e-invoicing deadlines have passed. <span style="color:var(--blue)">We get you compliant — fast.</span></h1>
+          <p class="lede">Every sales-tax registered business in Pakistan is now required to issue invoices through FBR's digital invoicing system — the last phase ended 31 December 2025, and enforcement started in 2026. We connect your existing ERP, POS, or custom software to FBR, or hand you VectorERP with it built in. Sandbox to go-live, handled by us.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="contact.html">Get FBR-ready
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="https://wa.me/15123555462" target="_blank" rel="noopener">WhatsApp us</a>
+          </div>
+        </div>
+        <div class="mock-wrap reveal">
+          <div class="float-card fc-1">
+            <div class="f-label">FBR response</div>
+            <div class="f-val" style="color:#178A50">✓ Invoice registered</div>
+          </div>
+          <div class="doc" role="img" aria-label="FBR-registered sales tax invoice sample">
+            <div class="doc-head">
+              <div>
+                <div class="d-brand">
+                  <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/></svg>
+                  Indus Foods (Pvt) Ltd
+                </div>
+                <div style="font-size:9px;color:var(--muted);margin-top:4px">STRN 17-00-2251-889-64 · NTN 4471820-6</div>
+                <span class="fbr-chip">FBR INVOICE NO. ASSIGNED</span>
+              </div>
+              <div class="doc-meta">
+                <b>SALES TAX INVOICE</b><br>
+                INV-0871 · 02 AUG 2026<br>
+                FBR NO. 7000007DI17540…
+              </div>
+            </div>
+            <table class="doc-table">
+              <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr></thead>
+              <tbody>
+                <tr><td>Cooking oil 5L (carton)</td><td class="num">80</td><td class="num">6,400</td><td class="num">5,12,000</td></tr>
+                <tr><td>Flour 10kg (bag)</td><td class="num">150</td><td class="num">1,120</td><td class="num">1,68,000</td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div class="doc-qr" aria-hidden="true"></div>
+              <div>
+                <div class="doc-total"><span style="color:var(--muted)">Subtotal</span><span class="num">Rs 6,80,000</span></div>
+                <div class="doc-total"><span style="color:var(--muted)">Sales tax (18%)</span><span class="num">Rs 1,22,400</span></div>
+                <div class="doc-total dt-final"><span>Total</span><span>Rs 8,02,400</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ URGENCY / WHO MUST COMPLY ============ -->
+    <section class="section" id="comply">
+      <div class="wrap">
+        <div class="urgent-band reveal">
+          <div>
+            <p class="fig" style="color:#FF8A5C"><span style="color:#FF8A5C">Enforcement has started</span> <span class="fig-dim" style="color:rgba(252,237,230,.5)">— this is not optional</span></p>
+            <h2>Integration is mandatory for every sales tax registered person</h2>
+            <p>Under SRO 69(I)/2025 (Chapter XIV, Sales Tax Rules) all registered persons — corporate and non-corporate — had to integrate in phases ending <strong style="color:#fff">31 December 2025</strong> (SRO 1852(I)/2025). No blanket extension came in 2026. Instead: penalty proceedings from January 2026, and Finance Act 2026 powers to fine, blacklist, and seal non-integrated businesses from July 2026.</p>
+            <p style="margin-top:12px">The silver lining: <strong style="color:#7ED9A0">Section 64D gives you a 10% tax credit</strong> on what you spend integrating — hardware and software included.</p>
+          </div>
+          <div class="u-side">
+            <b>Cost of staying out</b>
+            <ul>
+              <li>Penalties up to Rs 10 lakh — Rs 50 lakh for repeat violations</li>
+              <li>De-registration, blacklisting, even sealing of the business</li>
+              <li>Your invoices lose validity — buyers can't claim input tax and stop buying from you</li>
+              <li>Importers: registration suspension and loss of green channel</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMPLIANCE TIMELINE ============ -->
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="fig">Who &amp; when <span class="fig-dim">— SRO 1852(I)/2025 schedule</span></p>
+          <h2>Every phase has already passed</h2>
+          <p class="lede">If your business falls in any row below and isn't integrated yet, you're not early — you're exposed.</p>
+        </div>
+        <div class="deadline-scroll reveal">
+          <table class="deadline-table">
+            <thead><tr><th>Category</th><th>E-invoicing mandatory from</th><th>Status — Aug 2026</th></tr></thead>
+            <tbody>
+              <tr><td>Public companies, importers, turnover above Rs 1 billion</td><td>1 November 2025</td><td style="color:#D93636;font-weight:600">Passed — enforcement active</td></tr>
+              <tr><td>Individuals &amp; AOPs with turnover above Rs 100 million</td><td>1 November 2025</td><td style="color:#D93636;font-weight:600">Passed — enforcement active</td></tr>
+              <tr><td>Companies with turnover Rs 100 million – 1 billion</td><td>15 November 2025</td><td style="color:#D93636;font-weight:600">Passed — enforcement active</td></tr>
+              <tr><td>Companies up to Rs 100 million turnover</td><td>1 December 2025</td><td style="color:#D93636;font-weight:600">Passed — enforcement active</td></tr>
+              <tr><td>All other sales tax registered persons</td><td>31 December 2025</td><td style="color:#D93636;font-weight:600">Passed — enforcement active</td></tr>
+              <tr><td>Service businesses (restaurants, hotels, medical, education)</td><td>Draft SRO 288(I)/2026 — coming</td><td style="color:#925E10;font-weight:600">Get ahead of it</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="reveal" style="margin-top:14px;font-size:.85rem;color:var(--muted)">Tier-1 retailers additionally remain under the separate POS integration regime. Category unclear? Send us your STRN — we'll tell you exactly where you stand, free.</p>
+      </div>
+    </section>
+
+    <!-- ============ WHAT WE DO ============ -->
+    <section class="section section-alt" id="offer">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="fig">What we do <span class="fig-dim">— three ways in</span></p>
+          <h2>Whatever software you run, we get it talking to FBR</h2>
+        </div>
+        <div class="offer-grid">
+          <article class="card reveal">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></div>
+            <h3>VectorERP — FBR built in</h3>
+            <p>The fastest route: our ERP issues FBR-registered invoices out of the box. Every invoice gets its FBR number and QR code automatically — your counter staff won't even notice the integration exists.</p>
+            <div class="card-tags"><span class="tag">Fastest</span><span class="tag">Included in Karobar plan</span></div>
+          </article>
+          <article class="card reveal reveal-delay-1">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg></div>
+            <h3>Connect your existing software</h3>
+            <p>Already running Odoo, ERPNext, QuickBooks, a POS, or custom software? We build the bridge: your system keeps working exactly as it does — invoices just start registering with FBR in real time.</p>
+            <div class="card-tags"><span class="tag">Any ERP / POS</span><span class="tag">Custom software too</span></div>
+          </article>
+          <article class="card reveal reveal-delay-2">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4.5"/></svg></div>
+            <h3>Compliance care, ongoing</h3>
+            <p>FBR specs change; rejected invoices happen at 6pm on the 25th. We monitor your integration, fix rejections, and keep you compliant as the rules evolve — on a support retainer with real response times.</p>
+            <div class="card-tags"><span class="tag">Monitoring</span><span class="tag">WhatsApp support</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROCEDURE ============ -->
+    <section class="section" id="procedure">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="fig">The procedure <span class="fig-dim">— what actually happens</span></p>
+          <h2>From registered person to registered invoices, in five steps</h2>
+          <p class="lede">This is the official FBR onboarding path. You sign in twice and approve things; we do everything in between.</p>
+        </div>
+        <div class="steps-rail reveal">
+          <div class="rail-step">
+            <span class="r-num">STEP 1 · IRIS</span>
+            <h3>Enrollment</h3>
+            <p>Your business enrolls for Digital Invoicing on FBR's IRIS portal, selects PRAL as licensed integrator (free by law), and registers us as your system provider. Server IPs whitelisted.</p>
+          </div>
+          <div class="rail-step">
+            <span class="r-num">STEP 2 · MAPPING</span>
+            <h3>Data mapping</h3>
+            <p>Your items get HS codes, units of measure, tax rate IDs, and FBR scenario IDs mapped the way the validator expects — the step most DIY attempts fail.</p>
+          </div>
+          <div class="rail-step">
+            <span class="r-num">STEP 3 · SANDBOX</span>
+            <h3>Scenario testing</h3>
+            <p>FBR requires passing scenario-based tests in the sandbox before production access. We run your real invoice types until every scenario clears.</p>
+          </div>
+          <div class="rail-step">
+            <span class="r-num">STEP 4 · TOKEN</span>
+            <h3>Production access</h3>
+            <p>Sandbox cleared, your 5-year production security token is issued and the integration goes live.</p>
+          </div>
+          <div class="rail-step">
+            <span class="r-num">STEP 5 · LIVE</span>
+            <h3>Go-live + watch</h3>
+            <p>Every invoice now carries its FBR invoice number and QR code. We monitor rejections, handle the 72-hour correction window, and train your team.</p>
+          </div>
+        </div>
+        <p class="reveal" style="margin-top:18px;font-size:.88rem;color:var(--muted)">Regulatory basis: SRO 69(I)/2025 (Sales Tax Rules, Chapter XIV), SRO 1852(I)/2025, STGO 01 of 2026, PRAL DI API v1.12. Integration runs through PRAL as licensed integrator of record — free of government charges — with VectorIT as your software provider and technical contact.</p>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head reveal" style="text-align:center">
+          <p class="fig" style="justify-content:center">FAQ <span class="fig-dim">— FBR integration</span></p>
+          <h2 style="margin-inline:auto">What businesses ask us about FBR</h2>
+        </div>
+        <div class="faq reveal">
+          <details>
+            <summary>Is this the same as the old POS integration for retailers?</summary>
+            <p class="faq-a">No — the Tier-1 retailer POS regime came first and still applies to large retailers. Digital invoicing under SRO 69(I)/2025 is broader: it covers sales-tax-registered businesses generally, B2B invoices included. Many businesses now need both. We handle either.</p>
+          </details>
+          <details>
+            <summary>Do we have to buy new software?</summary>
+            <p class="faq-a">No. If your current ERP or POS works for you, we integrate it directly with FBR. Replacing software is only worth it if the current system is already failing you — we'll tell you honestly which case you're in.</p>
+          </details>
+          <details>
+            <summary>What happens when FBR's system is down or an invoice is rejected?</summary>
+            <p class="faq-a">The integration queues invoices and retries automatically — the rules allow offline-issued invoices as long as they're uploaded within 24 hours of restoration, and our queue handles that window for you. Rejections come to us with the reason decoded (usually an HS code or unit-of-measure mapping issue we fix once). Corrections after issuance are only allowed within 72 hours under STGO 01/2026 — past that needs Commissioner approval — so our monitoring catches problems inside the window. Your counter never stops billing.</p>
+          </details>
+          <details>
+            <summary>Are you an FBR licensed integrator? Will we pay per-invoice fees?</summary>
+            <p class="faq-a">We're your software provider and technical team — the integration itself runs through PRAL, FBR's own licensed integrator, which is free of charge by law. That means no per-invoice fees on the government side (commercial licensed integrators may charge up to Rs 10 per invoice — the PRAL route avoids that entirely). Our fee is for the engineering: connecting your software, passing sandbox testing, and supporting you after go-live — fixed, quoted in writing.</p>
+          </details>
+          <details>
+            <summary>Is there any benefit to offset the cost?</summary>
+            <p class="faq-a">Yes — Section 64D of the Income Tax Ordinance (Finance Act 2026) gives a 10% tax credit on what you spend to integrate, covering hardware, software, and implementation. Keep the invoices we issue you; your tax consultant claims it in the year of installation.</p>
+          </details>
+          <details>
+            <summary>How long does integration take?</summary>
+            <p class="faq-a">A standard ERP/POS integration typically runs 2–4 weeks including sandbox testing. VectorERP customers are FBR-live from day one of go-live.</p>
+          </details>
+          <details>
+            <summary>What does it cost?</summary>
+            <p class="faq-a">Depends on your software and invoice volume — a fixed quote after a 30-minute call, in rupees, in writing. VectorERP Karobar customers get FBR integration included.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-band reveal">
+          <p class="fig">Next step <span class="fig-dim">— before the deadline does it for you</span></p>
+          <h2>Get FBR-compliant this month</h2>
+          <p class="lede">Send us your STRN and what software you bill from. You'll get a straight answer on what integration needs — and a fixed price in writing.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="contact.html">Book a compliance call
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="https://wa.me/15123555462" target="_blank" rel="noopener">WhatsApp us</a>
+          </div>
+        </div>
+        <p style="margin-top:22px;text-align:center;font-size:.8rem;color:var(--faint)">References: SRO 69(I)/2025 · SRO 1852(I)/2025 · STGO 01 of 2026 · Finance Act 2026 · PRAL DI API v1.12. Page updated August 2026. This is general information, not tax advice — confirm your category with your tax consultant.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:30px;height:30px">
+              <circle cx="30" cy="34" r="8" fill="#2E5BDB"/>
+              <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/>
+            </svg>
+            <span class="brand-name">Vector<em>IT</em></span>
+          </a>
+          <p>VectorERP — accounting, inventory, sales, and payroll in one platform. Built for Pakistani business by VectorIT.</p>
+          <p class="footer-coords">AUSTIN, TX · SERVING PAKISTAN NATIONWIDE</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="index.html#modules">Modules</a></li>
+            <li><a href="fbr.html">FBR Invoicing</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="services.html">Implementation services</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="brand/brand-guide.html">Brand</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:shadab@vectorsolution.it">shadab@vectorsolution.it</a></li>
+            <li><a href="tel:+15123555462">+1 (512) 355-5462</a></li>
+            <li><a href="https://wa.me/15123555462" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li><a href="https://maps.google.com/?q=5900+Balcones+Drive+Suite+100+Austin+TX+78731" target="_blank" rel="noopener">5900 Balcones Drive Suite 100,<br>Austin, TX 78731</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> VectorIT · vectorsolution.it</span>
+        <span>VectorERP — software with direction</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

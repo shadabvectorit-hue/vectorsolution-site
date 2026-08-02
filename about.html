@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — VectorIT | Software Studio in Austin, TX</title>
+  <meta name="description" content="VectorIT is a software studio in Austin, Texas, founded by Muhammad Shadab. Custom software, web and mobile development, and IT consulting with fixed scope and real numbers.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://vectorsolution.it/about.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: clamp(40px, 6vw, 80px);
+      align-items: start;
+    }
+    .story-grid p { color: var(--muted); margin-bottom: 18px; font-size: 1.02rem; }
+    .story-grid p strong { color: var(--ink); font-weight: 600; }
+    .definition-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(26px, 4vw, 40px);
+      position: sticky;
+      top: 110px;
+    }
+    .definition-card .def-word {
+      font-family: var(--font-display);
+      font-stretch: 112%;
+      font-weight: 700;
+      font-size: 1.9rem;
+      margin-bottom: 4px;
+    }
+    .definition-card .def-phon {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--blue);
+      margin-bottom: 18px;
+    }
+    .definition-card .def-item {
+      border-top: 1px dashed var(--line);
+      padding-block: 14px;
+      font-size: 0.94rem;
+      color: var(--muted);
+    }
+    .definition-card .def-item b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; font-size: 0.78rem; letter-spacing: .1em; text-transform: uppercase; display:block; margin-bottom: 4px; }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 900px) {
+      .story-grid { grid-template-columns: 1fr; }
+      .definition-card { position: static; }
+      .values-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap nav-bar">
+      <a class="brand" href="index.html" aria-label="VectorIT home">
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 32 v-16 h16" stroke="#2E5BDB" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+          <path d="M108 88 v16 h-16" stroke="#2E5BDB" stroke-opacity=".38" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="30" cy="34" r="8" fill="#2E5BDB"/>
+          <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB" stroke="#2E5BDB" stroke-width="6" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-name">Vector<em>IT</em></span>
+      </a>
+      <nav aria-label="Main">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="about.html" aria-current="page">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li class="nav-cta"><a class="btn btn-primary btn-sm" href="contact.html">Start a project</a></li>
+        </ul>
+      </nav>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="fig">About <span class="fig-dim">— the studio</span></p>
+        <h1>A small studio with a precise way of working</h1>
+        <p class="lede">VectorIT exists because too much custom software ships late, over budget, and owned by the wrong people. We run projects the way engineers wish they were run.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 30px">
+      <div class="wrap story-grid">
+        <div class="reveal">
+          <p><strong>The name is the method.</strong> A vector has two properties: direction and magnitude. Software projects fail when they're missing one — plenty of effort pointed nowhere, or a clear goal with no momentum behind it. Everything about how we work is designed to keep both locked in: fixed scope so the direction can't drift, weekly shipped increments so the magnitude never drops to zero.</p>
+          <p>We're based in <strong>Austin, Texas</strong>, and we deliberately stay small. No account managers between you and the people writing your code. The person who scoped your project is the person building it — and the person answering the phone when something needs attention at 9pm before your launch.</p>
+          <p>Our roots are in operational software — logistics, dispatch, back-office systems where downtime costs real money and "it mostly works" isn't acceptable. That background shapes how we build everything: boring launches, documented handovers, and systems your team can actually run.</p>
+          <div style="margin-top: 30px">
+            <div class="founder-card">
+              <div class="founder-avatar" aria-hidden="true">MS</div>
+              <div>
+                <h3>Muhammad Shadab</h3>
+                <p class="founder-role">Founder &amp; Lead Developer</p>
+                <p>Engineer first, founder second. Muhammad leads every VectorIT engagement personally — from architecture decisions to the final deploy — and answers to clients directly, not through layers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="definition-card reveal" aria-label="Definition of vector">
+          <div class="def-word">vec·tor</div>
+          <div class="def-phon">/ˈvektər/ · noun</div>
+          <div class="def-item"><b>Mathematics</b>A quantity having direction as well as magnitude, determining the position of one point relative to another.</div>
+          <div class="def-item"><b>Engineering</b>The course an object follows; a heading held deliberately.</div>
+          <div class="def-item"><b>VectorIT</b>Software built with a stated destination, a fixed scope, and measurable momentum toward it — every week.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="fig">Fig. 01 <span class="fig-dim">— what we optimize for</span></p>
+          <h2>Three things we refuse to compromise</h2>
+        </div>
+        <div class="values-grid">
+          <article class="card reveal">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+            <h3>Predictability</h3>
+            <p>A date is a promise. Scope is written down, change requests are priced upfront, and you see working software every single week.</p>
+          </article>
+          <article class="card reveal reveal-delay-1">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></div>
+            <h3>Ownership</h3>
+            <p>Your code lives in your repositories, your infrastructure runs in your accounts, and your documentation is written for your next hire.</p>
+          </article>
+          <article class="card reveal reveal-delay-2">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5"/></svg></div>
+            <h3>Durability</h3>
+            <p>We build for the team that maintains it after us — tested, documented, and free of clever tricks that only the author understands.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-band reveal">
+          <p class="fig">Next step</p>
+          <h2>Work with the people who'll actually build it</h2>
+          <p class="lede">One conversation is enough to know if we're the right fit. No pitch deck, no pressure.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="contact.html">Book a conversation
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="tel:+15123555462">+1 (512) 355-5462</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html">
+            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:30px;height:30px">
+              <circle cx="30" cy="34" r="8" fill="#2E5BDB"/>
+              <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/>
+            </svg>
+            <span class="brand-name">Vector<em>IT</em></span>
+          </a>
+          <p>Custom software, web &amp; mobile development, and IT consulting. Software with direction.</p>
+          <p class="footer-coords">30.3606° N, 97.7503° W — AUSTIN, TX</p>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="index.html#work">Work</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html#custom">Custom software</a></li>
+            <li><a href="services.html#web">Web development</a></li>
+            <li><a href="services.html#mobile">Mobile apps</a></li>
+            <li><a href="services.html#cloud">Cloud &amp; DevOps</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:shadab@vectorsolution.it">shadab@vectorsolution.it</a></li>
+            <li><a href="tel:+15123555462">+1 (512) 355-5462</a></li>
+            <li><a href="https://maps.google.com/?q=5900+Balcones+Drive+Suite+100+Austin+TX+78731" target="_blank" rel="noopener">5900 Balcones Drive Suite 100,<br>Austin, TX 78731</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> VectorIT · vectorsolution.it</span>
+        <span>Engineered in Austin, TX</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

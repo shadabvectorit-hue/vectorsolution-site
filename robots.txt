@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /brand/
+
+Sitemap: https://vectorsolution.it/sitemap.xml

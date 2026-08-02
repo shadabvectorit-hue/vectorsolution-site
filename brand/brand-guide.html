@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VectorIT — Brand Guidelines v1.0</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .bg-section { border-top: 1px solid var(--line); padding-block: clamp(48px, 8vh, 80px); }
+    .bg-label { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--signal); margin-bottom: 26px; }
+    .logo-stage {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      padding: 60px; margin-bottom: 18px;
+    }
+    .logo-stage.light { background: #F3F5FA; }
+    .logo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    .swatch { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); }
+    .swatch .chip { height: 90px; }
+    .swatch .meta { padding: 12px 14px; background: var(--card); }
+    .swatch .meta b { display: block; font-size: .85rem; margin-bottom: 2px; }
+    .swatch .meta span { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
+    .type-demo { border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(24px,4vw,44px); background: var(--card); margin-bottom: 18px; }
+    .type-demo .t-label { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px; }
+    .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .rule { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 20px 22px; background: var(--card); }
+    .rule .do { color: #178A50; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; margin-bottom: 8px; }
+    .rule .dont { color: #D93636; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; margin-bottom: 8px; }
+    .rule p { color: var(--muted); font-size: .92rem; }
+    .voice-table { width: 100%; border-collapse: collapse; }
+    .voice-table th, .voice-table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: .95rem; vertical-align: top; }
+    .voice-table th { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .voice-table td:first-child { color: #D93636; }
+    .voice-table td:last-child { color: #178A50; }
+    @media (max-width: 900px) { .swatches { grid-template-columns: repeat(3, 1fr); } .logo-row, .rule-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="fig">Brand Guidelines <span class="fig-dim">— v1.0 · August 2026</span></p>
+        <h1>Vector<span style="color:var(--blue)">IT</span> Brand System</h1>
+        <p class="lede">The complete identity system for VectorIT — logo, color, typography, voice, and usage rules. Internal document for anyone producing VectorIT materials.</p>
+      </div>
+    </section>
+
+    <div class="wrap">
+
+      <section class="bg-section">
+        <p class="bg-label">01 — The Name</p>
+        <h2 style="margin-bottom:18px">Why "VectorIT"</h2>
+        <p class="lede" style="margin-bottom:16px">A vector is a quantity with <strong style="color:var(--ink)">direction and magnitude</strong>. It's the perfect metaphor for what the company sells: software effort that is pointed at a business goal and has real momentum behind it. "IT" grounds it in the industry while doubling as the English word "it" — <em>Vector it.</em> — a quiet imperative to give any problem direction.</p>
+        <p style="color:var(--muted)">Always written as one word, capital V and capital IT: <strong style="color:var(--ink)">VectorIT</strong>. The domain is <span style="font-family:var(--font-mono);color:var(--blue)">vectorsolution.it</span> — the Italian TLD completes the word "it" literally.</p>
+      </section>
+
+      <section class="bg-section">
+        <p class="bg-label">02 — The Mark</p>
+        <h2 style="margin-bottom:18px">A "V" drawn as a literal vector</h2>
+        <p class="lede" style="margin-bottom:30px">The mark is a vector path: it begins at an <strong style="color:var(--ink)">origin point</strong>, dives to a vertex, and exits with an <strong style="color:var(--ink)">arrowhead pointing up and to the right</strong> — the universal direction of growth. Corner ticks frame it like a coordinate plane. The mark should feel like it was lifted from an engineering drawing.</p>
+        <div class="logo-row">
+          <div>
+            <div class="logo-stage">
+              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:140px">
+                <path d="M12 32 v-16 h16" stroke="#2E5BDB" stroke-opacity=".45" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M108 88 v16 h-16" stroke="#2E5BDB" stroke-opacity=".45" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="30" cy="34" r="7.5" fill="#2E5BDB"/>
+                <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB" stroke="#2E5BDB" stroke-width="5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p style="color:var(--muted);font-size:.9rem">Primary mark — light backgrounds (default) · #2E5BDB</p>
+          </div>
+          <div>
+            <div class="logo-stage" style="background:#0F1B33">
+              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:140px">
+                <path d="M12 32 v-16 h16" stroke="#5B8CFF" stroke-opacity=".38" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M108 88 v16 h-16" stroke="#5B8CFF" stroke-opacity=".38" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="30" cy="34" r="7.5" fill="#5B8CFF"/>
+                <path d="M30 34 L60 92 L81.5 50.5" stroke="#5B8CFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#5B8CFF" stroke="#5B8CFF" stroke-width="5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p style="color:var(--muted);font-size:.9rem">Dark-background variant — use #5B8CFF</p>
+          </div>
+        </div>
+        <div class="rule-grid" style="margin-top:18px">
+          <div class="rule"><div class="do">DO</div><p>Keep clear space around the mark equal to the origin dot's diameter × 3. Use the supplied SVGs — never redraw.</p></div>
+          <div class="rule"><div class="dont">DON'T</div><p>Rotate the mark, remove the arrowhead or origin dot, change the stroke weight, or place it on busy photography.</p></div>
+        </div>
+      </section>
+
+      <section class="bg-section">
+        <p class="bg-label">03 — Color</p>
+        <h2 style="margin-bottom:30px">Blueprint palette</h2>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#F7F9FC;border-bottom:1px solid var(--line)"></div><div class="meta"><b>Paper</b><span>#F7F9FC · page ground</span></div></div>
+          <div class="swatch"><div class="chip" style="background:#FFFFFF;border-bottom:1px solid var(--line)"></div><div class="meta"><b>Card</b><span>#FFFFFF · surfaces</span></div></div>
+          <div class="swatch"><div class="chip" style="background:#2E5BDB"></div><div class="meta"><b>Vector Blue</b><span>#2E5BDB · brand accent</span></div></div>
+          <div class="swatch"><div class="chip" style="background:#FF5A2D"></div><div class="meta"><b>Signal Orange</b><span>#FF5A2D · CTAs only</span></div></div>
+          <div class="swatch"><div class="chip" style="background:#0F1B33"></div><div class="meta"><b>Ink</b><span>#0F1B33 · primary text</span></div></div>
+          <div class="swatch"><div class="chip" style="background:#55617D"></div><div class="meta"><b>Graphite</b><span>#55617D · secondary text</span></div></div>
+        </div>
+        <p style="color:var(--muted);font-size:.92rem;margin-top:20px">Ratio rule: ~80% paper/card, ~15% ink text, ~4% Vector Blue, ~1% Signal Orange. Orange is reserved exclusively for the single most important action on a screen — if two things are orange, neither is important. The blue drafting grid sits at 6% opacity: present, never loud.</p>
+      </section>
+
+      <section class="bg-section">
+        <p class="bg-label">04 — Typography</p>
+        <h2 style="margin-bottom:30px">Two voices: engineered &amp; annotated</h2>
+        <div class="type-demo">
+          <div class="t-label">Display — Archivo SemiExpanded Bold</div>
+          <div style="font-family:var(--font-display);font-stretch:112%;font-weight:700;font-size:clamp(1.8rem,4vw,3rem);line-height:1.1">Software with direction.</div>
+        </div>
+        <div class="type-demo">
+          <div class="t-label">Body — Archivo Regular</div>
+          <p style="max-width:60ch">Body text is set in Archivo at normal width, 17px, with relaxed 1.65 line height. It stays quiet so display and annotations can speak.</p>
+        </div>
+        <div class="type-demo">
+          <div class="t-label">Annotation — IBM Plex Mono</div>
+          <p style="font-family:var(--font-mono);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)">FIG. 01 — SECTION LABELS, COORDINATES, METADATA</p>
+        </div>
+        <p style="color:var(--muted);font-size:.92rem">The mono annotation layer is the brand's signature detail — section labels, coordinates, version stamps. Use it for structure, never for paragraphs.</p>
+      </section>
+
+      <section class="bg-section">
+        <p class="bg-label">05 — Voice</p>
+        <h2 style="margin-bottom:30px">Say the number. Name the date.</h2>
+        <table class="voice-table">
+          <thead><tr><th>Not this</th><th>This</th></tr></thead>
+          <tbody>
+            <tr><td>"We leverage cutting-edge synergies to deliver best-in-class solutions."</td><td>"We build custom software. Fixed scope, real numbers, working demo every Friday."</td></tr>
+            <tr><td>"Contact us to learn more!"</td><td>"Tell us where you're headed. Answer within one business day."</td></tr>
+            <tr><td>"World-class innovative digital transformation."</td><td>"Your dispatch team stops re-typing loads into three systems."</td></tr>
+          </tbody>
+        </table>
+        <p style="color:var(--muted);font-size:.92rem;margin-top:20px">VectorIT sounds like a senior engineer who respects your time: concrete, direct, lightly dry. Never salesy, never vague, never exclamation marks.</p>
+      </section>
+
+      <section class="bg-section" style="border-bottom:1px solid var(--line)">
+        <p class="bg-label">06 — Assets</p>
+        <h2 style="margin-bottom:18px">File inventory</h2>
+        <ul style="list-style:none;display:grid;gap:10px;font-family:var(--font-mono);font-size:.85rem;color:var(--muted)">
+          <li>assets/logo-mark.svg — primary mark, light backgrounds</li>
+          <li>assets/logo-mark-dark.svg — variant for dark backgrounds</li>
+          <li>assets/favicon.svg — browser tab / app icon tile</li>
+          <li>css/main.css — full design token system (colors, type, spacing)</li>
+          <li>brand/brand-guide.html — this document</li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

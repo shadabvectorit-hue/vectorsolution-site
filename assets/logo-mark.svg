@@ -1,0 +1,8 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- VectorIT primary mark (light backgrounds) — the V drawn as a literal vector: origin dot, dive to vertex, exit with arrowhead -->
+  <path d="M12 32 v-16 h16" stroke="#2E5BDB" stroke-opacity=".45" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M108 88 v16 h-16" stroke="#2E5BDB" stroke-opacity=".45" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="30" cy="34" r="7.5" fill="#2E5BDB"/>
+  <path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB" stroke="#2E5BDB" stroke-width="5" stroke-linejoin="round"/>
+</svg>
