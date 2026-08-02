@@ -44,6 +44,179 @@ $pk = static function ($n): string {
     return 'Rs ' . number_format($n);
 };
 
+/** Integer → words in Pakistani notation (lakh / crore), e.g. 454300 → "Four Lakh Fifty Four Thousand Three Hundred". */
+function pkWords(int $n): string {
+    $ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+    $tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    $two = static function (int $x) use ($ones, $tens): string {
+        if ($x < 20) return $ones[$x];
+        return trim($tens[intdiv($x, 10)] . ' ' . $ones[$x % 10]);
+    };
+    if ($n === 0) return 'Zero';
+    $parts = [];
+    foreach ([[10000000, 'Crore'], [100000, 'Lakh'], [1000, 'Thousand'], [100, 'Hundred']] as [$div, $label]) {
+        if ($n >= $div) {
+            $q = intdiv($n, $div);
+            $parts[] = ($div === 100 ? $ones[$q] : ($q < 100 ? $two($q) : pkWords($q))) . ' ' . $label;
+            $n %= $div;
+        }
+    }
+    if ($n > 0) $parts[] = $two($n);
+    return implode(' ', $parts);
+}
+
+/* ---------- print-ready documents (open in a new tab, save as PDF from the print dialog) ---------- */
+if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
+    $printCss = '
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:"Segoe UI",Arial,sans-serif;background:#eef2f8;color:#1f2937;padding:22px}
+      .toolbar{max-width:820px;margin:0 auto 14px;display:flex;gap:10px;align-items:center}
+      .toolbar a,.toolbar button{border:0;border-radius:999px;padding:10px 20px;font:600 13px "Segoe UI",sans-serif;cursor:pointer;text-decoration:none}
+      .tb-back{background:#fff;color:#0F1B33;border:1px solid #cbd5e1}
+      .tb-print{background:#2E5BDB;color:#fff}
+      .toolbar span{font-size:12px;color:#55617D}
+      .sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:6px;box-shadow:0 16px 40px rgba(15,33,63,.15);overflow:hidden}
+      .stripe{height:10px;background:linear-gradient(90deg,#0F1B33,#2E5BDB 55%,#5B8CFF)}
+      .pad{padding:26px 30px 28px}
+      .lh{text-align:center;border-bottom:2px solid #0F1B33;padding-bottom:11px;margin-bottom:14px}
+      .lh h1{font-size:22px;letter-spacing:.05em;color:#0F1B33}
+      .lh .sub{font-size:10.5px;color:#475569;margin-top:3px;line-height:1.6}
+      .lh .reg{font-size:10px;color:#0F1B33;margin-top:5px;font-weight:700}
+      .title{text-align:center;margin:12px 0 14px}
+      .title span{display:inline-block;background:#0F1B33;color:#fff;font-size:12px;font-weight:800;letter-spacing:.15em;padding:6px 24px;border-radius:4px}
+      .band-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+      .band{border:1px solid #cbd5e1;border-radius:6px;overflow:hidden}
+      .band h4{background:#f1f5f9;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#0F1B33;padding:5px 10px;border-bottom:1px solid #cbd5e1;font-weight:800}
+      .band .bd{padding:8px 10px;font-size:10.5px;line-height:1.65}
+      .band .kv{display:flex;justify-content:space-between;gap:8px}
+      .band .kv span:first-child{color:#64748b}
+      table{width:100%;border-collapse:collapse;margin-bottom:10px}
+      th{background:#0F1B33;color:#fff;font-size:9px;letter-spacing:.05em;padding:7px 8px;text-align:left;font-weight:700}
+      th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+      td{font-size:10.5px;padding:7px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top}
+      tfoot td{font-weight:700;color:#0F1B33;border-bottom:0}
+      tfoot tr.grand td{border-top:2px solid #0F1B33;font-size:12px;padding-top:9px}
+      .words{border-top:1px solid #0F1B33;border-bottom:1px solid #0F1B33;padding:7px 3px;margin:8px 0 12px;font-size:10.5px;color:#0F1B33}
+      .fbr{display:inline-flex;align-items:center;gap:5px;background:#DCF5E7;color:#14713F;border-radius:999px;padding:3px 10px;font-size:9px;font-weight:800;font-family:Consolas,monospace}
+      .fbr::before{content:"";width:6px;height:6px;border-radius:50%;background:#14713F}
+      .qr{width:64px;height:64px;border-radius:5px;background:repeating-linear-gradient(0deg,#0F1B33 0 3px,transparent 3px 6px),repeating-linear-gradient(90deg,#0F1B33 0 3px,#fff 3px 6px);opacity:.9}
+      .bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+      .bottom .note{font-size:9.5px;color:#64748b;line-height:1.6;max-width:420px}
+      .sign{margin-top:26px;display:flex;justify-content:flex-end}
+      .sign div{width:210px;border-top:1px solid #0F1B33;padding-top:5px;text-align:center;font-size:10px;font-weight:700;color:#0F1B33}
+      .foot{margin-top:14px;border-top:1px solid #e2e8f0;padding-top:8px;text-align:center;font-size:8.5px;color:#94a3b8;line-height:1.7}
+      @media print{
+        body{background:#fff;padding:0}
+        .toolbar{display:none}
+        .sheet{max-width:none;box-shadow:none;border-radius:0}
+        @page{size:A4;margin:10mm}
+      }';
+    $company = $DATA['company'];
+
+    if ($p === 'print_invoice') {
+        $no = (string)($_GET['no'] ?? 'INV-2041');
+        $inv = null;
+        foreach ($DATA['invoices'] as $i) { if ($i['no'] === $no) { $inv = $i; break; } }
+        if (!$inv) { $inv = $DATA['invoices'][0]; $no = $inv['no']; }
+        $lines = $DATA['invoice_lines'][$no] ?? [
+            ['item' => 'Goods as per delivery challan ' . str_replace('INV', 'DC', $no), 'hs' => '5208.1100', 'uom' => 'Lot', 'qty' => 1, 'rate' => $inv['excl']],
+        ];
+        $subtotal = 0; foreach ($lines as $l) { $subtotal += $l['qty'] * $l['rate']; }
+        $tax = (int)round($subtotal * 0.18);
+        $total = $subtotal + $tax;
+        ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex">
+        <title><?= $e($no) ?> — Sales Tax Invoice</title><style><?= $printCss ?></style></head><body>
+        <div class="toolbar">
+          <a class="tb-back" href="index.php?p=invoices">← Back to demo</a>
+          <button class="tb-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+          <span>In the print window choose <b>“Save as PDF”</b> — that file is what your customer receives.</span>
+        </div>
+        <div class="sheet"><div class="stripe"></div><div class="pad">
+          <div class="lh">
+            <h1><?= $e(strtoupper($company['name'])) ?></h1>
+            <div class="sub">General Order Suppliers &amp; Textile Traders · <?= $e($company['city']) ?>, Pakistan · Tel: +92 21 XXXX XXXX</div>
+            <div class="reg">NTN <?= $e($company['ntn']) ?> &nbsp;|&nbsp; STRN <?= $e($company['strn']) ?></div>
+          </div>
+          <div class="title"><span>SALES TAX INVOICE</span></div>
+          <div class="band-row">
+            <div class="band"><h4>Billed To</h4><div class="bd">
+              <b><?= $e($inv['party']) ?></b><br>Karachi, Sindh<br>NTN: 0000000-0 · STRN: 00-00-0000-000-00
+            </div></div>
+            <div class="band"><h4>Document Info</h4><div class="bd">
+              <div class="kv"><span>Invoice No.</span><b><?= $e($no) ?></b></div>
+              <div class="kv"><span>Date</span><b><?= $e($inv['date']) ?></b></div>
+              <div class="kv"><span>FY</span><b><?= $e($company['fy']) ?></b></div>
+              <div class="kv"><span>FBR Invoice No.</span><b style="font-family:Consolas,monospace;font-size:9.5px"><?= $e($inv['fbr']) ?></b></div>
+            </div></div>
+          </div>
+          <table>
+            <thead><tr><th style="width:4%">#</th><th>Description</th><th style="width:11%">HS Code</th><th class="num" style="width:8%">Qty</th><th style="width:8%">UoM</th><th class="num" style="width:12%">Rate</th><th class="num" style="width:14%">Amount (PKR)</th></tr></thead>
+            <tbody>
+              <?php $i = 0; foreach ($lines as $l): $i++; ?>
+              <tr><td><?= $i ?></td><td><?= $e($l['item']) ?></td><td><?= $e($l['hs']) ?></td>
+                  <td class="num"><?= number_format($l['qty']) ?></td><td><?= $e($l['uom']) ?></td>
+                  <td class="num"><?= number_format($l['rate']) ?></td><td class="num"><?= number_format($l['qty'] * $l['rate']) ?></td></tr>
+              <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="6" class="num">Value excluding sales tax</td><td class="num"><?= number_format($subtotal) ?></td></tr>
+              <tr><td colspan="6" class="num">Sales tax @ 18%</td><td class="num"><?= number_format($tax) ?></td></tr>
+              <tr class="grand"><td colspan="6" class="num">TOTAL PAYABLE (PKR)</td><td class="num"><?= number_format($total) ?></td></tr>
+            </tfoot>
+          </table>
+          <div class="words">Amount in words: <b>Rupees <?= $e(pkWords($total)) ?> Only</b></div>
+          <div class="bottom">
+            <div>
+              <span class="fbr">FBR DIGITAL INVOICE — REGISTERED</span>
+              <p class="note" style="margin-top:8px">This invoice has been electronically reported to the Federal Board of Revenue. Verify by scanning the QR code with the FBR Tax Asaan app.</p>
+            </div>
+            <div class="qr" aria-hidden="true"></div>
+          </div>
+          <div class="sign"><div>For <?= $e($company['name']) ?></div></div>
+          <div class="foot">Computer-generated document produced by VectorERP · vectorsolution.it · Sample data for demonstration</div>
+        </div></div>
+        </body></html><?php
+        exit;
+    }
+
+    /* print_report — monthly sales register */
+    $tExcl = 0; $tTax = 0;
+    ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex">
+    <title>Sales Register — August 2026</title><style><?= $printCss ?></style></head><body>
+    <div class="toolbar">
+      <a class="tb-back" href="index.php?p=ledger">← Back to demo</a>
+      <button class="tb-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+      <span>The same report your tax consultant needs at filing time.</span>
+    </div>
+    <div class="sheet"><div class="stripe"></div><div class="pad">
+      <div class="lh">
+        <h1><?= $e(strtoupper($company['name'])) ?></h1>
+        <div class="sub">NTN <?= $e($company['ntn']) ?> · STRN <?= $e($company['strn']) ?> · FY <?= $e($company['fy']) ?></div>
+      </div>
+      <div class="title"><span>SALES REGISTER — AUGUST 2026</span></div>
+      <table>
+        <thead><tr><th style="width:12%">Date</th><th style="width:13%">Invoice</th><th>Customer</th><th class="num" style="width:14%">Excl. Tax</th><th class="num" style="width:13%">Tax 18%</th><th class="num" style="width:15%">Total (PKR)</th></tr></thead>
+        <tbody>
+          <?php foreach ($DATA['invoices'] as $iv): $tExcl += $iv['excl']; $tTax += $iv['tax']; ?>
+          <tr><td><?= $e($iv['date']) ?></td><td><b><?= $e($iv['no']) ?></b></td><td><?= $e($iv['party']) ?></td>
+              <td class="num"><?= number_format($iv['excl']) ?></td><td class="num"><?= number_format($iv['tax']) ?></td>
+              <td class="num"><?= number_format($iv['excl'] + $iv['tax']) ?></td></tr>
+          <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+          <tr class="grand"><td colspan="3">TOTAL — <?= count($DATA['invoices']) ?> INVOICES</td>
+              <td class="num"><?= number_format($tExcl) ?></td><td class="num"><?= number_format($tTax) ?></td>
+              <td class="num"><?= number_format($tExcl + $tTax) ?></td></tr>
+        </tfoot>
+      </table>
+      <div class="words">Total sales in words: <b>Rupees <?= $e(pkWords($tExcl + $tTax)) ?> Only</b></div>
+      <div class="sign"><div>Prepared by VectorERP</div></div>
+      <div class="foot">Computer-generated report produced by VectorERP · vectorsolution.it · Sample data for demonstration</div>
+    </div></div>
+    </body></html><?php
+    exit;
+}
+
 $NAV = [
     'dashboard' => ['Dashboard',    'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z'],
     'invoices'  => ['Invoices',     'M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h6'],
@@ -248,7 +421,7 @@ tbody tr:hover{background:var(--paper)}
         <div class="panel">
           <h2>Sales tax invoices <span>every invoice registered with FBR</span></h2>
           <table>
-            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Sales tax 18%</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Sales tax 18%</th><th class="num">Total</th><th>Status</th><th></th><th></th></tr></thead>
             <tbody>
             <?php foreach ($DATA['invoices'] as $inv):
               $st = isset($paid[$inv['no']]) ? 'paid' : $inv['status']; ?>
@@ -260,12 +433,13 @@ tbody tr:hover{background:var(--paper)}
                 <td class="num"><?= $rs($inv['tax']) ?></td>
                 <td class="num"><b><?= $rs($inv['excl'] + $inv['tax']) ?></b></td>
                 <td><span class="pill <?= $e($st) ?>"><?= $st === 'due' ? 'Due' : ucfirst($st) ?></span></td>
+                <td><a class="btn-sm" style="background:#0F1B33" target="_blank" href="?p=print_invoice&no=<?= urlencode($inv['no']) ?>">PDF</a></td>
                 <td><?php if ($st !== 'paid'): ?><a class="btn-sm" href="?pay=<?= urlencode($inv['no']) ?>">Mark paid</a><?php endif; ?></td>
               </tr>
             <?php endforeach; ?>
             </tbody>
           </table>
-          <p class="note">Try it: click <b>Mark paid</b> on any overdue invoice and watch the status update.</p>
+          <p class="note">Try it: click <b>PDF</b> on any invoice to see the printed sales tax invoice — with FBR number and QR — exactly as your customer receives it. Or click <b>Mark paid</b> and watch the status update.</p>
         </div>
         <div class="panel">
           <h2>INV-2041 — as printed for the customer <span>FBR number + QR on every invoice</span></h2>
@@ -328,7 +502,11 @@ tbody tr:hover{background:var(--paper)}
 
       <?php elseif ($p === 'ledger'): ?>
         <div class="panel">
-          <h2>Cash &amp; bank ledger <span>financial year 1 July – 30 June</span></h2>
+          <h2>Cash &amp; bank ledger
+            <span style="display:inline-flex;gap:10px;align-items:center">financial year 1 July – 30 June
+              <a class="btn-sm" style="background:#0F1B33" target="_blank" href="?p=print_report">Sales Register PDF</a>
+            </span>
+          </h2>
           <table>
             <thead><tr><th>Date</th><th>Narration</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Balance</th></tr></thead>
             <tbody>
