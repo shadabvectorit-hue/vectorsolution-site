@@ -2,5 +2,5 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/vectorit/public_html
-    - /bin/cp -f index.html fbr.html services.html about.html contact.html 404.html robots.txt sitemap.xml $DEPLOYPATH/
+    - /bin/cp -f index.html fbr.html services.html about.html contact.html 404.html robots.txt sitemap.xml .htaccess $DEPLOYPATH/
     - /bin/cp -Rf css js assets brand $DEPLOYPATH/

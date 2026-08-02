@@ -1,0 +1,21 @@
+# VectorIT — canonical URL: https://vectorsolution.it
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://vectorsolution.it/$1 [R=301,L]
+
+# www → apex
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://vectorsolution.it/$1 [R=301,L]
+
+# Custom error page
+ErrorDocument 404 /404.html
+
+# Basic caching for static assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
