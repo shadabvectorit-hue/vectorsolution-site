@@ -4,4 +4,5 @@ deployment:
     - export DEPLOYPATH=/home/vectorit/public_html
     - /bin/cp -f index.html work.html fbr.html services.html about.html contact.html 404.html robots.txt sitemap.xml .htaccess contact-submit.php inquiries.php $DEPLOYPATH/
     - /bin/cp -Rf css js assets brand $DEPLOYPATH/
-    - if [ -d demo_src ]; then /bin/mkdir -p $DEPLOYPATH/demo && /bin/cp -Rf demo_src/. $DEPLOYPATH/demo/; fi
+    - /bin/mkdir -p $DEPLOYPATH/demo
+    - /bin/cp -Rf demo/. $DEPLOYPATH/demo/
