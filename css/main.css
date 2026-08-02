@@ -172,6 +172,9 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   padding-block: 4px;
 }
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--ink); }
+/* the nav CTA is a .btn inside .nav-links — keep its own text color, don't inherit the grey link color */
+.nav-links a.btn-primary, .nav-links a.btn-primary:hover { color: #FFFFFF; }
+.nav-links a.btn-ghost, .nav-links a.btn-ghost:hover { color: var(--ink); }
 .nav-links a[aria-current="page"]::after {
   content: "";
   position: absolute;
@@ -878,6 +881,144 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
 @media (max-width: 560px) {
   .trust-strip { grid-template-columns: 1fr; }
 }
+
+/* ---------- chat bot ---------- */
+.bot-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 92px;
+  z-index: 95;
+  width: min(370px, calc(100vw - 32px));
+  max-height: min(560px, calc(100vh - 120px));
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(15,27,51,.14), 0 32px 80px rgba(15,27,51,.22);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bot-panel.open { display: flex; }
+.bot-head {
+  background: linear-gradient(135deg, #178A50, #25D366);
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bot-head .b-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-family: var(--font-display);
+}
+.bot-head b { display: block; font-family: var(--font-display); font-size: .98rem; }
+.bot-head span { font-size: .75rem; opacity: .85; }
+.bot-close { margin-left: auto; color: #fff; font-size: 1.3rem; line-height: 1; padding: 4px 8px; }
+.bot-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper);
+}
+.bot-msg {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: .92rem;
+  line-height: 1.5;
+  animation: bot-in .25s ease;
+}
+.bot-msg.bot {
+  background: var(--card);
+  border: 1px solid var(--line-soft);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  box-shadow: var(--shadow-sm);
+}
+.bot-msg.user {
+  background: var(--blue);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+@keyframes bot-in { from { opacity: 0; transform: translateY(8px); } }
+.bot-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-self: flex-start;
+}
+.bot-quick button {
+  background: var(--card);
+  border: 1.5px solid var(--blue);
+  color: var(--blue);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: background .15s ease, color .15s ease;
+}
+.bot-quick button:hover { background: var(--blue); color: #fff; }
+.bot-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--card);
+}
+.bot-input input {
+  flex: 1;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: .92rem;
+}
+.bot-input input:focus { outline: none; border-color: var(--blue); }
+.bot-input button {
+  background: var(--blue);
+  color: #fff;
+  border-radius: 999px;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bot-input button svg { width: 18px; height: 18px; }
+.bot-wa-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 11px 18px;
+  margin-top: 4px;
+  font-size: .92rem;
+}
+.bot-wa-link svg { width: 18px; height: 18px; fill: #fff; }
+@media (max-width: 640px) {
+  .bot-panel { right: 16px; bottom: 84px; }
+}
+
+/* ---------- form toast ---------- */
+.sent-note {
+  background: #DCF5E7;
+  border: 1px solid #9ADFBB;
+  color: #14713F;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: none;
+}
+.sent-note.show { display: block; }
 
 /* ---------- reveal animations ---------- */
 .reveal {

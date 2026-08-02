@@ -169,9 +169,24 @@
     requestAnimationFrame(draw);
   }
 
-  /* ---------- contact form (mailto handoff) ---------- */
+  /* ---------- contact form ---------- */
   var form = document.getElementById("contact-form");
-  if (form) {
+  if (form && form.getAttribute("action")) {
+    // Server-side submission: show the result banner after redirect back.
+    var params = new URLSearchParams(window.location.search);
+    var note = document.getElementById("sent-note");
+    if (note && params.get("sent") === "1") {
+      note.classList.add("show");
+      note.scrollIntoView({ block: "center" });
+    } else if (params.get("sent") === "0") {
+      var status = document.getElementById("form-status");
+      if (status) status.textContent = "Kuch reh gaya — please give your name and a WhatsApp number or email, then send again.";
+    }
+    form.addEventListener("submit", function () {
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; btn.style.opacity = "0.7"; }
+    });
+  } else if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var data = new FormData(form);

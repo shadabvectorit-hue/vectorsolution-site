@@ -86,16 +86,22 @@
         </div>
 
         <div class="form-card reveal reveal-delay-1">
-          <form id="contact-form" novalidate>
+          <p class="sent-note" id="sent-note">✓ Shukriya! Your inquiry is received — we will reply within one business day (on WhatsApp if you shared your number).</p>
+          <form id="contact-form" action="contact-submit.php" method="post" novalidate>
+            <input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
             <div class="form-row">
               <div class="field">
                 <label for="f-name">Your name</label>
-                <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Jane Smith">
+                <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Muhammad Ahmed">
               </div>
               <div class="field">
-                <label for="f-email">Email</label>
-                <input id="f-email" name="email" type="email" autocomplete="email" required placeholder="jane@company.com">
+                <label for="f-whatsapp">WhatsApp number</label>
+                <input id="f-whatsapp" name="whatsapp" type="tel" autocomplete="tel" placeholder="03xx xxxxxxx">
               </div>
+            </div>
+            <div class="field">
+              <label for="f-email">Email <span style="opacity:.5">(optional if WhatsApp given)</span></label>
+              <input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@company.com">
             </div>
             <div class="form-row">
               <div class="field">
@@ -198,5 +204,6 @@
     <span>WhatsApp us</span>
   </a>
   <script src="js/main.js"></script>
+  <script src="js/bot.js" defer></script>
 </body>
 </html>
