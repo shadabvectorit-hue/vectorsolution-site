@@ -27,9 +27,17 @@ $leads = [];
 if ($authed) {
     $file = dirname(__DIR__) . '/_private/inquiries.jsonl';
     if (is_file($file)) {
+        $seen = [];
+        // Newest first; a completed chat supersedes its own earlier partial save.
         foreach (array_reverse(file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) as $line) {
             $row = json_decode($line, true);
-            if (is_array($row)) $leads[] = $row;
+            if (!is_array($row)) continue;
+            $id = (string)($row['leadId'] ?? '');
+            if ($id !== '') {
+                if (isset($seen[$id])) continue;
+                $seen[$id] = true;
+            }
+            $leads[] = $row;
         }
     }
 }
@@ -84,6 +92,8 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
       <div class="card">
         <b><?= $e($l['name'] ?? '') ?></b>
         <span class="tag"><?= $e($l['source'] ?? '') ?></span>
+        <?php if (!empty($l['lang'])): ?><span class="tag"><?= $e($l['lang']) ?></span><?php endif; ?>
+        <?php if (($l['stage'] ?? '') === 'partial'): ?><span class="tag" style="background:#FFF0D9;color:#925E10">chat not finished — follow up</span><?php endif; ?>
         <?php if (!empty($l['service'])): ?><span class="tag"><?= $e($l['service']) ?></span><?php endif; ?>
         <?php if (!empty($l['budget'])): ?><span class="tag"><?= $e($l['budget']) ?></span><?php endif; ?>
         <div class="meta">

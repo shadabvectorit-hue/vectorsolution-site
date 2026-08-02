@@ -148,6 +148,7 @@ tbody tr:hover{background:var(--paper)}
 .save-form button:hover{background:#1FBA59}
 .save-form button:disabled{opacity:.65;cursor:default}
 .save-done{background:rgba(37,211,102,.16);border:1px solid rgba(37,211,102,.45);border-radius:11px;padding:13px 16px;font-size:.92rem}
+.save-warn{background:rgba(255,90,45,.16);border:1px solid rgba(255,90,45,.5);border-radius:11px;padding:12px 15px;font-size:.9rem;margin-top:12px;color:#FFD3C4}
 .save-alt{margin-top:14px;font-size:.86rem;color:rgba(233,238,249,.65)}
 .save-alt a{color:#7BE49E;font-weight:600}
 @media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}.save-form input{min-width:100%}.save-form button{width:100%}}
@@ -369,14 +370,18 @@ tbody tr:hover{background:var(--paper)}
       <div class="panel save-panel" id="save">
         <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF">apne business ke liye</span></h2>
         <p class="save-lede">Leave your name and WhatsApp number — we'll set VectorERP up with <b>your own</b> products, parties and opening balances, and send you a private login. Free, no obligation.</p>
-        <form class="save-form" id="save-form" autocomplete="on">
-          <input type="text" name="website" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px">
+        <form class="save-form" id="save-form" action="../contact-submit.php" method="post" autocomplete="on">
+          <input type="text" name="website" tabindex="-1" aria-hidden="true" autocomplete="off" style="position:absolute;left:-9999px">
+          <input type="hidden" name="source" value="demo-save">
+          <input type="hidden" name="service" value="VectorERP — set up with my own data">
+          <input type="hidden" name="message" value="Requested &quot;Save my demo data&quot; from the live demo at /demo">
           <input name="name" placeholder="Aap ka naam / Your name" required aria-label="Your name">
           <input name="whatsapp" placeholder="WhatsApp — 03xx xxxxxxx" required aria-label="WhatsApp number">
           <input name="company" placeholder="Business ka naam (optional)" aria-label="Business name">
           <button type="submit">Save my demo →</button>
         </form>
         <p class="save-done" id="save-done" hidden>✓ <b>Shukriya!</b> Your details are saved. We'll WhatsApp you a private demo set up with your own data — usually the same day.</p>
+        <p class="save-warn" id="save-warn" hidden>Couldn't save just now — please add your name and full WhatsApp number, or message us directly on WhatsApp below.</p>
         <p class="save-alt">Prefer to talk right now?
           <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Assalam o Alaikum, maine VectorERP ka demo dekha hai. Mujhe apne business ke liye setup karwana hai.') ?>" target="_blank" rel="noopener">WhatsApp par baat karein →</a>
         </p>
@@ -391,15 +396,17 @@ tbody tr:hover{background:var(--paper)}
           if (f.website.value) return;                    // honeypot
           var btn = f.querySelector('button');
           btn.disabled = true; btn.textContent = 'Saving…';
-          var d = new FormData(f);
-          d.append('source', 'demo-save');
-          d.append('service', 'VectorERP — set up with my own data');
-          d.append('message', 'Requested "Save my demo data" from the live demo at /demo');
-          fetch('../contact-submit.php', { method: 'POST', body: d, headers: { Accept: 'application/json' } })
-            .catch(function () {})
-            .then(function () {
+          fetch('../contact-submit.php', { method: 'POST', body: new FormData(f), headers: { Accept: 'application/json' } })
+            .then(function (r) { return r.json().catch(function () { return { ok: r.ok }; }); })
+            .then(function (res) {
+              if (!res.ok) throw new Error('rejected');
               f.hidden = true;
               document.getElementById('save-done').hidden = false;
+            })
+            .catch(function () {
+              btn.disabled = false; btn.textContent = 'Save my demo →';
+              var w = document.getElementById('save-warn');
+              if (w) w.hidden = false;
             });
         });
       })();

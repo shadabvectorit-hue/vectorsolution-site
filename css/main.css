@@ -965,6 +965,7 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   transition: background .15s ease, color .15s ease;
 }
 .bot-quick button:hover { background: var(--blue); color: #fff; }
+.bot-input[hidden] { display: none; }
 .bot-input {
   display: flex;
   gap: 8px;
@@ -1012,6 +1013,8 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   text-align: right;
 }
 .bot-msg.bot.rtl { border-bottom-left-radius: 14px; border-bottom-right-radius: 4px; }
+/* mirror the whole conversation column so bot bubbles sit right, visitor left */
+.bot-panel.rtl-mode .bot-msgs { direction: rtl; }
 .bot-panel.rtl-mode .bot-quick { justify-content: flex-end; }
 .bot-panel.rtl-mode .bot-quick button {
   font-family: "Noto Nastaliq Urdu", serif;
