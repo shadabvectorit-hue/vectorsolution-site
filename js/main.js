@@ -79,6 +79,22 @@
     counters.forEach(function (el) { cio.observe(el); });
   }
 
+  /* ---------- first-party analytics (no cookies, no third parties) ---------- */
+  function track(event) {
+    try {
+      var d = new FormData();
+      d.append("e", event);
+      d.append("p", location.pathname || "/");
+      if (navigator.sendBeacon) navigator.sendBeacon("/t.php", d);
+      else fetch("/t.php", { method: "POST", body: d, keepalive: true });
+    } catch (e) { /* analytics must never break the page */ }
+  }
+  track("pv");
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest('a[href*="wa.me"]');
+    if (a) track("wa");
+  });
+
   /* ---------- footer year ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();

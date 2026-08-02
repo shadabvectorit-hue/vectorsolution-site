@@ -15,11 +15,29 @@ const WA = '923363138686';
 
 $DATA = require __DIR__ . '/data.php';
 
+/** Server-side analytics: same file the site beacon writes to. Never blocks the page. */
+function demoTrack(string $event, string $page = ''): void {
+    $dir = dirname(__DIR__, 2) . '/_private';
+    if (!is_dir($dir)) { @mkdir($dir, 0700, true); }
+    $file = $dir . '/analytics.jsonl';
+    if (is_file($file) && filesize($file) > 50 * 1024 * 1024) { return; }
+    $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
+    if (preg_match('/bot|crawl|spider|preview|whatsapp|curl|python|headless/i', $ua)) { return; }
+    $row = [
+        't' => date('Y-m-d H:i:s'), 'e' => $event, 'p' => $page ?: '/demo/',
+        'v' => substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-a7x|' . date('Y-m-d')), 0, 12),
+        'r' => substr((string)($_SERVER['HTTP_REFERER'] ?? ''), 0, 160),
+        'm' => preg_match('/Mobile|Android|iPhone/i', $ua) ? 1 : 0,
+    ];
+    @file_put_contents($file, json_encode($row, JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX);
+}
+
 /* ---------- auth ---------- */
 if (isset($_GET['logout'])) { session_destroy(); header('Location: index.php'); exit; }
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['user'])) {
     if ($_POST['user'] === DEMO_USER && ($_POST['pass'] ?? '') === DEMO_PASS) {
         $_SESSION['demo_ok'] = true;
+        demoTrack('demo_login');
         header('Location: index.php'); exit;
     }
     $loginError = 'Use demo / demo — they are printed on the form for you.';
@@ -77,6 +95,7 @@ if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '
     array_unshift($custom, $inv);
     $_SESSION['custom_invoices'] = $custom;
     $_SESSION['custom_lines'][$no] = $items;
+    demoTrack('demo_invoice_created');
     header('Location: index.php?p=invoices&created=' . urlencode($no)); exit;
 }
 
@@ -117,6 +136,7 @@ function pkWords(int|float $n): string {
 
 /* ---------- print-ready documents (open in a new tab, save as PDF from the print dialog) ---------- */
 if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
+    demoTrack($p === 'print_invoice' ? 'demo_pdf_invoice' : 'demo_pdf_report', '/demo/?p=' . $p);
     $printCss = '
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:"Segoe UI",Arial,sans-serif;background:#eef2f8;color:#1f2937;padding:22px}
@@ -433,7 +453,9 @@ tbody tr:hover{background:var(--paper)}
         <div class="toast">✓ <?= $e((string)$_GET['done']) ?> marked as paid — the ledger and receivables updated instantly. (Demo only: this resets when you sign out.)</div>
       <?php endif; ?>
       <?php if (isset($_GET['created'])): ?>
-        <div class="toast">✓ Invoice <?= $e((string)$_GET['created']) ?> created with its FBR number — now click <b>PDF</b> on it to see the printed sales tax invoice. (Your session only: it resets when you sign out.)</div>
+        <div class="toast">✓ Invoice <?= $e((string)$_GET['created']) ?> created with its FBR number — now click <b>PDF</b> on it to see the printed sales tax invoice.
+          <a href="#save" style="display:inline-block;margin-left:10px;background:#178A50;color:#fff;border-radius:999px;padding:5px 15px;font-weight:700;font-size:.85rem">Like it? Save my demo data →</a>
+        </div>
       <?php endif; ?>
       <?php if (isset($_GET['full'])): ?>
         <div class="toast" style="background:#FFF0D9;border-color:#F2CE8E;color:#925E10">The demo allows up to 10 invoices per session — sign out and back in for a fresh company.</div>

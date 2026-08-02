@@ -17,6 +17,31 @@ if (!empty($_POST['website'])) {
     exit;
 }
 
+// Rate limit: max 5 submissions per IP per hour — enough for any genuine visitor,
+// a wall for a spam script. State lives outside the webroot.
+$rlDir = dirname(__DIR__) . '/_private/ratelimit';
+if (!is_dir($rlDir)) {
+    @mkdir($rlDir, 0700, true);
+}
+$rlFile = $rlDir . '/' . substr(sha1(($_SERVER['REMOTE_ADDR'] ?? '') . '|vectorit-rl'), 0, 20) . '.json';
+$hits = [];
+if (is_file($rlFile)) {
+    $hits = json_decode((string)@file_get_contents($rlFile), true) ?: [];
+}
+$hits = array_values(array_filter($hits, static fn($ts) => is_int($ts) && $ts > time() - 3600));
+if (count($hits) >= 5) {
+    $tooMany = str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+    if ($tooMany) {
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => false, 'error' => 'too many requests — please try again later']);
+    } else {
+        header('Location: contact.html?sent=0');
+    }
+    exit;
+}
+$hits[] = time();
+@file_put_contents($rlFile, json_encode($hits), LOCK_EX);
+
 /** Strips control characters so nothing user-typed can forge an email header. */
 $clean = static function (string $v, int $max): string {
     $v = str_replace(["\r", "\n", "\0"], ' ', $v);

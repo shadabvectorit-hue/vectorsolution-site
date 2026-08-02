@@ -23,6 +23,41 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
 }
 $authed = !empty($_SESSION['inq_ok']);
 
+$stats = null;
+if ($authed) {
+    // ---- traffic stats from the first-party analytics log ----
+    $af = dirname(__DIR__) . '/_private/analytics.jsonl';
+    $stats = ['pv7' => 0, 'pv30' => 0, 'uniq7' => [], 'wa7' => 0, 'demo7' => 0, 'inv7' => 0, 'pdf7' => 0, 'pages' => [], 'mobile' => 0, 'total7' => 0];
+    if (is_file($af)) {
+        $rows = file($af, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (count($rows) > 50000) $rows = array_slice($rows, -50000);
+        $d7  = date('Y-m-d', strtotime('-7 days'));
+        $d30 = date('Y-m-d', strtotime('-30 days'));
+        foreach ($rows as $line) {
+            $r = json_decode($line, true);
+            if (!is_array($r)) continue;
+            $day = substr((string)($r['t'] ?? ''), 0, 10);
+            $ev = $r['e'] ?? '';
+            if ($day >= $d30 && $ev === 'pv') $stats['pv30']++;
+            if ($day < $d7) continue;
+            $stats['total7']++;
+            if (!empty($r['m'])) $stats['mobile']++;
+            if ($ev === 'pv') {
+                $stats['pv7']++;
+                $stats['uniq7'][$r['v'] ?? ''] = true;
+                $pg = $r['p'] ?: '/';
+                $stats['pages'][$pg] = ($stats['pages'][$pg] ?? 0) + 1;
+            }
+            elseif ($ev === 'wa') $stats['wa7']++;
+            elseif ($ev === 'demo_login') $stats['demo7']++;
+            elseif ($ev === 'demo_invoice_created') $stats['inv7']++;
+            elseif ($ev === 'demo_pdf_invoice' || $ev === 'demo_pdf_report') $stats['pdf7']++;
+        }
+        arsort($stats['pages']);
+        $stats['pages'] = array_slice($stats['pages'], 0, 8, true);
+    }
+}
+
 $leads = [];
 if ($authed) {
     $file = dirname(__DIR__) . '/_private/inquiries.jsonl';
@@ -85,6 +120,26 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
       <h1>Inquiries <small><?= count($leads) ?> total</small></h1>
       <a href="?logout=1">Log out</a>
     </div>
+
+    <?php if ($stats): ?>
+    <div class="card" style="margin-bottom:18px">
+      <b style="font-size:1.05rem">Traffic — last 7 days</b>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:12px">
+        <div><div style="font-size:1.5rem;font-weight:800"><?= $stats['pv7'] ?></div><div class="meta">Page views (30d: <?= $stats['pv30'] ?>)</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800"><?= count($stats['uniq7']) ?></div><div class="meta">Unique visitors</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800;color:#178A50"><?= $stats['wa7'] ?></div><div class="meta">WhatsApp clicks</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['demo7'] ?></div><div class="meta">Demo logins</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['inv7'] ?></div><div class="meta">Invoices created</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['pdf7'] ?></div><div class="meta">PDFs printed</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800"><?= $stats['total7'] ? round($stats['mobile'] * 100 / $stats['total7']) : 0 ?>%</div><div class="meta">On mobile</div></div>
+      </div>
+      <?php if ($stats['pages']): ?>
+      <div class="meta" style="margin-top:12px">Top pages:
+        <?php foreach ($stats['pages'] as $pg => $n): ?><span class="tag"><?= $e($pg) ?> · <?= $n ?></span><?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
     <?php if (!$leads): ?>
       <div class="card empty">No inquiries yet. They will appear here the moment someone submits the contact form or finishes the chat bot.</div>
     <?php endif; ?>
