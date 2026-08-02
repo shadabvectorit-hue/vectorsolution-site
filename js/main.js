@@ -41,7 +41,9 @@
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      // Low threshold on purpose: a tall element (e.g. an image gallery) can never
+      // reach a high visibility ratio on a short viewport, and would stay hidden.
+      { threshold: 0.02, rootMargin: "0px 0px -40px 0px" }
     );
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
