@@ -91,8 +91,11 @@ $pk = static function ($n): string {
     return 'Rs ' . number_format($n);
 };
 
-/** Integer → words in Pakistani notation (lakh / crore), e.g. 454300 → "Four Lakh Fifty Four Thousand Three Hundred". */
-function pkWords(int $n): string {
+/** Amount → words in Pakistani notation (lakh / crore), e.g. 454300 → "Four Lakh Fifty Four Thousand Three Hundred".
+    Accepts int or float — visitor-entered quantities arrive as floats, and strict_types
+    would otherwise fatal mid-page exactly where the words print. */
+function pkWords(int|float $n): string {
+    $n = (int)round($n);
     $ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
     $tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
     $two = static function (int $x) use ($ones, $tens): string {
@@ -169,6 +172,7 @@ if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
             ['item' => 'Goods as per delivery challan ' . str_replace('INV', 'DC', $no), 'hs' => '5208.1100', 'uom' => 'Lot', 'qty' => 1, 'rate' => $inv['excl']],
         ];
         $subtotal = 0; foreach ($lines as $l) { $subtotal += $l['qty'] * $l['rate']; }
+        $subtotal = (int)round($subtotal);
         $tax = (int)round($subtotal * 0.18);
         $total = $subtotal + $tax;
         ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex">
