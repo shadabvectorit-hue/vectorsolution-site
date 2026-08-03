@@ -9,13 +9,13 @@ require_once __DIR__ . '/lib/guard.php';
 @ini_set('display_errors', '0');
 header('X-Robots-Tag: noindex');
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-    header('Location: contact.html');
+    header('Location: /contact');
     exit;
 }
 
 // Honeypot: real visitors never fill this hidden field.
 if (!empty($_POST['website'])) {
-    header('Location: contact.html?sent=1');
+    header('Location: /contact?sent=1');
     exit;
 }
 
@@ -27,7 +27,7 @@ if (!vit_rate_allow('lead', 5, 3600)) {
         header('Content-Type: application/json');
         echo json_encode(['ok' => false, 'error' => 'too many requests — please try again later']);
     } else {
-        header('Location: contact.html?sent=0');
+        header('Location: /contact?sent=0');
     }
     exit;
 }
@@ -64,7 +64,7 @@ $respond = static function (bool $ok, string $why = '') use ($wantsJson): never 
         header('Content-Type: application/json');
         echo json_encode(['ok' => $ok] + ($why !== '' ? ['error' => $why] : []));
     } else {
-        header('Location: contact.html?sent=' . ($ok ? '1' : '0'));
+        header('Location: /contact?sent=' . ($ok ? '1' : '0'));
     }
     exit;
 };

@@ -424,7 +424,7 @@ tbody tr:hover{background:var(--paper)}
 
 <div class="demo-bar">
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
-  <a href="../index.html">← Back to vectorsolution.it</a>
+  <a href="/">← Back to vectorsolution.it</a>
   <?php if ($authed): ?><a href="#save" style="background:#25D366;border-color:#25D366">💾 Save my demo data</a><?php endif; ?>
   <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like to discuss it for my business.') ?>" target="_blank" rel="noopener">Discuss this for my business →</a>
 </div>

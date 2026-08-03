@@ -1,5 +1,5 @@
 Contact: mailto:shadab@vectorsolution.it
-Contact: https://vectorsolution.it/contact.html
+Contact: https://vectorsolution.it/contact
 Expires: 2027-06-30T00:00:00.000Z
 Preferred-Languages: en, ur
 Canonical: https://vectorsolution.it/.well-known/security.txt
