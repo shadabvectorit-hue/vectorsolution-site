@@ -112,7 +112,12 @@ if ($lead['email'] !== '' && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)) 
     $headers .= 'Reply-To: ' . $lead['email'] . "\r\n";
 }
 $mailed = false;
-foreach (['website@vectorsolution.it', 'shadabvectorit@gmail.com'] as $to) {
+// Gmail first: it is the copy proven to arrive. shadab@ is the professional
+// address and routes out to wherever the domain's mail actually lives.
+// website@ was dropped — it is a mailbox on this server, and once mail routing
+// was pointed at the domain's real mail host, mail addressed to it left the
+// building instead of landing in that local mailbox.
+foreach (['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'] as $to) {
     // The envelope sender is deliberately left as the hosting account's own
     // default. Stamping it as website@vectorsolution.it made receiving servers
     // check that domain's SPF record, which lists only Microsoft's servers and
