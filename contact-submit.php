@@ -113,7 +113,14 @@ if ($lead['email'] !== '' && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)) 
 }
 $mailed = false;
 foreach (['website@vectorsolution.it', 'shadabvectorit@gmail.com'] as $to) {
-    $mailed = @mail($to, $subject, $body, $headers, '-f website@vectorsolution.it') || $mailed;
+    // The envelope sender is deliberately left as the hosting account's own
+    // default. Stamping it as website@vectorsolution.it made receiving servers
+    // check that domain's SPF record, which lists only Microsoft's servers and
+    // ends in a hard fail — so mail from this web server was declared a forgery
+    // and bounced or junked. The host's own domain publishes SPF correctly, so
+    // letting it sign for the delivery is the one fix available without editing
+    // DNS. Replies still come back here via the From and Reply-To headers.
+    $mailed = @mail($to, $subject, $body, $headers) || $mailed;
 }
 
 // Only a lead that reached neither the disk nor a mailbox is a failure.
