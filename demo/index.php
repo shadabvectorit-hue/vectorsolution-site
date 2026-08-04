@@ -22,6 +22,7 @@ const DEMO_PASS = 'demo';
 const WA = '923363138686';
 
 $DATA = require __DIR__ . '/data.php';
+if (!empty($_SESSION['biz'])) { $DATA['company']['name'] = (string)$_SESSION['biz']; }
 
 /** Server-side analytics: same file the site beacon writes to. Never blocks the page. */
 function demoTrack(string $event, string $page = ''): void {
@@ -86,8 +87,16 @@ $TRACKS = [
 if (isset($_GET['logout'])) { session_destroy(); header('Location: index.php'); exit; }
 
 /* Choosing a track is the way in — no login wall in front of a sales demo. */
-$wanted = (string)($_GET['track'] ?? '');
+$wanted = (string)($_GET['track'] ?? $_POST['track'] ?? '');
 if ($wanted !== '' && isset($TRACKS[$wanted])) {
+    // Their own shop name, printed on every document from here on. Seeing your
+    // own name on a real sales tax invoice is the moment a demo stops being a
+    // demo, so it is worth the one field.
+    if (isset($_POST['biz'])) {
+        $biz = trim(preg_replace('/[\r\n\t\0]+/', ' ', (string)$_POST['biz']));
+        $biz = mb_substr($biz, 0, 42);
+        if ($biz !== '') { $_SESSION['biz'] = $biz; } else { unset($_SESSION['biz']); }
+    }
     if (empty($_SESSION['demo_ok'])) { session_regenerate_id(true); }
     $_SESSION['demo_ok'] = true;
     $_SESSION['track'] = $wanted;
@@ -416,7 +425,23 @@ button,input{font:inherit}
 .choose-head .mark svg{width:30px;height:30px}
 .choose-head .mark em{font-style:normal;color:var(--blue)}
 .choose-head h1{font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.02em;margin-bottom:12px}
-.choose-head p{color:var(--muted);max-width:620px;margin:0 auto;font-size:1rem}
+.choose-head h1 .hl{color:var(--blue);position:relative;white-space:nowrap}
+.choose-head h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.28em;
+  background:rgba(255,90,45,.22);border-radius:3px;z-index:-1}
+.choose-head p{color:var(--muted);max-width:640px;margin:0 auto;font-size:1rem}
+/* the name field — the hook */
+.bizbox{background:var(--card);border:1px solid var(--line-soft);border-radius:16px;padding:20px 22px;
+  max-width:560px;margin:0 auto 26px;box-shadow:0 8px 26px rgba(30,63,166,.09);text-align:center}
+.bizbox label{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:9px}
+.bizbox input{width:100%;padding:14px 16px;border:2px solid var(--blue);border-radius:11px;font-size:1.05rem;
+  font-weight:600;text-align:center;outline:none;font-family:var(--disp)}
+.bizbox input::placeholder{color:var(--faint);font-weight:400}
+.bizhint{display:block;font-size:.8rem;color:var(--muted);margin-top:10px}
+.choose-proof{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:34px}
+.choose-proof span{font-size:.86rem;color:var(--muted);background:var(--card);border:1px solid var(--line-soft);
+  border-radius:12px;padding:14px 16px;line-height:1.5}
+.choose-proof b{color:var(--ink)}
 .choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
 .tcard{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:26px 24px 22px;
   display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);
@@ -426,8 +451,9 @@ button,input{font:inherit}
   background:color-mix(in srgb,var(--acc) 12%,#fff);color:var(--acc);margin-bottom:15px}
 .tico svg{width:23px;height:23px}
 .twho{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
-.tcard h2{font-size:1.2rem;margin:5px 0 9px;letter-spacing:-.01em}
-.tcard p{color:var(--muted);font-size:.9rem;line-height:1.55;margin-bottom:15px}
+.tcard{font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer;border-left:0;border-right:0;border-bottom:0}
+.tcard .th2{display:block;font-size:1.2rem;font-weight:700;margin:5px 0 9px;letter-spacing:-.01em}
+.tcard .tp{display:block;color:var(--muted);font-size:.9rem;line-height:1.55;margin-bottom:15px}
 .tfeats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
 .tfeats i{font-style:normal;font-size:.72rem;font-weight:600;background:var(--paper);border:1px solid var(--line-soft);
   border-radius:999px;padding:4px 10px;color:var(--muted)}
@@ -537,20 +563,36 @@ tbody tr:hover{background:var(--paper)}
         <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/></svg>
         Vector<em>ERP</em>
       </span>
-      <h1>What kind of business are you?</h1>
-      <p>Pick the one closest to yours and you will land in a working system with sample data — not a slideshow. Nothing is saved, nothing to install, no sign-up.</p>
+      <h1>See it running with <span class="hl">your own</span> business name on it</h1>
+      <p>Type your business name, pick the counter closest to yours, and you land in a working system — with your name printed on the invoice and the FBR number on it. Nothing to install, no sign-up, nothing saved.</p>
     </div>
-    <div class="choose-grid">
-      <?php foreach ($TRACKS as $key => [$title, $who, $colour, $blurb, $feats, $icon]): ?>
-        <a class="tcard" href="?track=<?= $e($key) ?>" style="--acc:<?= $e($colour) ?>">
-          <span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $icon ?>"/></svg></span>
-          <span class="twho"><?= $e($who) ?></span>
-          <h2><?= $e($title) ?></h2>
-          <p><?= $e($blurb) ?></p>
-          <span class="tfeats"><?php foreach ($feats as $f): ?><i><?= $e($f) ?></i><?php endforeach; ?></span>
-          <span class="tgo">Open this demo <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg></span>
-        </a>
-      <?php endforeach; ?>
+
+    <form method="post" action="index.php" class="choose-form">
+      <div class="bizbox">
+        <label for="biz">Your business name</label>
+        <input id="biz" name="biz" maxlength="42" autocomplete="organization"
+               placeholder="e.g. Ahmed Kiryana Store" value="<?= $e($_SESSION['biz'] ?? '') ?>">
+        <span class="bizhint">Optional — but this is the bit that makes it feel real. It goes on the receipts and invoices you print.</span>
+      </div>
+
+      <div class="choose-grid">
+        <?php foreach ($TRACKS as $key => [$title, $who, $colour, $blurb, $feats, $icon]): ?>
+          <button type="submit" name="track" value="<?= $e($key) ?>" class="tcard" style="--acc:<?= $e($colour) ?>">
+            <span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $icon ?>"/></svg></span>
+            <span class="twho"><?= $e($who) ?></span>
+            <span class="th2"><?= $e($title) ?></span>
+            <span class="tp"><?= $e($blurb) ?></span>
+            <span class="tfeats"><?php foreach ($feats as $f): ?><i><?= $e($f) ?></i><?php endforeach; ?></span>
+            <span class="tgo">Open this demo <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg></span>
+          </button>
+        <?php endforeach; ?>
+      </div>
+    </form>
+
+    <div class="choose-proof">
+      <span><b>Built for here.</b> Rupees, lakh and crore, FBR digital invoicing, Urdu-speaking support on WhatsApp.</span>
+      <span><b>Real documents.</b> Every invoice and receipt prints exactly as your customer receives it.</span>
+      <span><b>Runs on your phone.</b> No terminal to buy, no software to install.</span>
     </div>
     <p class="choose-foot">Not sure which fits? <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I want to see the VectorERP demo but not sure which one fits my business.') ?>" target="_blank" rel="noopener">Ask us on WhatsApp</a> — tell us what you do and we will point you at the right one.</p>
   </div>

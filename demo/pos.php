@@ -98,6 +98,9 @@ if ($mode === 'resto') {
     }
 }
 
+// Their own name on the shopfront and on every printed document.
+if (!empty($_SESSION['biz'])) { $M['name'] = (string)$_SESSION['biz']; }
+
 /** Turn a posted cart into priced lines + totals, using catalogue prices only. */
 function priceCart($raw, array $CAT, bool $inclusive): array {
     $lines = []; $net = $tax = $exempt = 0.0;
@@ -248,6 +251,7 @@ if ($p === 'receipt') {
       .bar a,.bar button{border:0;border-radius:999px;padding:10px 18px;font:600 13px "Segoe UI",sans-serif;cursor:pointer;text-decoration:none}
       .back{background:#fff;color:#0F1B33;border:1px solid #cbd5e1}
       .print{background:<?= $e($M['accent']) ?>;color:#fff}
+      .wa{background:#0B8043;color:#fff}
       .tip{max-width:420px;margin:0 auto 14px;font-size:12.5px;color:#475569;line-height:1.5}
       .paper{width:302px;margin:0 auto;background:#fff;padding:16px 14px 22px;box-shadow:0 10px 30px rgba(15,27,51,.14);
              font-family:"Courier New",monospace;font-size:12px;color:#000;line-height:1.45}
@@ -264,9 +268,16 @@ if ($p === 'receipt') {
       @media print{@page{size:80mm auto;margin:0}body{background:#fff;padding:0}.bar,.tip{display:none}
         .paper{width:72mm;box-shadow:none;padding:2mm 2mm 6mm;margin:0}}
     </style></head><body>
+    <?php
+      $waText = "Assalam o alaikum. I just rang up a sale on your VectorERP demo —\n"
+              . "Receipt {$sale['no']} · Total Rs " . number_format($sale['total']) . "\n"
+              . ($isResto ? "Sindh service tax" : "Sales tax") . " Rs " . number_format($sale['tax']) . "\n\n"
+              . "I want this for " . ($M['name']) . ". Please tell me the cost and how long setup takes.";
+    ?>
     <div class="bar">
       <a class="back" href="pos.php">← Back to till</a>
       <button class="print" onclick="window.print()">🖨 Print receipt</button>
+      <a class="wa" href="https://wa.me/<?= WA ?>?text=<?= rawurlencode($waText) ?>" target="_blank" rel="noopener">💬 I want this for my business</a>
       <a class="back" href="pos.php?p=day">Day summary</a>
     </div>
     <p class="tip">A real 80&nbsp;mm thermal layout — on a receipt printer this comes out exactly like this, with no page margins. On a normal printer choose <b>Save as PDF</b>.</p>
@@ -469,6 +480,13 @@ button,input,select{font:inherit}
 .qty span{font-family:var(--mono);font-size:.85rem;min-width:22px;text-align:center}
 .rm{border:0;background:none;color:var(--faint);cursor:pointer;font-size:.75rem;text-decoration:underline;padding:0;margin-left:4px}
 .rm:hover{color:var(--red)}
+/* Nobody should land on a till and wonder what to do. Disappears on first tap. */
+.nudge{margin:0 16px 14px;background:var(--acc-t);border:1px dashed var(--acc);border-radius:12px;
+  padding:11px 14px;font-size:.83rem;color:var(--ink);line-height:1.5;animation:nudge 2.4s ease-in-out infinite}
+.nudge b{color:var(--acc);display:block;margin-bottom:2px}
+.nudge code{font-family:var(--mono);font-size:.92em;background:#fff;border-radius:5px;padding:1px 6px}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.nudge{animation:none}}
 .totals{padding:13px 16px;border-top:1px solid var(--line);background:#FBFCFE}
 .trow{display:flex;justify-content:space-between;font-size:.86rem;color:var(--muted);padding:2px 0}
 .trow.big{font-size:1.35rem;font-weight:800;color:var(--ink);padding-top:8px;margin-top:6px;border-top:1px solid var(--line)}
@@ -681,6 +699,12 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
         </div>
       <?php endif; ?>
       <div class="lines" id="lines"><div class="empty">Nothing added yet.</div></div>
+      <div class="nudge" id="nudge">
+        <b>Try it →</b>
+        <?php if ($mode === 'retail'): ?>Tap any item on the left, or type <code>8964000201457</code> and press Enter.
+        <?php elseif ($mode === 'resto'): ?>Pick a table above, tap a few dishes, then send the ticket to the kitchen.
+        <?php else: ?>Tap a medicine — the till picks the batch expiring first, on its own.<?php endif; ?>
+      </div>
       <div class="totals">
         <div class="trow"><span><?= $mode === 'resto' ? 'Food &amp; service' : 'Taxable value' ?></span><span id="t-net">Rs 0</span></div>
         <div class="trow"><span><?= $e($M['taxLabel']) ?></span><span id="t-tax">Rs 0</span></div>
@@ -790,6 +814,7 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
       ['b-cash', 'b-card', 'b-wallet', 'b-khata', 'b-kot'].forEach(function (id) {
         var el = document.getElementById(id); if (el) el.disabled = !cart.length;
       });
+      if (cart.length) { var nd = document.getElementById('nudge'); if (nd) nd.remove(); }
       var n = cart.reduce(function (a, l) { return a + l.qty; }, 0);
       document.getElementById('mb-total').textContent = money(t.total);
       document.getElementById('mb-count').textContent = n ? n + (n === 1 ? ' item' : ' items') : 'Cart empty';
@@ -808,6 +833,7 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
       if (it.dead) { flash('Expired batch — cannot sell'); return; }
       var line = cart.find(function (l) { return l.code === code; });
       if (line) line.qty++; else cart.push({ code: code, qty: 1 });
+      var n = document.getElementById('nudge'); if (n) n.remove();
       render();
     }
 
