@@ -426,6 +426,9 @@ button,input,select{font:inherit}
 .tbl.on small{color:rgba(255,255,255,.85)}
 
 .wrap{display:grid;grid-template-columns:1fr 400px;gap:18px;padding:18px 20px 30px;align-items:start;max-width:1500px;margin:0 auto}
+/* Grid and flex children default to min-width:auto, so one long barcode or
+   product name can push a column wider than a phone screen. */
+.wrap>*{min-width:0}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(15,27,51,.05)}
 .cats{display:flex;gap:8px;padding:14px 16px 0;flex-wrap:wrap}
 .cat{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 15px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted)}
@@ -434,9 +437,10 @@ button,input,select{font:inherit}
 .tile{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;cursor:pointer;text-align:left;transition:transform .07s,border-color .12s,box-shadow .12s}
 .tile:hover{border-color:var(--acc);box-shadow:0 6px 18px rgba(15,27,51,.12)}
 .tile:active{transform:scale(.97)}
-.tile b{display:block;font-size:.9rem;line-height:1.3;margin-bottom:5px}
+.tile{overflow:hidden}
+.tile b{display:block;font-size:.9rem;line-height:1.3;margin-bottom:5px;overflow-wrap:anywhere}
 .tile .pr{color:var(--acc);font-weight:800}
-.tile .bc{font-family:var(--mono);font-size:.62rem;color:var(--faint);margin-top:5px}
+.tile .bc{font-family:var(--mono);font-size:.62rem;color:var(--faint);margin-top:5px;overflow-wrap:anywhere}
 .tile .tg{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-top:3px}
 .tile .exp{font-family:var(--mono);font-size:.64rem;margin-top:5px;color:var(--muted)}
 .tile.warn{border-color:#F0D3A0;background:#FFFCF5}
@@ -456,7 +460,8 @@ button,input,select{font:inherit}
 .lines{overflow-y:auto;flex:1;min-height:110px}
 .empty{padding:38px 20px;text-align:center;color:var(--faint);font-size:.9rem}
 .ln{display:grid;grid-template-columns:1fr auto;gap:6px;padding:11px 16px;border-bottom:1px solid rgba(15,27,51,.05)}
-.ln .nm{font-size:.88rem;font-weight:600;line-height:1.3}
+.ln>div{min-width:0}
+.ln .nm{font-size:.88rem;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
 .ln .sub{font-size:.72rem;color:var(--muted);margin-top:2px}
 .ln .amt{font-weight:700;text-align:right;white-space:nowrap}
 .qty{display:flex;align-items:center;gap:7px;margin-top:6px}
@@ -500,7 +505,35 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
 .badge{font-size:.7rem;font-weight:700;border-radius:999px;padding:3px 9px}
 .b-red{background:#FDECEC;color:#B32222}.b-amb{background:#FFF4DF;color:#8A5A0B}.b-ok{background:#E7F5EC;color:#0B8043}
 .note{background:#FFF8E8;border:1px solid #F0DCAE;border-radius:12px;padding:13px 15px;font-size:.86rem;margin-top:16px}
+/* Always-visible total + pay button on a phone: on a small screen the cart
+   sits below the item grid, and a cashier must never have to scroll to take
+   money. Hidden on desktop, where the cart panel is already beside the tiles. */
+.mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:45;background:#fff;
+  border-top:1px solid var(--line);box-shadow:0 -6px 22px rgba(15,27,51,.13);
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));align-items:center;gap:12px}
+.mbar .info{flex:1;min-width:0;line-height:1.25}
+.mbar .info b{display:block;font-size:1.15rem}
+.mbar .info span{font-size:.74rem;color:var(--muted)}
+.mbar button{border:0;border-radius:11px;background:var(--acc);color:#fff;font-weight:700;
+  font-size:1rem;padding:13px 22px;cursor:pointer;white-space:nowrap}
+.mbar button:disabled{opacity:.4}
+
 @media (max-width:1080px){.wrap{grid-template-columns:1fr}.cart{position:static;max-height:none}}
+@media (max-width:700px){
+  .wrap{padding:12px 12px 24px;gap:12px}
+  .modes,.tables{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .modes a,.tbl{flex:0 0 auto}
+  .topbar{padding:11px 13px;gap:10px}
+  .topbar .meta{font-size:.76rem}
+  .tiles{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;padding:12px}
+  .tile{padding:10px}
+  .cats{padding:12px 12px 0;gap:6px;overflow-x:auto;flex-wrap:nowrap}
+  .cat{flex:0 0 auto}
+  .day{padding:0 12px}.day .panel{padding:18px 14px;overflow-x:auto}
+  .mbar{display:flex}
+  body.has-mbar{padding-bottom:78px}
+  .modal{padding:18px}.due b{font-size:1.5rem}
+}
 </style>
 </head>
 <body>
@@ -666,6 +699,11 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
     </div>
   </div>
 
+  <div class="mbar" id="mbar">
+    <div class="info"><b id="mb-total">Rs 0</b><span id="mb-count">Cart empty</span></div>
+    <button id="mb-pay" disabled><?= $mode === 'resto' ? 'Bill' : 'Pay' ?></button>
+  </div>
+
   <div class="mask" id="mask">
     <div class="modal">
       <h3 id="m-title">Cash payment</h3>
@@ -752,6 +790,11 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
       ['b-cash', 'b-card', 'b-wallet', 'b-khata', 'b-kot'].forEach(function (id) {
         var el = document.getElementById(id); if (el) el.disabled = !cart.length;
       });
+      var n = cart.reduce(function (a, l) { return a + l.qty; }, 0);
+      document.getElementById('mb-total').textContent = money(t.total);
+      document.getElementById('mb-count').textContent = n ? n + (n === 1 ? ' item' : ' items') : 'Cart empty';
+      document.getElementById('mb-pay').disabled = !cart.length;
+      document.body.classList.toggle('has-mbar', true);
     }
 
     function flash(msg) {
@@ -859,6 +902,7 @@ table.z td{padding:9px 6px;border-bottom:1px solid rgba(15,27,51,.05)}
       var el = document.getElementById(pair[0]);
       if (el) el.onclick = function () { openPay(pair[1]); };
     });
+    document.getElementById('mb-pay').onclick = function () { if (cart.length) openPay('cash'); };
     document.getElementById('m-cx').onclick = function () { mask.classList.remove('on'); scan.focus(); };
     mask.addEventListener('click', function (ev) { if (ev.target === mask) { mask.classList.remove('on'); scan.focus(); } });
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { mask.classList.remove('on'); scan.focus(); } });
