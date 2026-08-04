@@ -106,7 +106,8 @@ foreach (['time', 'source', 'lang', 'stage', 'name', 'whatsapp', 'email', 'compa
 }
 $body = implode("\n", $bodyLines) . "\n\nView all inquiries: https://vectorsolution.it/inquiries.php";
 
-$headers = "From: VectorIT Website <website@vectorsolution.it>\r\n";
+$headers = "From: VectorIT Website <website@vectorsolution.it>\r\n"
+         . "Content-Type: text/plain; charset=UTF-8\r\n";
 // Only a genuinely valid address may enter a header — otherwise it's an injection vector.
 if ($lead['email'] !== '' && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)) {
     $headers .= 'Reply-To: ' . $lead['email'] . "\r\n";
@@ -126,6 +127,54 @@ foreach (['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'] as $to) {
     // letting it sign for the delivery is the one fix available without editing
     // DNS. Replies still come back here via the From and Reply-To headers.
     $mailed = @mail($to, $subject, $body, $headers) || $mailed;
+}
+
+/* ---- acknowledgement to the person who wrote in ----
+   Someone who has just handed over their phone number should not be left
+   wondering whether it arrived. Skipped for the bot's half-finished save, or
+   the same person would be thanked twice for one conversation. */
+if ($lead['stage'] !== 'partial'
+    && $lead['email'] !== ''
+    && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)
+    && !in_array(strtolower($lead['email']), ['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'], true)) {
+
+    $who = $lead['name'] !== '' ? $lead['name'] : 'there';
+    $ack = [
+        'Assalam o alaikum ' . $who . ',',
+        '',
+        'Thank you for contacting VectorIT — your message has reached us.',
+        'You will get a reply from me personally, usually the same working day.',
+        '',
+        'Here is what you sent, so you have it for your record:',
+    ];
+    foreach (['company' => 'Company', 'service' => 'Interested in', 'budget' => 'Budget', 'message' => 'Your message'] as $k => $label) {
+        if ($lead[$k] !== '') {
+            $ack[] = '  ' . $label . ': ' . $lead[$k];
+        }
+    }
+    $ack[] = '';
+    $ack[] = 'If it is urgent, WhatsApp is the fastest way to reach us:';
+    $ack[] = 'https://wa.me/923363138686';
+    $ack[] = '';
+    $ack[] = 'In the meantime you are welcome to try the live demo —';
+    $ack[] = 'pick the counter closest to your business and put your own name on it:';
+    $ack[] = 'https://vectorsolution.it/demo/';
+    $ack[] = '';
+    $ack[] = '--';
+    $ack[] = 'Muhammad Shadab';
+    $ack[] = 'Founder & Lead Engineer, VectorIT';
+    $ack[] = 'shadab@vectorsolution.it';
+    $ack[] = '+92 336 3138686 (Pakistan) · +1 (512) 355-5462 (USA)';
+    $ack[] = 'https://vectorsolution.it';
+
+    @mail(
+        $lead['email'],
+        'We have your message — VectorIT',
+        implode("\n", $ack),
+        "From: VectorIT <shadab@vectorsolution.it>\r\n"
+        . "Reply-To: shadab@vectorsolution.it\r\n"
+        . "Content-Type: text/plain; charset=UTF-8\r\n"
+    );
 }
 
 // Only a lead that reached neither the disk nor a mailbox is a failure.
