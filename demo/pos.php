@@ -52,7 +52,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '') === 'pay
     if (!in_array($method, ['cash', 'card', 'wallet', 'khata'], true)) $method = 'cash';
 
     $lines = [];
-    $net = $tax = 0.0;
+    $net = $tax = $exempt = 0.0;   // exempt is kept apart: it is not taxable value
     if (is_array($raw)) {
         foreach (array_slice($raw, 0, 40) as $row) {
             $code = (string)($row['code'] ?? '');
@@ -62,17 +62,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '') === 'pay
             $qty = min($qty, 999);
             $it = $byCode[$code];
             $gross = $it['price'] * $qty;                            // shelf price includes sales tax
-            $lineNet = $it['tax'] > 0 ? $gross / (1 + $it['tax'] / 100) : $gross;
             $lines[] = ['name' => $it['name'], 'code' => $code, 'qty' => $qty,
                         'price' => $it['price'], 'gross' => $gross, 'tax' => $it['tax'],
                         'sch3' => !empty($it['sch3'])];
-            $net += $lineNet;
-            $tax += $gross - $lineNet;
+            if ($it['tax'] > 0) {
+                $lineNet = $gross / (1 + $it['tax'] / 100);
+                $net += $lineNet;
+                $tax += $gross - $lineNet;
+            } else {
+                $exempt += $gross;
+            }
         }
     }
     if (!$lines) { header('Location: pos.php?empty=1'); exit; }
 
-    $total = $net + $tax;
+    $total = $net + $tax + $exempt;
     $tendered = max(0.0, (float)($_POST['tendered'] ?? 0));
     $seq = (int)($_SESSION['pos_seq'] ?? 0) + 1;
     $_SESSION['pos_seq'] = $seq;
@@ -80,7 +84,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '') === 'pay
 
     $sale = [
         'no' => $no, 'time' => date('d M Y H:i'), 'lines' => $lines,
-        'net' => round($net, 2), 'tax' => round($tax, 2), 'total' => round($total, 2),
+        'net' => round($net, 2), 'tax' => round($tax, 2), 'exempt' => round($exempt, 2), 'total' => round($total, 2),
         'method' => $method, 'tendered' => $tendered,
         'change' => $method === 'cash' ? max(0.0, $tendered - $total) : 0.0,
         'khata' => $method === 'khata' ? trim(mb_substr((string)($_POST['khata'] ?? ''), 0, 60)) : '',
@@ -170,6 +174,9 @@ if ($p === 'receipt') {
       <table>
         <tr><td>Taxable value</td><td class="r"><?= number_format($sale['net']) ?></td></tr>
         <tr><td>Sales tax</td><td class="r"><?= number_format($sale['tax']) ?></td></tr>
+        <?php if (($sale['exempt'] ?? 0) > 0): ?>
+          <tr><td>Exempt goods *</td><td class="r"><?= number_format($sale['exempt']) ?></td></tr>
+        <?php endif; ?>
         <tr class="tot"><td>TOTAL</td><td class="r">Rs <?= number_format($sale['total']) ?></td></tr>
       </table>
       <hr>
