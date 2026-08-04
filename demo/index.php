@@ -391,7 +391,7 @@ button,input{font:inherit}
 .cust-steps li{font-size:.92rem;color:var(--muted)}
 .cust-steps b{color:var(--ink)}
 /* demo chooser */
-.choose-wrap{max-width:1120px;margin:0 auto;padding:44px 20px 70px;
+.choose-wrap{max-width:1200px;margin:0 auto;padding:44px 20px 70px;
   background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(46,91,219,.09),transparent 62%)}
 .choose-head{text-align:center;margin-bottom:34px}
 .choose-head .mark{display:inline-flex;align-items:center;gap:9px;font-size:1.15rem;font-weight:800;margin-bottom:18px}
@@ -399,7 +399,7 @@ button,input{font:inherit}
 .choose-head .mark em{font-style:normal;color:var(--blue)}
 .choose-head h1{font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.02em;margin-bottom:12px}
 .choose-head p{color:var(--muted);max-width:620px;margin:0 auto;font-size:1rem}
-.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:18px}
+.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
 .tcard{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:26px 24px 22px;
   display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);
   transition:transform .14s,box-shadow .14s,border-color .14s;border-top:4px solid var(--acc)}
