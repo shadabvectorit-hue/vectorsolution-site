@@ -85,7 +85,7 @@ $stats = null;
 if ($authed) {
     // ---- traffic stats from the first-party analytics log ----
     $af = VIT_PRIVATE . '/analytics.jsonl';
-    $stats = ['pv7' => 0, 'pv30' => 0, 'uniq7' => [], 'wa7' => 0, 'demo7' => 0, 'inv7' => 0, 'pdf7' => 0, 'pages' => [], 'mobile' => 0, 'total7' => 0];
+    $stats = ['pv7' => 0, 'pv30' => 0, 'uniq7' => [], 'wa7' => 0, 'demo7' => 0, 'inv7' => 0, 'pdf7' => 0, 'pos7' => 0, 'tracks' => [], 'pages' => [], 'mobile' => 0, 'total7' => 0];
     if (is_file($af)) {
         // Bounded read: pulling the whole log into an array would let anyone who
         // can grow it exhaust PHP's memory and lock the owner out of this page.
@@ -112,6 +112,11 @@ if ($authed) {
             elseif ($ev === 'demo_login') $stats['demo7']++;
             elseif ($ev === 'demo_invoice_created') $stats['inv7']++;
             elseif ($ev === 'demo_pdf_invoice' || $ev === 'demo_pdf_report') $stats['pdf7']++;
+            elseif ($ev === 'demo_pos_sale') $stats['pos7']++;
+            elseif (str_starts_with($ev, 'demo_start_')) {
+                $t = substr($ev, 11);
+                $stats['tracks'][$t] = ($stats['tracks'][$t] ?? 0) + 1;
+            }
         }
         arsort($stats['pages']);
         $stats['pages'] = array_slice($stats['pages'], 0, 8, true);
@@ -215,8 +220,14 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
         <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['demo7'] ?></div><div class="meta">Demo logins</div></div>
         <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['inv7'] ?></div><div class="meta">Invoices created</div></div>
         <div><div style="font-size:1.5rem;font-weight:800;color:#2E5BDB"><?= $stats['pdf7'] ?></div><div class="meta">PDFs printed</div></div>
+        <div><div style="font-size:1.5rem;font-weight:800;color:#0B8043"><?= $stats['pos7'] ?></div><div class="meta">POS sales rung up</div></div>
         <div><div style="font-size:1.5rem;font-weight:800"><?= $stats['total7'] ? round($stats['mobile'] * 100 / $stats['total7']) : 0 ?>%</div><div class="meta">On mobile</div></div>
       </div>
+      <?php if (!empty($stats['tracks'])): ?>
+      <div class="meta" style="margin-top:12px">Which demo they picked:
+        <?php arsort($stats['tracks']); foreach ($stats['tracks'] as $t => $n): ?><span class="tag"><?= $e($t) ?> · <?= (int)$n ?></span><?php endforeach; ?>
+      </div>
+      <?php endif; ?>
       <?php if ($stats['pages']): ?>
       <div class="meta" style="margin-top:12px">Top pages:
         <?php foreach ($stats['pages'] as $pg => $n): ?><span class="tag"><?= $e($pg) ?> · <?= $n ?></span><?php endforeach; ?>

@@ -43,8 +43,50 @@ function demoTrack(string $event, string $page = ''): void {
     @file_put_contents($file, (string)json_encode($row, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) . "\n", FILE_APPEND | LOCK_EX);
 }
 
-/* ---------- auth ---------- */
+/* ---------- which demo is this visitor here for? ---------- */
+$TRACKS = [
+    'pos' => [
+        'Retail counter / POS', 'Shop, mart, pharmacy, restaurant', '#0B8043',
+        'Scan a barcode, take cash or JazzCash, print an 80 mm receipt with the FBR number on it.',
+        ['Barcode scanning', 'Thermal receipt', 'Khata / udhaar', 'Day close'],
+        'M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 5h13M10 21a1 1 0 100-2 1 1 0 000 2zM17 21a1 1 0 100-2 1 1 0 000 2z',
+    ],
+    'fbr' => [
+        'FBR digital invoicing', 'Sales-tax registered business', '#2E5BDB',
+        'Raise a sales tax invoice, file it with FBR, get the invoice number and QR back, print the statutory document.',
+        ['Live FBR filing', 'Invoice number + QR', 'Sales tax register', '72-hour corrections'],
+        'M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h4',
+    ],
+    'erp' => [
+        'Full business ERP', 'Trading, distribution, manufacturing', '#1E3FA6',
+        'Accounts, stock across godowns, receivables, CRM pipeline and payroll — one system instead of six files.',
+        ['Accounting & ledger', 'Inventory', 'CRM', 'Payroll & EOBI'],
+        'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8',
+    ],
+    'custom' => [
+        'Something built for you', 'No off-the-shelf system fits', '#FF5A2D',
+        'Field apps, approval workflows, integrations with machines or portals — software shaped around how you actually work.',
+        ['Web & mobile apps', 'Workflow automation', 'System integration', 'Legacy rebuilds'],
+        'M12 2l2.4 6.9L21 9.6l-5 4.6 1.4 7-5.4-3.4L6.6 21 8 14.2l-5-4.6 6.6-.7z',
+    ],
+];
+
 if (isset($_GET['logout'])) { session_destroy(); header('Location: index.php'); exit; }
+
+/* Choosing a track is the way in — no login wall in front of a sales demo. */
+$wanted = (string)($_GET['track'] ?? '');
+if ($wanted !== '' && isset($TRACKS[$wanted])) {
+    if (empty($_SESSION['demo_ok'])) { session_regenerate_id(true); }
+    $_SESSION['demo_ok'] = true;
+    $_SESSION['track'] = $wanted;
+    // Generic event keeps the inbox "demo opens" figure continuous; the second
+    // one says which demo they picked, which is the useful sales signal.
+    demoTrack('demo_login');
+    demoTrack('demo_start_' . $wanted);
+    $to = ['pos' => 'pos.php', 'fbr' => 'index.php?p=invoices', 'custom' => 'index.php?p=custom'][$wanted] ?? 'index.php';
+    header('Location: ' . $to); exit;
+}
+$track = (string)($_SESSION['track'] ?? 'erp');
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['user'])) {
     if ($_POST['user'] === DEMO_USER && ($_POST['pass'] ?? '') === DEMO_PASS) {
         session_regenerate_id(true);
@@ -316,6 +358,7 @@ $NAV = [
     'crm'       => ['Sales / CRM',  'M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9.5 11a4 4 0 100-8 4 4 0 000 8z'],
     'ledger'    => ['Accounting',   'M4 4h16v16H4zM4 9h16M9 9v11'],
     'payroll'   => ['HR & Payroll', 'M2 7h20v14H2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2'],
+    'custom'    => ['Custom builds', 'M12 2l2.4 6.9L21 9.6l-5 4.6 1.4 7-5.4-3.4L6.6 21 8 14.2l-5-4.6 6.6-.7z'],
 ];
 ?><!DOCTYPE html>
 <html lang="en">
@@ -338,6 +381,42 @@ button,input{font:inherit}
 .demo-bar b{font-weight:700}
 .demo-bar a{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:4px 14px;font-weight:600;white-space:nowrap}
 .demo-bar a:hover{background:rgba(255,255,255,.28)}
+/* custom-build page */
+.cust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.cust{border:1px solid var(--line-soft);border-radius:14px;padding:18px 20px;background:#FBFCFE}
+.cust h3{font-size:1.02rem;margin-bottom:7px}
+.cust p{color:var(--muted);font-size:.88rem;line-height:1.55;margin-bottom:10px}
+.cust-tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.cust-steps{margin:12px 0 0 18px;display:grid;gap:9px}
+.cust-steps li{font-size:.92rem;color:var(--muted)}
+.cust-steps b{color:var(--ink)}
+/* demo chooser */
+.choose-wrap{max-width:1120px;margin:0 auto;padding:44px 20px 70px;
+  background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(46,91,219,.09),transparent 62%)}
+.choose-head{text-align:center;margin-bottom:34px}
+.choose-head .mark{display:inline-flex;align-items:center;gap:9px;font-size:1.15rem;font-weight:800;margin-bottom:18px}
+.choose-head .mark svg{width:30px;height:30px}
+.choose-head .mark em{font-style:normal;color:var(--blue)}
+.choose-head h1{font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.02em;margin-bottom:12px}
+.choose-head p{color:var(--muted);max-width:620px;margin:0 auto;font-size:1rem}
+.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:18px}
+.tcard{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:26px 24px 22px;
+  display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);
+  transition:transform .14s,box-shadow .14s,border-color .14s;border-top:4px solid var(--acc)}
+.tcard:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 16px 40px rgba(15,27,51,.13)}
+.tico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--acc) 12%,#fff);color:var(--acc);margin-bottom:15px}
+.tico svg{width:23px;height:23px}
+.twho{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.tcard h2{font-size:1.2rem;margin:5px 0 9px;letter-spacing:-.01em}
+.tcard p{color:var(--muted);font-size:.9rem;line-height:1.55;margin-bottom:15px}
+.tfeats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tfeats i{font-style:normal;font-size:.72rem;font-weight:600;background:var(--paper);border:1px solid var(--line-soft);
+  border-radius:999px;padding:4px 10px;color:var(--muted)}
+.tgo{margin-top:auto;display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:.9rem;color:var(--acc)}
+.tgo svg{width:15px;height:15px}
+.choose-foot{text-align:center;color:var(--muted);font-size:.9rem;margin-top:30px}
+.choose-foot a{color:var(--blue);font-weight:600;text-decoration:underline}
 /* login */
 .login-wrap{min-height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse 70% 60% at 70% 10%,rgba(46,91,219,.10),transparent 60%)}
 .login{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:38px 34px;width:min(400px,100%);box-shadow:0 4px 12px rgba(15,27,51,.05),0 30px 70px rgba(30,63,166,.14)}
@@ -362,7 +441,10 @@ button,input{font:inherit}
 .side a svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;opacity:.85}
 .side a:hover{background:rgba(255,255,255,.06);color:#fff}
 .side a.on{background:rgba(91,140,255,.18);color:#fff;border-left:3px solid #5B8CFF;padding-left:15px}
+.side .pos-link{margin-top:12px;color:#9BE8BE;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
+.side .pos-link:hover{background:rgba(11,128,67,.28);color:#fff}
 .side .foot{margin-top:auto;padding:16px 18px 0;font-size:.76rem;color:#7D8CB0;border-top:1px solid rgba(255,255,255,.08)}
+.side .foot a{color:#9DBAFF}
 .side .foot a{padding:0;display:inline;color:#9DBAFF}
 .main{padding:26px clamp(16px,3vw,34px);overflow-x:auto}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -424,27 +506,35 @@ tbody tr:hover{background:var(--paper)}
 
 <div class="demo-bar">
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
+  <?php if ($authed): ?><a href="?p=choose">↔ Switch demo</a><?php endif; ?>
   <a href="/">← Back to vectorsolution.it</a>
   <?php if ($authed): ?><a href="#save" style="background:#25D366;border-color:#25D366">💾 Save my demo data</a><?php endif; ?>
   <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like to discuss it for my business.') ?>" target="_blank" rel="noopener">Discuss this for my business →</a>
 </div>
 
-<?php if (!$authed): ?>
-  <div class="login-wrap">
-    <form class="login" method="post">
-      <div class="mark">
+<?php if (!$authed || $p === 'choose'): ?>
+  <div class="choose-wrap">
+    <div class="choose-head">
+      <span class="mark">
         <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/></svg>
-        <b>Vector<em>ERP</em></b>
-      </div>
-      <p class="sub">Demo company — Al-Karam Traders (Pvt) Ltd, Karachi</p>
-      <?php if (!empty($loginError)): ?><p class="err"><?= $e($loginError) ?></p><?php endif; ?>
-      <label for="u">User name</label>
-      <input id="u" name="user" value="demo" autocomplete="off">
-      <label for="p">Password</label>
-      <input id="p" name="pass" type="password" value="demo">
-      <button type="submit">Sign in to the demo</button>
-      <p class="hint">Login is <code>demo</code> / <code>demo</code> — already filled in. Click through everything; the data resets when you leave.</p>
-    </form>
+        Vector<em>ERP</em>
+      </span>
+      <h1>What kind of business are you?</h1>
+      <p>Pick the one closest to yours and you will land in a working system with sample data — not a slideshow. Nothing is saved, nothing to install, no sign-up.</p>
+    </div>
+    <div class="choose-grid">
+      <?php foreach ($TRACKS as $key => [$title, $who, $colour, $blurb, $feats, $icon]): ?>
+        <a class="tcard" href="?track=<?= $e($key) ?>" style="--acc:<?= $e($colour) ?>">
+          <span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $icon ?>"/></svg></span>
+          <span class="twho"><?= $e($who) ?></span>
+          <h2><?= $e($title) ?></h2>
+          <p><?= $e($blurb) ?></p>
+          <span class="tfeats"><?php foreach ($feats as $f): ?><i><?= $e($f) ?></i><?php endforeach; ?></span>
+          <span class="tgo">Open this demo <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg></span>
+        </a>
+      <?php endforeach; ?>
+    </div>
+    <p class="choose-foot">Not sure which fits? <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I want to see the VectorERP demo but not sure which one fits my business.') ?>" target="_blank" rel="noopener">Ask us on WhatsApp</a> — tell us what you do and we will point you at the right one.</p>
   </div>
 <?php else: ?>
   <div class="shell">
@@ -458,7 +548,10 @@ tbody tr:hover{background:var(--paper)}
           <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $path ?>"/></svg><?= $e($label) ?>
         </a>
       <?php endforeach; ?>
-      <div class="foot">Demo build · <a href="?logout=1">Sign out &amp; reset</a></div>
+      <a href="pos.php" class="pos-link">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 5h13M10 21a1 1 0 100-2 1 1 0 000 2zM17 21a1 1 0 100-2 1 1 0 000 2z"/></svg>Retail POS
+      </a>
+      <div class="foot"><a href="?p=choose">↔ Switch demo</a> · <a href="?logout=1">Sign out &amp; reset</a></div>
     </nav>
 
     <main class="main">
@@ -724,6 +817,42 @@ tbody tr:hover{background:var(--paper)}
             </tbody>
           </table>
           <p class="note">Salman Raza shows 28 days — attendance flows straight into the salary calculation.</p>
+        </div>
+
+      <?php elseif ($p === 'custom'): ?>
+        <div class="panel">
+          <h2>When nothing off-the-shelf fits <span>what a custom build actually looks like</span></h2>
+          <p class="note" style="margin-bottom:18px">There is no sample screen for this one, because custom work has no standard screen — it is shaped around how <em>you</em> work. So here is honestly what we have built for other businesses, and what the process looks like.</p>
+          <div class="cust-grid">
+            <div class="cust">
+              <h3>Field staff app</h3>
+              <p>Outdoor staff photograph a receipt on site; it is read automatically, an accountant approves it, and the expense posts to the ledger against that person's cash float. Built for an industrial services company working across Pakistan and Dubai.</p>
+              <span class="cust-tag">Mobile · offline-tolerant</span>
+            </div>
+            <div class="cust">
+              <h3>Legacy system rebuild</h3>
+              <p>A manufacturer ran twenty years of accounts, GST and excise on a Visual Basic 6 program that only worked on one ageing PC. We reverse-engineered it, migrated the data, and rebuilt it as a web system their whole team uses from any browser.</p>
+              <span class="cust-tag">Migration · GST &amp; excise</span>
+            </div>
+            <div class="cust">
+              <h3>Approval workflows</h3>
+              <p>Quotation → proforma → commercial invoice → packing list → delivery note, each with its own approvals and its own tax treatment, across two companies in two countries with two different fiscal calendars.</p>
+              <span class="cust-tag">Multi-entity · multi-currency</span>
+            </div>
+            <div class="cust">
+              <h3>Booking &amp; public portals</h3>
+              <p>A hospital site where patients book appointments online and reception sees them instantly, with WhatsApp confirmations — plus an Android app for the patients who live on their phone rather than a browser.</p>
+              <span class="cust-tag">Web · Android · WhatsApp</span>
+            </div>
+          </div>
+          <h2 style="margin-top:26px">How a custom project runs</h2>
+          <ol class="cust-steps">
+            <li><b>We sit with your process first.</b> Usually half a day. What actually happens, who signs what, where the current system hurts.</li>
+            <li><b>Fixed scope, fixed price, in writing.</b> You see the number before anything is built. No hourly meter.</li>
+            <li><b>You see it working every couple of weeks</b> — not a status report, the actual software.</li>
+            <li><b>You own the code outright</b> on final payment, and we hand over the source.</li>
+          </ol>
+          <p class="note">Honest note: if an existing system would serve you better than a custom build, we will tell you so — it is cheaper for you and it is a shorter argument than delivering something you did not need.</p>
         </div>
       <?php endif; ?>
 
