@@ -81,6 +81,45 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
 }
 $authed = !empty($_SESSION['inq_ok']);
 
+/* ---------- delete a lead ---------- */
+if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['del'])) {
+    $ok = !empty($_SESSION['inq_csrf']) && hash_equals((string)$_SESSION['inq_csrf'], (string)($_POST['csrf'] ?? ''));
+    $key = preg_replace('/[^a-f0-9]/', '', (string)$_POST['del']);
+    $leadId = trim(mb_substr((string)($_POST['leadId'] ?? ''), 0, 40));
+    $removed = 0;
+    if ($ok && $key !== '') {
+        $lf = VIT_PRIVATE . '/inquiries.jsonl';
+        $fh = @fopen($lf, 'c+');
+        if ($fh && flock($fh, LOCK_EX)) {
+            $keep = [];
+            rewind($fh);
+            while (($line = fgets($fh)) !== false) {
+                $trim = rtrim($line, "\r\n");
+                if ($trim === '') continue;
+                // Match the exact line, or every line of the same chat so a
+                // half-finished bot lead does not reappear after its twin goes.
+                $isTarget = substr(sha1($trim), 0, 16) === $key;
+                if (!$isTarget && $leadId !== '') {
+                    $row = json_decode($trim, true);
+                    if (is_array($row) && (string)($row['leadId'] ?? '') === $leadId) $isTarget = true;
+                }
+                if ($isTarget) { $removed++; } else { $keep[] = $trim; }
+            }
+            if ($removed > 0) {
+                ftruncate($fh, 0);
+                rewind($fh);
+                fwrite($fh, $keep ? implode("\n", $keep) . "\n" : '');
+                fflush($fh);
+            }
+            flock($fh, LOCK_UN);
+        }
+        if ($fh) fclose($fh);
+        vit_audit('lead_deleted', ['n' => $removed, 'name' => mb_substr((string)($_POST['who'] ?? ''), 0, 60)]);
+    }
+    header('Location: inquiries.php?deleted=' . $removed);
+    exit;
+}
+
 $stats = null;
 if ($authed) {
     // ---- traffic stats from the first-party analytics log ----
@@ -161,6 +200,7 @@ if ($authed) {
                 if (isset($seen[$id])) continue;
                 $seen[$id] = true;
             }
+            $row['_k'] = substr(sha1($line), 0, 16);   // handle for the delete button
             $leads[] = $row;
         }
     }
@@ -189,6 +229,13 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
   a { color: #2E5BDB; }
   .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
   .empty { color: #55617D; padding: 40px; text-align: center; }
+  .card { position: relative; }
+  .del-form { position: absolute; right: 14px; bottom: 12px; margin: 0; }
+  .del { background: none; color: #B0BACD; border: 1px solid #E3E9F5; border-radius: 7px;
+         padding: 4px 11px; font-size: .76rem; font-weight: 600; cursor: pointer; }
+  .del:hover { background: #FDECEC; color: #B32222; border-color: #E4B7B7; }
+  .done { background: #E7F5EC; border: 1px solid #B7DEC6; color: #0B6B39; border-radius: 10px;
+          padding: 11px 15px; margin-bottom: 14px; font-size: .9rem; }
 </style>
 </head>
 <body>
@@ -209,6 +256,11 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
       <h1>Inquiries <small><?= count($leads) ?> total</small></h1>
       <a href="?logout=1&amp;t=<?= $e($_SESSION['inq_csrf'] ?? '') ?>">Log out</a>
     </div>
+
+    <?php if (isset($_GET['deleted'])): ?>
+      <?php $n = (int)$_GET['deleted']; ?>
+      <div class="done"><?= $n > 0 ? '✓ Deleted — ' . $n . ' record' . ($n === 1 ? '' : 's') . ' removed.' : 'Nothing was deleted (the entry may already be gone).' ?></div>
+    <?php endif; ?>
 
     <?php if ($stats): ?>
     <div class="card" style="margin-bottom:18px">
@@ -275,6 +327,13 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
           <?php if (!empty($l['email'])): ?>✉️ <a href="mailto:<?= $e($l['email']) ?>"><?= $e($l['email']) ?></a><?php endif; ?>
         </div>
         <?php if (!empty($l['message'])): ?><div class="msg"><?= $e($l['message']) ?></div><?php endif; ?>
+        <form method="post" class="del-form" onsubmit="return confirm('Delete this inquiry permanently? This cannot be undone.')">
+          <input type="hidden" name="csrf" value="<?= $e($_SESSION['inq_csrf'] ?? '') ?>">
+          <input type="hidden" name="del" value="<?= $e($l['_k'] ?? '') ?>">
+          <input type="hidden" name="leadId" value="<?= $e($l['leadId'] ?? '') ?>">
+          <input type="hidden" name="who" value="<?= $e($l['name'] ?? '') ?>">
+          <button type="submit" class="del">Delete</button>
+        </form>
       </div>
     <?php endforeach; ?>
   </div>
