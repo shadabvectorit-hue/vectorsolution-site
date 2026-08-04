@@ -46,10 +46,22 @@ function demoTrack(string $event, string $page = ''): void {
 /* ---------- which demo is this visitor here for? ---------- */
 $TRACKS = [
     'pos' => [
-        'Retail counter / POS', 'Shop, mart, pharmacy, restaurant', '#0B8043',
+        'Shop / general store', 'Kiryana, mart, hardware, garments', '#0B8043',
         'Scan a barcode, take cash or JazzCash, print an 80 mm receipt with the FBR number on it.',
         ['Barcode scanning', 'Thermal receipt', 'Khata / udhaar', 'Day close'],
         'M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 5h13M10 21a1 1 0 100-2 1 1 0 000 2zM17 21a1 1 0 100-2 1 1 0 000 2z',
+    ],
+    'resto' => [
+        'Restaurant / café', 'Dine-in, takeaway, delivery', '#B7791F',
+        'Open a table, send the order to the kitchen printer, then bill it — with Sindh service tax, not FBR.',
+        ['Table plan', 'Kitchen tickets', 'SRB 15% service tax', 'Split by table'],
+        'M4 3v8a3 3 0 003 3v7M7 3v6M10 3v6M17 3c-1.5 2-2 4-2 6s.5 3 2 3v9',
+    ],
+    'pharma' => [
+        'Pharmacy / chemist', 'Batch and expiry matter here', '#0E7490',
+        'Every sale picks the batch expiring first, expired stock cannot be sold, and the receipt carries batch and expiry.',
+        ['Batch tracking', 'Expiry watch', 'FEFO picking', 'DRAP licence on receipt'],
+        'M10.5 20.5a4.95 4.95 0 01-7-7l7-7a4.95 4.95 0 017 7zM8.5 8.5l7 7',
     ],
     'fbr' => [
         'FBR digital invoicing', 'Sales-tax registered business', '#2E5BDB',
@@ -83,7 +95,8 @@ if ($wanted !== '' && isset($TRACKS[$wanted])) {
     // one says which demo they picked, which is the useful sales signal.
     demoTrack('demo_login');
     demoTrack('demo_start_' . $wanted);
-    $to = ['pos' => 'pos.php', 'fbr' => 'index.php?p=invoices', 'custom' => 'index.php?p=custom'][$wanted] ?? 'index.php';
+    $to = ['pos' => 'pos.php?mode=retail', 'resto' => 'pos.php?mode=resto', 'pharma' => 'pos.php?mode=pharma',
+           'fbr' => 'index.php?p=invoices', 'custom' => 'index.php?p=custom'][$wanted] ?? 'index.php';
     header('Location: ' . $to); exit;
 }
 $track = (string)($_SESSION['track'] ?? 'erp');
@@ -399,7 +412,7 @@ button,input{font:inherit}
 .choose-head .mark em{font-style:normal;color:var(--blue)}
 .choose-head h1{font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.02em;margin-bottom:12px}
 .choose-head p{color:var(--muted);max-width:620px;margin:0 auto;font-size:1rem}
-.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px}
+.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
 .tcard{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:26px 24px 22px;
   display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);
   transition:transform .14s,box-shadow .14s,border-color .14s;border-top:4px solid var(--acc)}

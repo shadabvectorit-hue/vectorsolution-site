@@ -66,6 +66,100 @@ return [
         ['code' => '8964008802114', 'name' => 'Rose Petal tissue box',      'cat' => 'Household',     'price' => 260,  'tax' => 18, 'stock' => 7],
     ],
 
+    /* ------------------------------------------------------------------
+     * RESTAURANT
+     * Menu prices are quoted EXCLUSIVE of tax — that is how a Pakistani menu
+     * card works, tax is added on the bill. And the tax is Sindh Revenue Board
+     * at 15% on the service, not FBR's 18% on goods: a restaurant in Karachi
+     * files to SRB, which is a different authority and a different portal.
+     * ------------------------------------------------------------------ */
+    'resto' => [
+        'name'   => 'Karachi Kitchen',
+        'branch' => 'Bahadurabad, Karachi',
+        'ntn'    => '4417820-6',
+        'srb'    => 'S-3311-2049-8',
+        'tax'    => 15,
+        'waiter' => 'Faisal',
+        'tables' => ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'],
+        'categories' => ['Karahi & Handi', 'BBQ', 'Fast food', 'Rice', 'Breads', 'Drinks', 'Dessert'],
+        'menu' => [
+            ['code' => 'M101', 'name' => 'Chicken Karahi — full',   'cat' => 'Karahi & Handi', 'price' => 2400],
+            ['code' => 'M102', 'name' => 'Chicken Karahi — half',   'cat' => 'Karahi & Handi', 'price' => 1300],
+            ['code' => 'M103', 'name' => 'Mutton Karahi — full',    'cat' => 'Karahi & Handi', 'price' => 4200],
+            ['code' => 'M104', 'name' => 'Chicken White Handi',     'cat' => 'Karahi & Handi', 'price' => 1650],
+            ['code' => 'M201', 'name' => 'Chicken Tikka (1 pc)',    'cat' => 'BBQ',            'price' => 480],
+            ['code' => 'M202', 'name' => 'Seekh Kabab (4 pcs)',     'cat' => 'BBQ',            'price' => 720],
+            ['code' => 'M203', 'name' => 'Malai Boti',              'cat' => 'BBQ',            'price' => 890],
+            ['code' => 'M204', 'name' => 'Beef Bihari Boti',        'cat' => 'BBQ',            'price' => 950],
+            ['code' => 'M301', 'name' => 'Zinger Burger',           'cat' => 'Fast food',      'price' => 690],
+            ['code' => 'M302', 'name' => 'Club Sandwich',           'cat' => 'Fast food',      'price' => 620],
+            ['code' => 'M303', 'name' => 'Loaded Fries',            'cat' => 'Fast food',      'price' => 450],
+            ['code' => 'M401', 'name' => 'Chicken Biryani',         'cat' => 'Rice',           'price' => 550],
+            ['code' => 'M402', 'name' => 'Mutton Pulao',            'cat' => 'Rice',           'price' => 780],
+            ['code' => 'M403', 'name' => 'Special Fried Rice',      'cat' => 'Rice',           'price' => 520],
+            ['code' => 'M501', 'name' => 'Roghni Naan',             'cat' => 'Breads',         'price' => 90],
+            ['code' => 'M502', 'name' => 'Garlic Naan',             'cat' => 'Breads',         'price' => 130],
+            ['code' => 'M503', 'name' => 'Tandoori Roti',           'cat' => 'Breads',         'price' => 40],
+            ['code' => 'M601', 'name' => 'Fresh Lime',              'cat' => 'Drinks',         'price' => 260],
+            ['code' => 'M602', 'name' => 'Mint Margarita',          'cat' => 'Drinks',         'price' => 380],
+            ['code' => 'M603', 'name' => 'Soft drink (regular)',    'cat' => 'Drinks',         'price' => 150],
+            ['code' => 'M604', 'name' => 'Kashmiri Chai',           'cat' => 'Drinks',         'price' => 320],
+            ['code' => 'M701', 'name' => 'Gulab Jamun (2 pcs)',     'cat' => 'Dessert',        'price' => 280],
+            ['code' => 'M702', 'name' => 'Kheer',                   'cat' => 'Dessert',        'price' => 300],
+        ],
+    ],
+
+    /* ------------------------------------------------------------------
+     * PHARMACY
+     * Every line is a batch, because a chemist does not sell "Panadol" — they
+     * sell a specific batch with an expiry date, and the till must pick the
+     * one expiring first. Most medicines carry no sales tax; OTC and cosmetic
+     * lines do.
+     * ------------------------------------------------------------------ */
+    'pharma' => [
+        'name'      => 'Al-Shifa Pharmacy',
+        'branch'    => 'Tariq Road, Karachi',
+        'ntn'       => '3390142-7',
+        'strn'      => '32-77-9014-227-11',
+        'licence'   => 'DRAP/RS/SD-4471',
+        'pharmacist'=> 'Dr. Sana Iqbal',
+        'categories'=> ['Painkillers', 'Antibiotics', 'Chronic', 'Stomach', 'Baby & OTC', 'Devices'],
+        'items' => [
+            ['code' => 'P1001', 'name' => 'Panadol 500mg (10 tabs)',   'cat' => 'Painkillers', 'price' => 90,   'tax' => 0,
+             'batches' => [['b' => 'PN-2411', 'exp' => '2026-09-30', 'qty' => 40], ['b' => 'PN-2503', 'exp' => '2027-06-30', 'qty' => 180]]],
+            ['code' => 'P1002', 'name' => 'Brufen 400mg (10 tabs)',    'cat' => 'Painkillers', 'price' => 165,  'tax' => 0,
+             'batches' => [['b' => 'BR-2402', 'exp' => '2027-02-28', 'qty' => 95]]],
+            ['code' => 'P1003', 'name' => 'Ponstan Forte (10 tabs)',   'cat' => 'Painkillers', 'price' => 285,  'tax' => 0,
+             'batches' => [['b' => 'PF-2312', 'exp' => '2026-08-31', 'qty' => 12], ['b' => 'PF-2504', 'exp' => '2027-11-30', 'qty' => 60]]],
+            ['code' => 'P2001', 'name' => 'Augmentin 625mg (14 tabs)', 'cat' => 'Antibiotics', 'price' => 1480, 'tax' => 0,
+             'batches' => [['b' => 'AG-2409', 'exp' => '2027-04-30', 'qty' => 26]]],
+            ['code' => 'P2002', 'name' => 'Azomax 500mg (6 caps)',     'cat' => 'Antibiotics', 'price' => 690,  'tax' => 0,
+             'batches' => [['b' => 'AZ-2408', 'exp' => '2026-10-31', 'qty' => 18], ['b' => 'AZ-2502', 'exp' => '2027-08-31', 'qty' => 44]]],
+            ['code' => 'P2003', 'name' => 'Flagyl 400mg (20 tabs)',    'cat' => 'Antibiotics', 'price' => 320,  'tax' => 0,
+             'batches' => [['b' => 'FG-2501', 'exp' => '2028-01-31', 'qty' => 70]]],
+            ['code' => 'P3001', 'name' => 'Glucophage 500mg (30)',     'cat' => 'Chronic',     'price' => 240,  'tax' => 0,
+             'batches' => [['b' => 'GP-2405', 'exp' => '2027-05-31', 'qty' => 130]]],
+            ['code' => 'P3002', 'name' => 'Concor 5mg (14 tabs)',      'cat' => 'Chronic',     'price' => 560,  'tax' => 0,
+             'batches' => [['b' => 'CN-2310', 'exp' => '2026-09-15', 'qty' => 9], ['b' => 'CN-2506', 'exp' => '2028-03-31', 'qty' => 55]]],
+            ['code' => 'P3003', 'name' => 'Tenormin 50mg (14 tabs)',   'cat' => 'Chronic',     'price' => 410,  'tax' => 0,
+             'batches' => [['b' => 'TN-2411', 'exp' => '2027-10-31', 'qty' => 48]]],
+            ['code' => 'P4001', 'name' => 'Risek 20mg (14 caps)',      'cat' => 'Stomach',     'price' => 520,  'tax' => 0,
+             'batches' => [['b' => 'RS-2404', 'exp' => '2027-03-31', 'qty' => 62]]],
+            ['code' => 'P4002', 'name' => 'ENO sachet',                'cat' => 'Stomach',     'price' => 60,   'tax' => 18,
+             'batches' => [['b' => 'EN-2502', 'exp' => '2027-12-31', 'qty' => 210]]],
+            ['code' => 'P5001', 'name' => 'Pampers medium (18)',       'cat' => 'Baby & OTC',  'price' => 1350, 'tax' => 18,
+             'batches' => [['b' => 'PM-2503', 'exp' => '2029-01-31', 'qty' => 24]]],
+            ['code' => 'P5002', 'name' => 'Cerelac wheat 350g',        'cat' => 'Baby & OTC',  'price' => 1180, 'tax' => 0,
+             'batches' => [['b' => 'CR-2412', 'exp' => '2026-11-30', 'qty' => 15]]],
+            ['code' => 'P5003', 'name' => 'Dettol 500ml',              'cat' => 'Baby & OTC',  'price' => 690,  'tax' => 18,
+             'batches' => [['b' => 'DT-2501', 'exp' => '2028-06-30', 'qty' => 33]]],
+            ['code' => 'P6001', 'name' => 'BP monitor (digital)',      'cat' => 'Devices',     'price' => 6900, 'tax' => 18,
+             'batches' => [['b' => 'BPM-24', 'exp' => '2030-12-31', 'qty' => 6]]],
+            ['code' => 'P6002', 'name' => 'Glucometer strips (50)',    'cat' => 'Devices',     'price' => 2450, 'tax' => 0,
+             'batches' => [['b' => 'GS-2410', 'exp' => '2026-12-31', 'qty' => 21]]],
+        ],
+    ],
+
     /** Regulars who buy on khata (running credit) — the counter reality here. */
     'khata' => [
         ['name' => 'Rashid — Flat 302',   'phone' => '0300 2214477', 'balance' => 8450],
