@@ -96,7 +96,8 @@ if ($wanted !== '' && isset($TRACKS[$wanted])) {
     demoTrack('demo_login');
     demoTrack('demo_start_' . $wanted);
     $to = ['pos' => 'pos.php?mode=retail', 'resto' => 'pos.php?mode=resto', 'pharma' => 'pos.php?mode=pharma',
-           'fbr' => 'index.php?p=invoices', 'custom' => 'index.php?p=custom'][$wanted] ?? 'index.php';
+           'fbr' => 'index.php?p=invoices', 'custom' => 'index.php?p=custom',
+           'erp' => 'index.php?p=dashboard'][$wanted] ?? 'index.php?p=dashboard';
     header('Location: ' . $to); exit;
 }
 $track = (string)($_SESSION['track'] ?? 'erp');
@@ -175,6 +176,10 @@ if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_GET['p'] ?? '
     header('Location: index.php?p=invoices&created=' . urlencode($no)); exit;
 }
 
+// Landing on /demo/ with nothing in the query always means "show me the menu",
+// even for someone who picked a demo earlier — otherwise a returning visitor
+// clicking "Live demo" is dropped into whichever one they saw last.
+$bare = !isset($_GET['p']);
 $p = $_GET['p'] ?? 'dashboard';
 $e = static fn($v): string => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 $rs = static fn($n): string => 'Rs ' . number_format((float)$n);
@@ -519,13 +524,13 @@ tbody tr:hover{background:var(--paper)}
 
 <div class="demo-bar">
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
-  <?php if ($authed): ?><a href="?p=choose">↔ Switch demo</a><?php endif; ?>
+  <?php if ($authed && !$bare && $p !== 'choose'): ?><a href="?p=choose">↔ Switch demo</a><?php endif; ?>
   <a href="/">← Back to vectorsolution.it</a>
-  <?php if ($authed): ?><a href="#save" style="background:#25D366;border-color:#25D366">💾 Save my demo data</a><?php endif; ?>
+  <?php if ($authed && !$bare && $p !== 'choose'): ?><a href="#save" style="background:#0B8043;border-color:#0B8043">💾 Save my demo data</a><?php endif; ?>
   <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like to discuss it for my business.') ?>" target="_blank" rel="noopener">Discuss this for my business →</a>
 </div>
 
-<?php if (!$authed || $p === 'choose'): ?>
+<?php if (!$authed || $bare || $p === 'choose'): ?>
   <div class="choose-wrap">
     <div class="choose-head">
       <span class="mark">
