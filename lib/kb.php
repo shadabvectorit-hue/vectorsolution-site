@@ -60,10 +60,18 @@ function vit_kb_facts(): array {
 function vit_kb_prompt(string $channel, string $visitorName = ''): string {
     $f = vit_kb_facts();
 
+    /* Exclusions get their own line rather than a trailing clause. Buried at the
+       end of a long sentence, "FBR e-invoicing is NOT in Starter" was read as
+       part of the feature list and the assistant told a shopkeeper the cheapest
+       plan included FBR — a promise the business would then have to withdraw.
+       What a plan does NOT do is as load-bearing as what it does. */
     $plans = '';
     foreach ($f['plans'] as $p) {
-        $plans .= "- {$p['name']}: {$p['price']} ({$p['terms']}). For {$p['for']}. Includes {$p['has']}."
-                . ($p['not'] !== '' ? " Note: {$p['not']}." : '') . "\n";
+        $plans .= "* {$p['name']} — {$p['price']} ({$p['terms']})\n"
+                . "  For: {$p['for']}\n"
+                . "  Includes: {$p['has']}\n"
+                . ($p['not'] !== '' ? "  DOES NOT INCLUDE: {$p['not']}\n" : '')
+                . "\n";
     }
 
     $who = $visitorName !== '' ? "The person you are talking to is called {$visitorName}. Use their name naturally, not in every message.\n" : '';
@@ -90,6 +98,9 @@ Contact: {$f['phone_pk']} (Pakistan), {$f['email']}
 PRICING — these are the only prices you may ever state
 {$plans}
 {$f['included']}
+
+THE ONE PRICING MISTAKE THAT MATTERS
+FBR e-invoicing is NOT in the Starter plan. A shop that needs FBR digital invoicing needs Business (Rs 3,499) or Enterprise. If someone on a Starter budget asks about FBR, say plainly that FBR invoicing starts at the Business plan — do not soften it and do not imply Starter covers it. Telling them otherwise wins the conversation and loses the customer when they find out. CRM, HR and Payroll are likewise Business and above.
 
 THE DEMO
 Anyone can open {$f['demo']} with no sign-up and no form. They pick the counter closest to their business ({$f['demo_tracks']}), type their own business name, and it prints on a real sales tax invoice. Recommend it early — it converts far better than description.
