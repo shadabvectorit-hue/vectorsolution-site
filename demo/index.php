@@ -401,11 +401,11 @@ $NAV = [
 <meta property="og:description" content="Pick the counter closest to your business, put your own business name on it, and print a real sales tax invoice with an FBR number. Nothing to install.">
 <meta property="og:url" content="https://vectorsolution.it/demo/">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://vectorsolution.it/assets/og-image.jpg?v=2">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image" content="https://vectorsolution.it/assets/og-image.jpg?v=3">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://vectorsolution.it/assets/og-image.jpg?v=2">
+<meta name="twitter:image" content="https://vectorsolution.it/assets/og-image.jpg?v=3">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
