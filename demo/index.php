@@ -394,6 +394,18 @@ $NAV = [
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
 <title>VectorERP — Live Demo</title>
+<!-- The demo link is the call to action in every post, email and message we
+     send, so a share of it must not render as a bare grey card. noindex keeps
+     it out of search; these only control how the link looks when shared. -->
+<meta property="og:title" content="Try VectorERP — free live demo, no sign-up">
+<meta property="og:description" content="Pick the counter closest to your business, put your own business name on it, and print a real sales tax invoice with an FBR number. Nothing to install.">
+<meta property="og:url" content="https://vectorsolution.it/demo/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://vectorsolution.it/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vectorsolution.it/assets/og-image.jpg">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
