@@ -2,10 +2,15 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/vectorit/public_html
-    - /bin/cp -f index.html work.html international.html leadership.html fbr.html services.html about.html contact.html 404.html email-signature.html google547811663ccac796.html robots.txt sitemap.xml .htaccess contact-submit.php inquiries.php t.php $DEPLOYPATH/
+    - /bin/cp -f index.html work.html international.html leadership.html fbr.html services.html about.html contact.html 404.html email-signature.html google547811663ccac796.html robots.txt sitemap.xml .htaccess contact-submit.php inquiries.php t.php chat.php $DEPLOYPATH/
     - /bin/cp -Rf css js assets brand $DEPLOYPATH/
+    # Copy the whole library rather than naming each file. The old per-file list
+    # meant any new module was silently left undeployed, and that failure looks
+    # like a broken feature rather than a missing file — much harder to spot.
     - /bin/mkdir -p $DEPLOYPATH/lib
-    - /bin/cp -f lib/guard.php $DEPLOYPATH/lib/
+    - /bin/cp -Rf lib/. $DEPLOYPATH/lib/
+    - /bin/mkdir -p $DEPLOYPATH/wa
+    - /bin/cp -Rf wa/. $DEPLOYPATH/wa/
     - /bin/mkdir -p $DEPLOYPATH/.well-known
     - /bin/cp -f .well-known/security.txt $DEPLOYPATH/.well-known/
     - /bin/mkdir -p $DEPLOYPATH/demo

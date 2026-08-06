@@ -2,3 +2,5 @@
 *.zip
 demo_src/
 demo-upload.zip
+config.php
+*.key
