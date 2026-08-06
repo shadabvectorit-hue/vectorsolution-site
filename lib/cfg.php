@@ -61,10 +61,19 @@ function vit_cfg_get(string $key, mixed $fallback = null): mixed {
     return $c[$key] ?? $fallback;
 }
 
-/** True only when there is a key to call the model with and no kill switch. */
+/**
+ * True only when there is a real key and no kill switch.
+ *
+ * "Not empty" is not enough. A freshly created config carries a placeholder like
+ * PASTE_YOUR_NEW_KEY_HERE, which is a non-empty string — so the system would
+ * report itself enabled, then fail every call with a 401. Requiring the real
+ * prefix means an unfinished setup reads as "not configured yet", which is what
+ * it is, and the health page tells the truth instead of showing a green tick
+ * over something that cannot work.
+ */
 function vit_ai_enabled(): bool {
     return !vit_cfg_get('kill_switch', false)
-        && trim((string)vit_cfg_get('anthropic_key', '')) !== '';
+        && str_starts_with(trim((string)vit_cfg_get('anthropic_key', '')), 'sk-ant-');
 }
 
 /** True only when WhatsApp is fully configured — all four values, not some. */
