@@ -42,6 +42,12 @@ n8n becomes worth it later, when you want WhatsApp **plus** email **plus** a CRM
 2. Add credit — **$5 is plenty to start** and will last months at your volume.
 3. **API keys → Create key**. Copy it (starts `sk-ant-`). It is shown once.
 
+> ⚠️ **Never write the key into this file, or into any file in this folder.**
+> Everything here is tracked by git and gets pushed to GitHub. The key belongs
+> in `/home/vectorit/_private/config.php` on the server and nowhere else.
+> A key that has been in a repo file, a chat, or an email should be deleted in
+> the console and reissued — it takes thirty seconds and removes all doubt.
+
 ### Step 2 — Create the config file
 
 The file lives **outside the website folder** so it can never be served, and it is not in git so a key can never be pushed to GitHub.
