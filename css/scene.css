@@ -1,0 +1,779 @@
+/* ============================================================
+   VectorERP — the scroll scene
+   ------------------------------------------------------------
+   One pinned sequence on the home page: a closed laptop opens,
+   the ERP boots, an invoice is raised, and FBR accepts it. It
+   exists because "ERP with FBR digital invoicing" means nothing
+   to a shopkeeper as a sentence. Shown as four seconds of scroll
+   it means "that is my counter, and the tax part is handled."
+
+   Two rules govern the code below.
+
+   1. BASE STYLES ARE THE FALLBACK, NOT THE EFFECT. Everything
+      outside the @supports block renders a perfectly good static
+      section: laptop open, dashboard on screen, three captions
+      in a row. A browser with no scroll-timeline support is not
+      shown a broken animation or an empty 400vh hole -- it is
+      shown a normal section and never knows a scene existed.
+
+   2. NOTHING ANIMATES EXCEPT transform AND opacity. Both are
+      compositor properties. The audience is on mid-range Android
+      and a scene that animates width, top or filter would drop
+      frames on exactly the phones this business sells to.
+   ============================================================ */
+
+/* The scene's own heading. The three captions are h3s, so the
+   section needs an h2 above them or the document outline jumps a
+   level -- but a visible one would crowd the pinned stage. This
+   keeps it for screen readers and out of the picture. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- shell ---------- */
+
+.scene {
+  position: relative;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(46, 91, 219, 0.07), transparent 70%),
+    var(--paper);
+  border-block: 1px solid var(--line-soft);
+  overflow: clip;                 /* keeps the glow off the neighbours */
+}
+
+.scene-track { position: relative; }
+
+.scene-stage {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(20px, 3vw, 34px);
+  padding-block: clamp(48px, 7vw, 90px);
+}
+
+/* ---------- captions ---------- */
+
+.scene-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.4vw, 30px);
+  width: min(var(--wrap), 100% - var(--gutter) * 2);
+}
+
+.scene-step { text-align: center; }
+
+.scene-step .s-no {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.scene-step h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.scene-step p {
+  color: var(--muted);
+  font-size: clamp(0.88rem, 1.3vw, 0.98rem);
+  line-height: 1.55;
+  max-width: 34ch;
+  margin-inline: auto;
+}
+
+/* ---------- the laptop ---------- */
+
+/* The camera sits ABOVE the machine, not level with it. A laptop
+   viewed from eye height has no readable closed state: the shut
+   lid is edge-on and perspective smears it into a slab. Lifting
+   the vanishing point means a closed lid presents its outer shell
+   to the viewer, which is what "closed laptop" actually looks
+   like, and the open state still reads face-on. */
+.laptop {
+  width: min(720px, 100% - var(--gutter) * 2);
+  perspective: 1500px;
+  perspective-origin: 50% -10%;
+  filter: drop-shadow(0 26px 44px rgba(15, 27, 51, 0.20));
+}
+
+.laptop-lid {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  transform-origin: bottom center;   /* the hinge */
+  transform-style: preserve-3d;
+  /* Base state is OPEN. The scene closes it and opens it again;
+     a browser that never runs the scene must not be left staring
+     at a shut laptop. */
+  transform: rotateX(0deg);
+}
+
+/* Folding the lid AWAY (positive rotateX) is what makes closing
+   look like closing rather than like the screen tipping over
+   toward the viewer. A separate aluminium back-face was tried
+   here and removed: at the shallow camera angle this scene uses,
+   the screen face never turns far enough past the viewer for
+   backface-visibility to hand over, so the shell was markup that
+   could never be seen. A dark machine reads as a shut laptop on
+   its own. */
+.laptop-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 13px 13px 3px 3px;
+  background: #0A101C;
+  border: 2px solid #222D44;
+  border-bottom-width: 0;
+}
+
+/* camera notch */
+.laptop-face::before {
+  content: "";
+  position: absolute;
+  top: 5px; left: 50%;
+  width: 5px; height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #2B3752;
+}
+
+.laptop-screen {
+  position: absolute;
+  inset: 11px 10px 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #05090F;
+  isolation: isolate;
+}
+
+/* the glass sheen, and the black screen before power-on */
+.laptop-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(112deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 38%);
+}
+
+.laptop-base {
+  position: relative;
+  height: clamp(11px, 1.7vw, 16px);
+  margin-inline: clamp(-26px, -3vw, -18px);
+  border-radius: 0 0 11px 11px;
+  background: linear-gradient(#C9D3E2, #93A1B8 60%, #7F8DA6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* the thumb notch on the front edge */
+.laptop-base::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 0;
+  width: clamp(60px, 9vw, 96px);
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 0 0 6px 6px;
+  background: rgba(15, 27, 51, 0.16);
+}
+
+/* ---------- screen contents ---------- */
+
+.scr {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: clamp(9px, 1.5vw, 15px);
+  font-size: clamp(6.5px, 1.02vw, 10px);
+  line-height: 1.45;
+  color: #C8D6F0;
+  background: #070C16;
+}
+
+/* Only the dashboard shows when the scene is not running, so the
+   fallback reads as a product screenshot rather than a stack of
+   half-drawn states. */
+.scr-boot,
+.scr-invoice,
+.scr-fbr { display: none; }
+
+.scr-dash { display: block; }
+
+/* -- boot --
+   No `display` here on purpose. The rule that hides the
+   non-dashboard screens is further up, and a `display: grid`
+   at this point would quietly outrank it and leave every screen
+   stacked on top of each other in the fallback. The scene block
+   is what switches these on. */
+.scr-boot {
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  background: #05090F;
+}
+.scr-boot svg { width: clamp(26px, 4.2vw, 40px); height: auto; }
+.scr-boot .b-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: 1.5em;
+  color: #E8EFFC;
+}
+.scr-boot .b-bar {
+  width: clamp(90px, 16vw, 150px);
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(91, 140, 255, 0.22);
+  overflow: hidden;
+}
+.scr-boot .b-bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #2E5BDB, #5B8CFF);
+}
+.scr-boot .b-meta {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  color: #6E80A6;
+  letter-spacing: 0.04em;
+}
+
+/* -- shared chrome for the app screens -- */
+.scr-app {
+  display: grid;
+  grid-template-columns: clamp(52px, 8.5vw, 84px) 1fr;
+  gap: clamp(8px, 1.2vw, 13px);
+  height: 100%;
+}
+
+.scr-side {
+  display: grid;
+  align-content: start;
+  gap: clamp(4px, 0.7vw, 7px);
+  padding: clamp(6px, 0.9vw, 10px) clamp(5px, 0.8vw, 9px);
+  border-radius: 6px;
+  background: #0C1424;
+  border: 1px solid rgba(91, 140, 255, 0.13);
+}
+.scr-side b {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 1.02em;
+  color: #E8EFFC;
+  margin-bottom: 3px;
+}
+.scr-side b svg { width: 1.5em; height: 1.5em; flex: none; }
+.scr-side span {
+  color: #7386AB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scr-side span.on {
+  color: #9EC0FF;
+  font-weight: 600;
+}
+
+/* Each screen names its own rows so the content reaches the
+   bottom bezel. Left to `align-content: start` the app sat in the
+   top third of a 16:10 panel with a dead black band beneath it,
+   which reads as a broken render rather than as software. */
+.scr-body { display: grid; gap: clamp(6px, 1vw, 11px); min-width: 0; }
+.scr-dash .scr-body    { grid-template-rows: auto auto 1fr; }
+.scr-invoice .scr-body { grid-template-rows: auto 1fr auto; }
+
+.scr-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.scr-head strong {
+  font-family: var(--font-display);
+  font-size: 1.25em;
+  color: #F2F6FF;
+  letter-spacing: -0.01em;
+}
+.scr-head em {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.9em;
+  color: #6E80A6;
+  letter-spacing: 0.06em;
+}
+
+/* -- dashboard -- */
+.scr-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 0.8vw, 9px); }
+.scr-kpi {
+  padding: clamp(5px, 0.8vw, 9px);
+  border-radius: 5px;
+  background: #0E1728;
+  border: 1px solid rgba(91, 140, 255, 0.14);
+  min-width: 0;
+}
+.scr-kpi i {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #66799F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scr-kpi b {
+  display: block;
+  font-size: 1.16em;
+  color: #F2F6FF;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.scr-kpi u {
+  text-decoration: none;
+  font-size: 0.88em;
+  color: #4ED08A;
+}
+.scr-kpi u.down { color: #FF9A6E; }
+
+/* The bars stretch to the full height of the plot and are sized
+   by scaleY from the bottom edge. Sizing them with `height`
+   instead would make them flex items with no content -- which is
+   to say, zero pixels tall -- and the chart renders as an empty
+   box. scaleY is also the only version of this that animates on
+   the compositor. */
+.scr-chart {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(3px, 0.6vw, 6px);
+  min-height: clamp(34px, 6vw, 62px);
+  padding: clamp(6px, 0.9vw, 10px);
+  border-radius: 6px;
+  background: #0C1424;
+  border: 1px solid rgba(91, 140, 255, 0.13);
+}
+.scr-chart i {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, #5B8CFF, #2E5BDB);
+  transform-origin: bottom center;
+  transform: scaleY(var(--h, 0.6));
+}
+.scr-chart i:nth-child(1) { --h: 0.42; }
+.scr-chart i:nth-child(2) { --h: 0.66; }
+.scr-chart i:nth-child(3) { --h: 0.38; }
+.scr-chart i:nth-child(4) { --h: 0.84; }
+.scr-chart i:nth-child(5) { --h: 0.58; }
+.scr-chart i:nth-child(6) { --h: 1;    }
+
+/* -- invoice -- */
+.scr-inv-doc {
+  border-radius: 6px;
+  background: #0E1728;
+  border: 1px solid rgba(91, 140, 255, 0.14);
+  padding: clamp(6px, 1vw, 11px);
+  display: grid;
+  gap: clamp(4px, 0.7vw, 7px);
+  align-content: start;   /* rows stack; without this they spread down the panel */
+}
+.scr-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: clamp(6px, 1vw, 12px);
+  align-items: baseline;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(91, 140, 255, 0.10);
+}
+.scr-row span { color: #A9BBDD; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scr-row var {
+  font-style: normal;
+  font-family: var(--font-mono);
+  color: #E8EFFC;
+  white-space: nowrap;
+}
+.scr-row.tot { border-bottom: none; padding-top: 2px; }
+.scr-row.tot span { color: #F2F6FF; font-weight: 700; }
+.scr-row.tot var { color: #9EC0FF; font-weight: 700; font-size: 1.1em; }
+
+.scr-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: clamp(4px, 0.7vw, 7px) clamp(8px, 1.3vw, 14px);
+  border-radius: 999px;
+  background: var(--signal);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.98em;
+  box-shadow: 0 4px 12px rgba(255, 90, 45, 0.35);
+}
+
+/* -- FBR accepted --  (no `display` here — see the boot note) */
+.scr-fbr {
+  place-content: center;
+  justify-items: center;
+  gap: clamp(5px, 0.9vw, 9px);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(23, 138, 80, 0.22), transparent 70%),
+    #070C16;
+}
+.scr-qr {
+  width: clamp(38px, 6.5vw, 62px);
+  height: clamp(38px, 6.5vw, 62px);
+  border-radius: 4px;
+  padding: 3px;
+  background: #fff;
+}
+.scr-qr svg { width: 100%; height: 100%; }
+.scr-fbr .f-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  font-size: 1.2em;
+  color: #4ED08A;
+}
+.scr-fbr .f-ok svg { width: 1.1em; height: 1.1em; }
+.scr-fbr .f-irn {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  letter-spacing: 0.05em;
+  color: #C8D6F0;
+}
+.scr-fbr .f-note { color: #6E80A6; font-size: 0.92em; max-width: 30ch; }
+
+/* ---------- narrow screens ----------
+   The screen mock is sized in vw, so on a 375px phone every
+   label lands at about 6.5px — present, but texture rather than
+   text. Most of this audience is on a phone, and a dashboard
+   nobody can read is not a dashboard. Fewer columns and a
+   slightly larger floor buy back the room. */
+@media (max-width: 560px) {
+  .scr { font-size: clamp(7px, 1.9vw, 10px); }
+  .scr-kpis { grid-template-columns: repeat(2, 1fr); }
+  .scr-side { min-width: 0; }
+
+  /* Drop the quantity column; the item and the amount are what
+     carry the point, and three columns at this width crushes
+     all three. */
+  .scr-row { grid-template-columns: 1fr auto; }
+  .scr-row var:not(:last-child) { display: none; }
+}
+
+/* ---------- progress rail + hint (scene only) ---------- */
+
+.scene-rail,
+.scene-hint { display: none; }
+
+/* ============================================================
+   THE SCENE ITSELF
+   ------------------------------------------------------------
+   Everything above is the static section. Everything below turns
+   it into the pinned sequence, and only where that is safe:
+
+   @supports        — no scroll-timeline, no scene, no penalty.
+   no-preference    — a visitor who asked for less motion keeps
+                      the static section.
+
+   Heights are in svh, not vh. On a phone, vh is the LARGE
+   viewport: it does not shrink when the address bar appears, so
+   a 100vh pinned stage is taller than the visible area and the
+   scene sits with its head cut off. svh is the small viewport --
+   the stage always fits, and the address bar sliding in and out
+   cannot resize the pin mid-scroll.
+   ============================================================ */
+
+@supports (animation-timeline: view()) and (animation-range: contain 0% contain 100%) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* The track is the timeline. `contain` runs from the moment
+       the track fully covers the viewport to the moment it stops
+       -- which is exactly the interval the stage is pinned for.
+       Tying the two together means the choreography can never
+       drift out of sync with the pin. */
+    .scene-track {
+      height: 420svh;
+      view-timeline-name: --scene;
+      view-timeline-axis: block;
+    }
+
+    .scene-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      padding-block: 0;
+      align-content: center;
+    }
+
+    /* -- captions cross-fade in place -- */
+    .scene-steps {
+      display: block;
+      position: relative;
+      height: clamp(96px, 13svh, 132px);
+    }
+    .scene-step {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      align-content: center;
+      opacity: 0;
+      animation: scene-caption linear both;
+      animation-timeline: --scene;
+    }
+    /* These track the SCREENS, not equal thirds of the scroll.
+       Step 01 covers the lid, the boot and the dashboard -- all
+       of which are "your whole business on one screen" -- so it
+       holds for half the scene. Splitting the captions evenly put
+       "Raise the invoice" over the dashboard, which reads as the
+       animation being broken. */
+    .scene-step:nth-child(1) { animation-range: contain 2%  contain 50%; }
+    .scene-step:nth-child(2) { animation-range: contain 52% contain 74%; }
+    .scene-step:nth-child(3) { animation-range: contain 76% contain 99%; }
+
+    @keyframes scene-caption {
+      0%   { opacity: 0; transform: translate3d(0, 14px, 0); }
+      16%  { opacity: 1; transform: translate3d(0, 0, 0); }
+      84%  { opacity: 1; transform: translate3d(0, 0, 0); }
+      100% { opacity: 0; transform: translate3d(0, -14px, 0); }
+    }
+
+    /* -- 1. the lid opens --
+       Closed is rotateX(90deg) about the hinge: the lid folds
+       backward and lies flat, screen down, shell up — which is
+       the only fold direction that reads as "shut" rather than
+       as the screen tipping over toward the viewer.
+
+       It overshoots slightly past upright and settles. A lid that
+       stops dead at 0deg looks mechanical; a few degrees of
+       rebound is what a hinge actually does. */
+    .laptop-lid {
+      animation: scene-lid linear both;
+      animation-timeline: --scene;
+      animation-range: contain 0% contain 20%;
+      will-change: transform;
+    }
+    @keyframes scene-lid {
+      /* 95deg, not 90. At exactly 90 the screen face is still
+         (barely) front-facing, so backface-visibility never trips
+         and the shut laptop shows its dark screen instead of its
+         shell. A few degrees past flat puts the face genuinely
+         behind and hands the frame to the aluminium. */
+      0%   { transform: rotateX(95deg); }
+      82%  { transform: rotateX(-5deg); }
+      100% { transform: rotateX(0deg); }
+    }
+
+    /* A shut lid collapses onto the hinge, which sits at the
+       BOTTOM of the laptop's layout box — so a closed machine
+       renders as a sliver at the foot of an otherwise empty
+       frame. Lifting the rig while it is closed keeps the
+       composition centred, and letting it settle back down as
+       the lid rises reads as the machine being set on a desk. */
+    .laptop {
+      animation: scene-rig linear both;
+      animation-timeline: --scene;
+      animation-range: contain 0% contain 26%;
+    }
+    @keyframes scene-rig {
+      0%   { transform: translate3d(0, -17svh, 0) scale(0.9); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
+    }
+
+    /* -- 2. the screen wakes -- */
+    .laptop-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background: #05090F;
+      animation: scene-power linear both;
+      animation-timeline: --scene;
+      animation-range: contain 14% contain 24%;
+    }
+    @keyframes scene-power {
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* -- 3. the three screens hand over to each other -- */
+    .scr-boot,
+    .scr-invoice,
+    .scr-fbr { display: block; }
+
+    .scr-boot,
+    .scr-dash,
+    .scr-invoice { opacity: 0; }
+
+    .scr-boot {
+      display: grid;
+      animation: scene-screen linear both;
+      animation-timeline: --scene;
+      animation-range: contain 15% contain 32%;
+    }
+    .scr-dash {
+      animation: scene-screen linear both;
+      animation-timeline: --scene;
+      animation-range: contain 30% contain 54%;
+    }
+    .scr-invoice {
+      animation: scene-screen linear both;
+      animation-timeline: --scene;
+      animation-range: contain 52% contain 78%;
+    }
+    .scr-fbr {
+      display: grid;
+      opacity: 0;
+      animation: scene-screen-last linear both;
+      animation-timeline: --scene;
+      animation-range: contain 76% contain 100%;
+    }
+
+    @keyframes scene-screen {
+      0%   { opacity: 0; }
+      14%  { opacity: 1; }
+      86%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes scene-screen-last {
+      0%   { opacity: 0; }
+      18%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    /* boot bar fills */
+    .scr-boot .b-bar i {
+      animation: scene-fill linear both;
+      animation-timeline: --scene;
+      animation-range: contain 16% contain 29%;
+    }
+    @keyframes scene-fill {
+      0%   { transform: scaleX(0.04); }
+      100% { transform: scaleX(1); }
+    }
+
+    /* dashboard bars grow as the dashboard lands */
+    .scr-chart i {
+      animation: scene-bar linear both;
+      animation-timeline: --scene;
+      animation-range: contain 33% contain 48%;
+    }
+    @keyframes scene-bar {
+      0%   { transform: scaleY(0.05); }
+      100% { transform: scaleY(var(--h, 1)); }
+    }
+
+    /* invoice lines arrive one after another */
+    .scr-inv-doc .scr-row {
+      opacity: 0;
+      animation: scene-line linear both;
+      animation-timeline: --scene;
+    }
+    .scr-inv-doc .scr-row:nth-child(1) { animation-range: contain 55% contain 59%; }
+    .scr-inv-doc .scr-row:nth-child(2) { animation-range: contain 58% contain 62%; }
+    .scr-inv-doc .scr-row:nth-child(3) { animation-range: contain 61% contain 65%; }
+    .scr-inv-doc .scr-row:nth-child(4) { animation-range: contain 64% contain 68%; }
+    .scr-inv-doc .scr-row:nth-child(5) { animation-range: contain 67% contain 71%; }
+    @keyframes scene-line {
+      0%   { opacity: 0; transform: translate3d(-8px, 0, 0); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+
+    /* the submit button is pressed */
+    .scr-cta {
+      animation: scene-press linear both;
+      animation-timeline: --scene;
+      animation-range: contain 71% contain 77%;
+    }
+    @keyframes scene-press {
+      0%   { transform: scale(1);    box-shadow: 0 4px 12px rgba(255, 90, 45, 0.35); }
+      70%  { transform: scale(0.93); box-shadow: 0 1px 4px rgba(255, 90, 45, 0.5); }
+      100% { transform: scale(1);    box-shadow: 0 4px 12px rgba(255, 90, 45, 0.35); }
+    }
+
+    /* the QR is drawn on, then the acceptance lands */
+    .scr-qr {
+      animation: scene-pop linear both;
+      animation-timeline: --scene;
+      animation-range: contain 79% contain 87%;
+    }
+    @keyframes scene-pop {
+      0%   { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+
+    /* -- progress rail: how much scene is left -- */
+    .scene-rail {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: clamp(18px, 3svh, 34px);
+      width: min(280px, 42vw);
+      height: 3px;
+      transform: translateX(-50%);
+      border-radius: 2px;
+      background: rgba(46, 91, 219, 0.16);
+      overflow: hidden;
+    }
+    .scene-rail i {
+      display: block;
+      height: 100%;
+      width: 100%;
+      border-radius: 2px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, var(--blue), var(--signal));
+      animation: scene-fill linear both;
+      animation-timeline: --scene;
+      animation-range: contain 0% contain 100%;
+    }
+
+    /* -- scroll hint, gone the moment it is obeyed -- */
+    .scene-hint {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: clamp(30px, 5.5svh, 54px);
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--faint);
+      white-space: nowrap;
+      animation: scene-hint linear both;
+      animation-timeline: --scene;
+      animation-range: contain 0% contain 9%;
+    }
+    @keyframes scene-hint {
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Short screens cannot hold a 16:10 laptop, a caption block
+       and a rail at once. Give the laptop less room rather than
+       letting the stage overflow its own pin. */
+    @media (max-height: 640px) {
+      .laptop { width: min(520px, 100% - var(--gutter) * 2); }
+      .scene-steps { height: 88px; }
+      .scene-hint { display: none; }
+    }
+  }
+}
