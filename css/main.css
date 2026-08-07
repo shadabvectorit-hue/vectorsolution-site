@@ -1127,6 +1127,149 @@ h3 { font-size: 1.25rem; line-height: 1.3; }
   .founder-avatar { margin-inline: auto; }
 }
 
+/* ============================================================
+   PARALLAX — scroll-driven depth
+   ============================================================
+   Driven entirely by CSS scroll-timelines, not a scroll event
+   listener. That matters more than it sounds: a JS parallax
+   recalculates layout on the main thread for every scroll frame,
+   which is exactly the work a mid-range Android phone cannot do
+   at 60fps -- the effect meant to look expensive is the thing
+   that makes the site feel broken. These animations run on the
+   compositor, so scrolling costs the same as it does now.
+
+   Everything is wrapped twice over:
+     @supports  — browsers without scroll-timelines get today's
+                  site, unchanged. Nothing degrades, it just
+                  doesn't move.
+     no-preference — a visitor who has asked their system for
+                  less motion never sees any of it.
+
+   Movement is deliberately small. On a page selling accounting
+   software to a shopkeeper, parallax that announces itself reads
+   as a gimmick; parallax you only notice when it's removed reads
+   as depth.
+   ============================================================ */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+
+    /* -- 1. The drafting grid drifts against the page --------
+       The grid repeats every 56px, so translating it by exactly
+       one tile over the whole scroll loops seamlessly: there is
+       no edge to run out of and no seam at either end. It gives
+       the blueprint motif a sense of being a surface the content
+       moves across, rather than wallpaper printed behind it. */
+    body::before {
+      animation: vit-grid-drift linear both;
+      animation-timeline: scroll(root block);
+    }
+    @keyframes vit-grid-drift {
+      to { transform: translate3d(0, -56px, 0); }
+    }
+
+    /* -- 2. Home hero: the mockup gains depth -----------------
+       The hero already has three stacked planes -- the browser
+       mockup and the two cards pinned to its corners. They read
+       as flat because they all move at exactly the same speed.
+       Giving each a different rate is what turns a stack into a
+       depth.
+
+       Direction is the whole trick. Scrolling down moves content
+       up the screen; a layer that is meant to feel FAR AWAY
+       should move up more slowly, which relative to the page
+       means it drifts down. A near layer does the opposite. So
+       the far card gets the largest positive value, the browser
+       a small one, and the near card a negative one -- the two
+       cards pull apart around the mockup as you scroll.
+
+       These are driven by the ROOT scroll, not view(). A view()
+       timeline measures an element against its own trip through
+       the viewport, and its `exit` phase does not begin until the
+       element starts leaving the top of the screen. For a hero,
+       that is exactly backwards: it would sit perfectly still for
+       the entire time the visitor is actually looking at it, then
+       animate on the way out where nobody sees it. Anchoring to
+       the first 90vh of page scroll means the depth appears the
+       instant they start scrolling, which is the only moment it
+       has any job to do.
+
+       The cards are position:absolute and the browser is a plain
+       block, so translating them cannot disturb the layout of
+       anything around them. */
+    .p-hero .browser {
+      animation: vit-mock-lag linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90vh;
+      will-change: transform;
+    }
+    @keyframes vit-mock-lag {
+      to { transform: translate3d(0, 18px, 0); }
+    }
+
+    .p-hero .float-card.fc-1 {          /* nearest — leads the page */
+      animation: vit-card-near linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90vh;
+      will-change: transform;
+    }
+    @keyframes vit-card-near {
+      to { transform: translate3d(0, -40px, 0); }
+    }
+
+    .p-hero .float-card.fc-2 {          /* furthest — lags the most */
+      animation: vit-card-far linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90vh;
+      will-change: transform;
+    }
+    @keyframes vit-card-far {
+      to { transform: translate3d(0, 38px, 0); }
+    }
+
+    /* -- 2b. Inner-page heroes -------------------------------
+       about / services / work / fbr and friends share one hero
+       shape. A single slow lag keeps them consistent with the
+       home page without repeating its mockup choreography. These
+       heroes also sit at the top of their page, so they take the
+       root scroll for the same reason the home hero does. The
+       slight fade is what stops the heading from colliding
+       visually with the first real section as it passes. */
+    .page-hero .wrap {
+      animation: vit-page-hero-lag linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 70vh;
+    }
+    @keyframes vit-page-hero-lag {
+      to { transform: translate3d(0, 34px, 0); opacity: 0.55; }
+    }
+
+    /* -- 3. Section reveals are deliberately NOT touched ------
+       A scroll-driven "settle" on .pk-band was tried here and
+       removed. Sections already carry .reveal, which transitions
+       translateY(26px) -> none via IntersectionObserver, so the
+       effect existed twice. Worse, it broke: a CSS animation
+       outranks a normal declaration, so the animation overrode
+       `.reveal.visible { transform: none }` and left the band
+       parked 26px low. Scroll-timelines are the right tool for
+       continuous depth, not for one-shot reveals -- the site
+       already has those, and they work. */
+
+    /* Phones move the viewport itself when the address bar
+       hides, which fights a scroll-timeline and shows up as a
+       twitch. Keep the seamless grid drift, drop the
+       viewport-sensitive layers. */
+    @media (max-width: 767px) {
+      .p-hero .browser,
+      .p-hero .float-card.fc-1,
+      .p-hero .float-card.fc-2,
+      .page-hero .wrap {
+        animation: none;
+        will-change: auto;
+      }
+    }
+  }
+}
+
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
