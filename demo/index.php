@@ -19,7 +19,7 @@ session_start();
 
 const DEMO_USER = 'demo';
 const DEMO_PASS = 'demo';
-const WA = '923363138686';
+const WA = '923022219093';
 
 $DATA = require __DIR__ . '/data.php';
 if (!empty($_SESSION['biz'])) { $DATA['company']['name'] = (string)$_SESSION['biz']; }

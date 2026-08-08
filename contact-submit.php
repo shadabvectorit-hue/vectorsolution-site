@@ -154,7 +154,7 @@ if ($lead['stage'] !== 'partial'
     }
     $ack[] = '';
     $ack[] = 'If it is urgent, WhatsApp is the fastest way to reach us:';
-    $ack[] = 'https://wa.me/923363138686';
+    $ack[] = 'https://wa.me/923022219093';
     $ack[] = '';
     $ack[] = 'In the meantime you are welcome to try the live demo —';
     $ack[] = 'pick the counter closest to your business and put your own name on it:';
@@ -164,7 +164,7 @@ if ($lead['stage'] !== 'partial'
     $ack[] = 'Muhammad Shadab';
     $ack[] = 'Founder & Lead Engineer, VectorIT';
     $ack[] = 'shadab@vectorsolution.it';
-    $ack[] = '+92 336 3138686 (Pakistan) · +1 (512) 355-5462 (USA)';
+    $ack[] = '+92 302 2219093 (Pakistan) · +1 (512) 355-5462 (USA)';
     $ack[] = 'https://vectorsolution.it';
 
     @mail(

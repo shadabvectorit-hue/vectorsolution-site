@@ -2,7 +2,7 @@
 
 One assistant, two places it answers:
 
-- **WhatsApp** — a customer messages +92 336 3138686, the assistant replies, captures the lead, and pings you when a human is needed.
+- **WhatsApp** — a customer messages +92 302 2219093, the assistant replies, captures the lead, and pings +92 336 3138686 when a human is needed.
 - **The website chat** — the same brain behind the widget already on the site.
 
 Both write leads into the same file the contact form uses, so everything still lands in one place: `vectorsolution.it/inquiries.php`.
@@ -79,7 +79,16 @@ Set its permissions to **600**.
 
 ### Step 3 — WhatsApp (about an hour, mostly Meta's verification)
 
-You need a phone number that is **not currently on the WhatsApp app**. A second SIM, or your landline. If you want to use 0336 3138686, you must first delete its WhatsApp account — do not do this until you have decided.
+**The two numbers, and why they must stay two.**
+
+| Number | Role | Must it have the WhatsApp app? |
+|---|---|---|
+| **0302 2219093** | The API number. Customers message this; the assistant answers it. | **No — it must NOT.** Registering it to the Cloud API takes the number over. |
+| **0336 3138686** | Yours. Receives the handover alert when a customer needs a person. | Yes, keep it as normal WhatsApp. |
+
+If both were the same number the assistant would be messaging the account it runs on: alerts would loop or silently vanish while everything looked healthy. Keeping them separate also means **you never have to delete WhatsApp from your own number** — that was the risk in the earlier plan, and it is gone.
+
+Before registering 0302 2219093, check the WhatsApp app is not installed on it. If it is, delete that WhatsApp account first — that step is irreversible, so do it only once you are ready.
 
 1. <https://developers.facebook.com> → **My Apps → Create App → Business**.
 2. Add the **WhatsApp** product. Meta gives you a free test number to try immediately.

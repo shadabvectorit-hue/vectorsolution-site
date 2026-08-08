@@ -143,8 +143,8 @@ function vit_agent_reply(string $contact, string $message, string $channel): arr
     // Falling back to a human is always better than failing silently. Every
     // early return below still gives the customer somewhere to go.
     $fallback = $channel === 'whatsapp'
-        ? "Thanks for your message — Shadab will reply here personally shortly. If it is urgent you can call +92 336 3138686."
-        : "Thanks — I could not reach the assistant just now. Message us on WhatsApp and we will pick it up: https://wa.me/923363138686";
+        ? "Thanks for your message — Shadab will reply here personally shortly. If it is urgent you can call +92 302 2219093."
+        : "Thanks — I could not reach the assistant just now. Message us on WhatsApp and we will pick it up: https://wa.me/923022219093";
 
     if (!vit_ai_enabled()) {
         return ['ok' => false, 'text' => $fallback, 'handover' => 'AI off', 'lead' => []];

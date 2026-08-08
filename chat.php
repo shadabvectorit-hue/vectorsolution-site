@@ -74,5 +74,5 @@ $out([
     // The widget uses this to surface the WhatsApp button at the right moment
     // instead of showing it constantly.
     'handover' => $reply['handover'] !== '',
-    'wa'       => 'https://wa.me/923363138686',
+    'wa'       => 'https://wa.me/923022219093',
 ]);

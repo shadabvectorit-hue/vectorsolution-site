@@ -20,7 +20,7 @@ session_name('VDEMOSESS');
 session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => true]);
 session_start();
 
-const WA = '923363138686';
+const WA = '923022219093';
 $SHOP = require __DIR__ . '/data_pos.php';
 
 if (empty($_SESSION['demo_ok'])) { header('Location: index.php'); exit; }

@@ -37,7 +37,13 @@ function vit_cfg(): array {
         'wa_phone_id'      => '',   // Phone Number ID (NOT the phone number)
         'wa_verify_token'  => '',   // any random string; must match Meta's webhook config
         'wa_app_secret'    => '',   // used to verify every webhook signature
-        'wa_owner'         => '923363138686', // where handover alerts go
+        // Where handover alerts go. This MUST NOT be the same number as the
+        // one registered to the Cloud API above: the assistant would be
+        // messaging the account it is running on, so every alert would either
+        // loop or vanish, and the owner would be told nothing while the system
+        // looked healthy. 0302 2219093 is the API number that customers write
+        // to; 0336 3138686 stays personal and receives the alerts.
+        'wa_owner'         => '923363138686',
 
         // --- spend ceilings (hard stops, not warnings) ---
         'daily_reply_cap'  => 400,  // total AI replies per day across all channels

@@ -29,7 +29,7 @@ function vit_kb_facts(): array {
         'demo'     => 'https://vectorsolution.it/demo/',
         'owner'    => 'Muhammad Shadab, Founder & Lead Engineer',
         'email'    => 'shadab@vectorsolution.it',
-        'phone_pk' => '+92 336 3138686',
+        'phone_pk' => '+92 302 2219093',
         'phone_us' => '+1 (512) 355-5462',
         'bases'    => 'Austin, USA and Karachi, Pakistan',
         'modules'  => 'Accounting, FBR digital invoicing, Inventory, POS, CRM, HR & Payroll',
