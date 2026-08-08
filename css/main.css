@@ -38,6 +38,25 @@
 /* ---------- reset ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+/* No `overflow-x: hidden` here, deliberately.
+ *
+ * It was masking three separate layout bugs rather than fixing them: a
+ * grid blowout from the ERP mockups, a sidebar strip that grew instead
+ * of scrolling, and a blockquote with a hard min-width. In each case the
+ * right-hand slice of the section really was off the screen and
+ * unreachable on a phone; the clip only stopped the scrollbar appearing
+ * to say so.
+ *
+ * On `body` it does not even clip `body` — with `html` at `overflow:
+ * visible` the value propagates to the viewport, which is also why
+ * `body`'s computed overflow-y reads `auto` and why scroll-driven
+ * timelines had to be reasoned about twice.
+ *
+ * The layout now measures zero horizontal overflow on every page from
+ * 320px up, so the crutch is gone and a regression will show itself as
+ * a scrollbar instead of hiding. If one ever appears, find the element
+ * — do not put this line back.
+ */
 body {
   background: var(--paper);
   color: var(--ink);
@@ -45,7 +64,6 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
