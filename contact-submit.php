@@ -106,7 +106,7 @@ foreach (['time', 'source', 'lang', 'stage', 'name', 'whatsapp', 'email', 'compa
 }
 $body = implode("\n", $bodyLines) . "\n\nView all inquiries: https://vectorsolution.it/inquiries.php";
 
-$headers = "From: VectorIT Website <website@vectorsolution.it>\r\n"
+$headers = "From: VectorIT Website <shadab@vectorsolution.it>\r\n"
          . "Content-Type: text/plain; charset=UTF-8\r\n";
 // Only a genuinely valid address may enter a header — otherwise it's an injection vector.
 if ($lead['email'] !== '' && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)) {
@@ -115,12 +115,14 @@ if ($lead['email'] !== '' && filter_var($lead['email'], FILTER_VALIDATE_EMAIL)) 
 $mailed = false;
 // Gmail first: it is the copy proven to arrive. shadab@ is the professional
 // address and routes out to wherever the domain's mail actually lives.
-// website@ was dropped — it is a mailbox on this server, and once mail routing
-// was pointed at the domain's real mail host, mail addressed to it left the
-// building instead of landing in that local mailbox.
+// website@ is gone entirely — it was a mailbox on this server, and once mail
+// routing was pointed at the domain's real mail host, anything addressed to it
+// left the building instead of landing in that local mailbox. It is no longer a
+// destination and no longer the From address either: a name nobody reads should
+// not be the one a customer sees when they hit reply.
 foreach (['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'] as $to) {
     // The envelope sender is deliberately left as the hosting account's own
-    // default. Stamping it as website@vectorsolution.it made receiving servers
+    // default. Stamping it with a vectorsolution.it address made receiving servers
     // check that domain's SPF record, which lists only Microsoft's servers and
     // ends in a hard fail — so mail from this web server was declared a forgery
     // and bounced or junked. The host's own domain publishes SPF correctly, so
