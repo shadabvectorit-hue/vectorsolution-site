@@ -253,13 +253,23 @@
 }
 
 /* -- shared chrome for the app screens -- */
+/* The sidebar column has to hold the mark plus "VectorERP" at the
+   screen's own font size. The old 84px ceiling never did, so the
+   wordmark simply hung outside the panel — invisible as a bug until
+   the panel started clipping, at which point it read as "Vector…". */
 .scr-app {
   display: grid;
-  grid-template-columns: clamp(52px, 8.5vw, 84px) 1fr;
+  grid-template-columns: clamp(52px, 10.5vw, 112px) 1fr;
   gap: clamp(8px, 1.2vw, 13px);
   height: 100%;
 }
 
+/* overflow:hidden is load-bearing, not tidiness. The column is sized in
+   vw while its contents are sized in em, so on a narrow screen the
+   wordmark grows wider than the panel, paints outside its own dark
+   background and lands on the data column next to it — which reads as
+   the logo overlapping the dashboard. Clipping keeps everything inside
+   the panel whatever the two units do relative to each other. */
 .scr-side {
   display: grid;
   align-content: start;
@@ -268,24 +278,31 @@
   border-radius: 6px;
   background: #0C1424;
   border: 1px solid rgba(91, 140, 255, 0.13);
+  overflow: hidden;
+  min-width: 0;
 }
 .scr-side b {
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
   font-family: var(--font-display);
   font-size: 1.02em;
   color: #E8EFFC;
   margin-bottom: 3px;
 }
 .scr-side b svg { width: 1.5em; height: 1.5em; flex: none; }
-.scr-side span {
+.scr-side b .s-name { min-width: 0; overflow: hidden; white-space: nowrap; }
+/* Direct children only. The wordmark is a span too, nested inside <b>,
+   and a bare `.scr-side span` claimed it — painting the brand in the
+   muted nav-item colour and truncating it with the nav items' ellipsis. */
+.scr-side > span {
   color: #7386AB;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.scr-side span.on {
+.scr-side > span.on {
   color: #9EC0FF;
   font-weight: 600;
 }
@@ -470,7 +487,13 @@
 @media (max-width: 560px) {
   .scr { font-size: clamp(7px, 1.9vw, 10px); }
   .scr-kpis { grid-template-columns: repeat(2, 1fr); }
-  .scr-side { min-width: 0; }
+
+  /* At this width the panel is about 52px and the wordmark alone wants
+     53px. Truncating it to "VectorE…" looks like a rendering fault, so
+     drop the word and keep the mark — which is what the sidebar of a
+     real app does when it collapses. */
+  .scr-side b .s-name { display: none; }
+  .scr-side b { justify-content: center; margin-bottom: 5px; }
 
   /* Drop the quantity column; the item and the amount are what
      carry the point, and three columns at this width crushes
