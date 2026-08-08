@@ -239,6 +239,20 @@
 .f-points li::before { content: "✓"; color: #178A50; font-weight: 700; flex-shrink: 0; }
 .f-mock .browser { font-size: 11.5px; }
 
+/* Grid items get `min-width: auto`, which refuses to shrink below the
+   content's min-content width. The dashboard and invoice mockups contain a
+   fixed-size table, so their min-content is around 400px — and on a 375px
+   phone the column was forced that wide, hanging 46px of the page off the
+   right edge. It was invisible only because `body` carries
+   `overflow-x: hidden`, which masks the symptom and leaves the bug.
+
+   The mockups already declare `overflow: hidden` to crop themselves; they
+   simply never got the chance, because the column grew to fit them instead.
+   Allowing the item to shrink hands the job back to the crop that was
+   always there. */
+.p-hero-grid > *,
+.feature-row > * { min-width: 0; }
+
 /* invoice document mockup */
 .doc {
   background: #FFFFFF;
@@ -431,7 +445,10 @@
   .modules { grid-template-columns: repeat(2, 1fr); }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .app { grid-template-columns: 1fr; }
-  .app-side { flex-direction: row; overflow-x: auto; padding: 8px; }
+  /* min-width:0 is what makes overflow-x:auto mean anything here. As a grid
+     item sized to its nowrap contents the strip simply grew to ~660px and
+     never scrolled — the scrollbar had nothing to scroll. */
+  .app-side { flex-direction: row; overflow-x: auto; min-width: 0; padding: 8px; }
   .app-side .app-logo { border-bottom: none; margin-bottom: 0; padding: 2px 10px; }
   .side-item { white-space: nowrap; }
   .kanban { grid-template-columns: 1fr; }
