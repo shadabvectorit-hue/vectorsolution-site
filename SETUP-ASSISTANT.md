@@ -88,20 +88,31 @@ Set its permissions to **600**.
 
 If both were the same number the assistant would be messaging the account it runs on: alerts would loop or silently vanish while everything looked healthy. Keeping them separate also means **you never have to delete WhatsApp from your own number** — that was the risk in the earlier plan, and it is gone.
 
-Before registering 0302 2219093, check the WhatsApp app is not installed on it. If it is, delete that WhatsApp account first — that step is irreversible, so do it only once you are ready.
+**Check first whether 0302 2219093 has WhatsApp on it at all.** If it never has, there is nothing to delete and the rest of this box does not apply.
 
-1. <https://developers.facebook.com> → **My Apps → Create App → Business**.
-2. Add the **WhatsApp** product. Meta gives you a free test number to try immediately.
-3. From **API Setup**, copy the **Phone number ID** → `wa_phone_id`.
-4. **Business Settings → Users → System Users** → add one, give it the WhatsApp app, generate a **permanent token** → `wa_token`. (The token on the API Setup page expires in 24 hours — do not use that one.)
-5. **App Settings → Basic → App Secret** → `wa_app_secret`.
-6. **WhatsApp → Configuration → Webhook → Edit**:
-   - Callback URL: `https://vectorsolution.it/wa/hook.php`
-   - Verify token: whatever you put in `wa_verify_token`
-   - Click **Verify and save**, then **Subscribe** to the `messages` field.
-7. Business verification — Meta will ask for documents. Until it completes you can send to a few test numbers, which is enough to prove it works.
+If it does:
 
-Re-check `vectorsolution.it/wa/health.php`. All green means send yourself a WhatsApp message and watch it reply.
+- **Consumer WhatsApp (green app)** — the account must be **deleted**, from Settings → Account → Delete my account on the primary device. *Uninstalling is not deleting*: the registration lives on Meta's servers, not the handset. Deletion is irreversible — chats, media, backups and group memberships all go.
+- **WhatsApp Business app (blue app)** — deletion is **not** the only option. Meta's Coexistence lets one number run the Business app and the API together with history preserved, but it requires onboarding through a Solution Partner / Tech Provider and costs you: 20 messages/sec instead of ~80, no group chats, no disappearing or view-once messages, no live location, no calls or channels on the API side, broadcast lists read-only, and you cannot deregister via API. For one assistant on a dedicated number it buys nothing. Use a clean number instead.
+
+Deleting a WhatsApp account does **not** lift a Meta account restriction — they are unrelated. Do not delete anything until the portfolio is confirmed working.
+
+### The actual steps (verified against Meta's docs, Aug 2026)
+
+1. **Business portfolio** — business.facebook.com → Create a business portfolio. Name must avoid internal capitals: "Vector It", not "VectorIT". **A WhatsApp Business Account cannot be moved between portfolios later**, so get this right once.
+2. **Create the app** — developers.facebook.com/apps → Create app → **Use cases → "Connect with customers through WhatsApp"**. App *types* no longer exist; any guide that says "choose Business type" is out of date. Attach the portfolio during creation — do not pick "I don't want to connect a business portfolio yet". Use cases cannot be removed afterwards.
+3. **Test WABA and test number** are provisioned automatically. WhatsApp Business Terms are accepted inline here; there is no separate terms page.
+4. **System user + permanent token** — business.facebook.com/settings/system-users → Add → Admin. **Assign the assets before generating the token**: Apps → your app (Full control), then WhatsApp accounts → your WABA (Full control). Then Generate new token → your app → Expiration **Never** → tick `whatsapp_business_messaging`, `whatsapp_business_management`, `business_management`. Shown once → `wa_token`. The blue "Generate access token" button on the App Dashboard is a short-lived *user* token — never ship that one.
+5. **App Secret** — App settings → Basic → Show → `wa_app_secret`. It is used only to validate the `X-Hub-Signature-256` header on webhooks, and is not an API credential.
+6. **Webhooks** — WhatsApp → Configuration → Callback URL `https://vectorsolution.it/wa/hook.php`, verify token = `wa_verify_token`, then subscribe the **`messages`** field.
+7. **Phone Number ID** — WhatsApp → API Setup → `wa_phone_id`. It is an ID, not the phone number.
+8. **Add the real number** — WhatsApp Manager → Account tools → Phone numbers → Add phone number. Display name goes to review; verify by SMS or voice.
+9. **Register it — a separate API call.** Adding the number in the UI does *not* register it: `POST /<PHONE_NUMBER_ID>/register` with `messaging_product: "whatsapp"` and your 6-digit two-step PIN. **Limit 10 attempts per number per 72 hours** — exceeding it returns error 133016 and locks the number for 72 hours. Do not burn attempts guessing the PIN.
+10. **Attach a payment method** in Meta Business Suite. Production numbers cannot send without one — the symptoms are errors 131042 and 2388103. The free test number does not need this.
+
+**Two things widely reported as required that are not.** App Review / Advanced Access is *not* needed for a business messaging its own customers from its own WABA. Business verification is *not* needed to start — it is a scaling lever: 250 unique recipients per rolling 24h unverified, 2,000 once verified, and the phone-number cap goes 2 → 20. Since 7 Oct 2025 these limits are **per portfolio**, not per number.
+
+Re-check `vectorsolution.it/wa/health.php`. All green means send a WhatsApp message to the test number and watch it reply.
 
 ---
 
