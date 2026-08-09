@@ -5,6 +5,13 @@
  * Self-contained: no database, no configuration. Sample data lives in data.php;
  * anything the visitor changes is held in their own session and disappears on
  * logout, so every visitor gets a clean company.
+ *
+ * The layout is deliberately NOT the dark-sidebar admin template every other
+ * ERP demo uses — a prospect who has just been shown a competitor's screen
+ * must not see the same screen here with different colours. The visual system
+ * is the site's own drafting-paper language brought inside the product:
+ * numbered sheet tabs instead of a sidebar, documents as paper sheets with
+ * corner ticks, and a live FBR compliance rail no generic panel carries.
  */
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/lib/guard.php';
@@ -378,15 +385,26 @@ if ($authed && ($p === 'print_invoice' || $p === 'print_report')) {
     exit;
 }
 
+/* Sheets are numbered like drawing sheets in a set — the numbering IS the nav. */
 $NAV = [
-    'dashboard' => ['Dashboard',    'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z'],
-    'invoices'  => ['Invoices',     'M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h6'],
-    'inventory' => ['Inventory',    'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8'],
-    'crm'       => ['Sales / CRM',  'M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9.5 11a4 4 0 100-8 4 4 0 000 8z'],
-    'ledger'    => ['Accounting',   'M4 4h16v16H4zM4 9h16M9 9v11'],
-    'payroll'   => ['HR & Payroll', 'M2 7h20v14H2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2'],
-    'custom'    => ['Custom builds', 'M12 2l2.4 6.9L21 9.6l-5 4.6 1.4 7-5.4-3.4L6.6 21 8 14.2l-5-4.6 6.6-.7z'],
+    'dashboard' => ['Daftar',        'Overview'],
+    'invoices'  => ['Invoices',      'Sales tax'],
+    'inventory' => ['Stock',         'Godowns'],
+    'crm'       => ['Pipeline',      'Sales / CRM'],
+    'ledger'    => ['Ledger',        'Accounts'],
+    'payroll'   => ['Payroll',       'HR & EOBI'],
+    'custom'    => ['Custom',        'Built for you'],
 ];
+
+/* The compliance rail is computed from the same data the tables show — the
+   point of it is that a generic admin panel has nowhere to put this. */
+$railFiled = 0; $railTax = 0; $railDue = 0; $railDueN = 0;
+foreach ($allInvoices as $iv) {
+    if (!empty($iv['fbr'])) $railFiled++;
+    $railTax += $iv['tax'];
+    $st = isset($paid[$iv['no']]) ? 'paid' : $iv['status'];
+    if ($st !== 'paid') { $railDue += $iv['excl'] + $iv['tax']; $railDueN++; }
+}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -411,151 +429,186 @@ $NAV = [
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#F7F9FC;--card:#fff;--ink:#0F1B33;--muted:#55617D;--faint:#93A0BC;--line:rgba(15,27,51,.10);--line-soft:rgba(15,27,51,.06);--blue:#2E5BDB;--blue-deep:#1E3FA6;--blue-tint:#E8EEFC;--signal:#FF5A2D;--mono:"IBM Plex Mono",monospace;--disp:"Archivo",system-ui,sans-serif}
+:root{--paper:#F7F9FC;--card:#fff;--ink:#0F1B33;--muted:#55617D;--faint:#93A0BC;--line:rgba(15,27,51,.12);--line-soft:rgba(15,27,51,.07);--grid:rgba(46,91,219,.07);--blue:#2E5BDB;--blue-deep:#1E3FA6;--blue-tint:#E8EEFC;--signal:#FF5A2D;--mono:"IBM Plex Mono",monospace;--disp:"Archivo",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--disp);background:var(--paper);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+/* The drafting paper the whole product sits on — the same surface as the
+   website, so the demo is recognisably the same brand and recognisably NOT
+   the admin template every competitor demo uses. */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 130% 100% at 50% 0%,#000 30%,transparent 100%)}
+body>*{position:relative;z-index:1}
 a{color:inherit;text-decoration:none}
 button,input{font:inherit}
-.demo-bar{background:linear-gradient(90deg,#12224A,#2E5BDB);color:#fff;padding:9px 18px;font-size:.84rem;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:center}
-.demo-bar b{font-weight:700}
-.demo-bar a{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:4px 14px;font-weight:600;white-space:nowrap}
-.demo-bar a:hover{background:rgba(255,255,255,.28)}
+/* ---------- demo strip ---------- */
+.demo-bar{background:#0F1B33;color:#C7D3EC;padding:8px 18px;font-size:.8rem;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:center}
+.demo-bar b{color:#fff;font-weight:700}
+.demo-bar a{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 13px;font-weight:600;white-space:nowrap;color:#fff}
+.demo-bar a:hover{background:rgba(255,255,255,.12)}
+/* ---------- workspace bar (replaces the sidebar) ---------- */
+.wbar{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.wbar-in{max-width:1280px;margin:0 auto;padding:0 clamp(14px,2.5vw,28px);display:flex;align-items:stretch;gap:clamp(10px,2vw,26px)}
+.wbrand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1rem;padding:12px 0;white-space:nowrap}
+.wbrand svg{width:22px;height:22px}
+.wbrand em{font-style:normal;color:var(--blue)}
+.wtabs{display:flex;align-items:stretch;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
+.wtabs::-webkit-scrollbar{display:none}
+.wtab{display:flex;flex-direction:column;justify-content:center;gap:1px;padding:9px 13px;border-bottom:2px solid transparent;white-space:nowrap}
+.wtab i{font-style:normal;font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;color:var(--faint)}
+.wtab b{font-weight:600;font-size:.88rem;color:var(--muted)}
+.wtab:hover b{color:var(--ink)}
+.wtab.on{border-bottom-color:var(--blue)}
+.wtab.on b{color:var(--ink);font-weight:700}
+.wtab.on i{color:var(--blue)}
+.wtab.till i{color:#0B8043}
+.wplate{display:flex;flex-direction:column;justify-content:center;text-align:right;padding:9px 0;white-space:nowrap}
+.wplate b{font-size:.86rem;font-weight:700;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.wplate span{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:var(--faint)}
+/* ---------- stage: sheets + compliance rail ---------- */
+.stage{max-width:1280px;margin:0 auto;padding:30px clamp(14px,2.5vw,28px) 60px;display:grid;grid-template-columns:minmax(0,1fr) 248px;gap:clamp(18px,2.5vw,30px);align-items:start}
+.stage.noRail{grid-template-columns:minmax(0,1fr)}
+/* a sheet is a piece of paper on the board: file tab on top, corner ticks */
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:20px 22px 22px;position:relative;margin-top:30px;box-shadow:0 1px 2px rgba(15,27,51,.04),0 10px 28px rgba(30,63,166,.06)}
+.sheet::after{content:"";position:absolute;right:7px;bottom:7px;width:14px;height:14px;border-right:2px solid var(--grid);border-bottom:2px solid var(--grid)}
+.sheet-tab{position:absolute;top:-25px;left:12px;background:var(--card);border:1px solid var(--line);border-bottom:1px solid var(--card);border-radius:6px 6px 0 0;padding:4px 14px 3px;font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sheet-tab b{color:var(--blue);font-weight:500}
+.sheet-act{position:absolute;top:-33px;right:0;display:flex;gap:8px}
+.sheet h2{font-size:1.05rem;letter-spacing:-.01em;margin-bottom:4px}
+.sheet .sub{color:var(--muted);font-size:.84rem;margin-bottom:14px}
+/* meter plates */
+.meters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.meter{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:13px 15px;position:relative}
+.meter::before{content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:3px;background:var(--blue);border-radius:0 2px 2px 0}
+.meter .l{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.meter .v{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.meter .d{font-size:.75rem;margin-top:2px;font-weight:600}
+.up{color:#178A50}.down{color:#D93636}
+/* register tables */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:7px 10px;border-bottom:1.5px solid var(--ink)}
+td{padding:10px;border-bottom:1px solid var(--line-soft);font-size:.9rem}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--paper)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:.78rem}
+.pill{display:inline-block;padding:2px 10px;border-radius:4px;font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.paid{background:#DCF5E7;color:#14713F}.due{background:#FFF0D9;color:#925E10}.overdue{background:#FDE3E3;color:#B32222}.low{background:#FDE3E3;color:#B32222}.ok{background:#DCF5E7;color:#14713F}
+.btn-sm{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:5px 13px;font-size:.76rem;font-weight:600;cursor:pointer;display:inline-block}
+.btn-sm:hover{background:var(--blue-deep)}
+.btn-dark{background:var(--ink)}
+.btn-act{background:var(--signal);padding:7px 16px;font-size:.82rem;border-radius:6px}
+.btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.fbr{display:inline-flex;align-items:center;gap:6px;background:#DCF5E7;color:#14713F;border-radius:4px;padding:3px 10px;font-size:.66rem;font-weight:600;font-family:var(--mono)}
+.fbr::before{content:"";width:6px;height:6px;border-radius:50%;background:#14713F}
+.note{color:var(--muted);font-size:.84rem;margin-top:12px}
+.in{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.in:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,91,219,.12)}
+.in[disabled]{background:var(--paper);color:var(--muted);border-color:var(--line-soft)}
+.lab{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+/* ---------- the FBR compliance rail ---------- */
+.rail{position:sticky;top:76px;border-left:1px solid var(--line);padding-left:18px;display:grid;gap:16px}
+.rail .rt{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.rbox{display:grid;gap:3px}
+.rbox .rv{font-size:1.25rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.rbox .rl{font-size:.78rem;color:var(--muted)}
+.rok{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:600;color:#14713F}
+.rok::before{content:"";width:8px;height:8px;border-radius:50%;background:#178A50;box-shadow:0 0 0 3px rgba(23,138,80,.18)}
+.rnote{font-size:.76rem;color:var(--muted);line-height:1.55;border-top:1px dashed var(--line);padding-top:12px}
+.rnote b{color:var(--ink)}
+.rwa{display:inline-flex;align-items:center;gap:7px;background:#0B8043;color:#fff;border-radius:6px;padding:8px 13px;font-size:.8rem;font-weight:600}
+.rwa:hover{background:#096B37}
+/* toasts */
+.toast{background:#DCF5E7;border:1px solid #9ADFBB;color:#14713F;border-radius:6px;padding:11px 15px;margin:26px 0 -8px;font-weight:600;font-size:.88rem;grid-column:1/-1}
+.toast.warn{background:#FFF0D9;border-color:#F2CE8E;color:#925E10}
+.toast.err{background:#FDE3E3;border-color:#F0A9A9;color:#B32222}
+/* kanban as index cards on the board */
+.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kcol h3{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1.5px solid var(--ink);padding-bottom:6px}
+.kcard{background:#fff;border:1px solid var(--line);border-radius:3px;padding:11px 12px;margin-bottom:9px;box-shadow:0 1px 2px rgba(15,27,51,.05);position:relative}
+.kcard::before{content:"";position:absolute;left:-1px;top:8px;bottom:8px;width:3px;background:var(--blue-tint)}
+.kcard b{display:block;font-size:.88rem;margin-bottom:2px}
+.kcard span{font-size:.79rem;color:var(--muted)}
+.kcard .amt{display:block;font-weight:700;color:var(--blue);margin-top:5px;font-variant-numeric:tabular-nums}
+.qr{width:74px;height:74px;border-radius:4px;background:repeating-linear-gradient(0deg,#0F1B33 0 4px,transparent 4px 8px),repeating-linear-gradient(90deg,#0F1B33 0 4px,#fff 4px 8px);opacity:.9}
 /* custom-build page */
 .cust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
-.cust{border:1px solid var(--line-soft);border-radius:14px;padding:18px 20px;background:#FBFCFE}
-.cust h3{font-size:1.02rem;margin-bottom:7px}
-.cust p{color:var(--muted);font-size:.88rem;line-height:1.55;margin-bottom:10px}
-.cust-tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.cust{border:1px solid var(--line);border-radius:3px;padding:16px 18px;background:#FBFCFE;position:relative}
+.cust::before{content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:3px;background:var(--signal);opacity:.6}
+.cust h3{font-size:1rem;margin-bottom:7px}
+.cust p{color:var(--muted);font-size:.87rem;line-height:1.55;margin-bottom:10px}
+.cust-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--signal)}
 .cust-steps{margin:12px 0 0 18px;display:grid;gap:9px}
 .cust-steps li{font-size:.92rem;color:var(--muted)}
 .cust-steps b{color:var(--ink)}
-/* demo chooser */
-.choose-wrap{max-width:1200px;margin:0 auto;padding:44px 20px 70px;
-  background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(46,91,219,.09),transparent 62%)}
+/* ---------- chooser ---------- */
+.choose-wrap{max-width:1220px;margin:0 auto;padding:44px 20px 70px}
 .choose-head{text-align:center;margin-bottom:34px}
 .choose-head .mark{display:inline-flex;align-items:center;gap:9px;font-size:1.15rem;font-weight:800;margin-bottom:18px}
 .choose-head .mark svg{width:30px;height:30px}
 .choose-head .mark em{font-style:normal;color:var(--blue)}
 .choose-head h1{font-size:clamp(1.7rem,4vw,2.5rem);letter-spacing:-.02em;margin-bottom:12px}
 .choose-head h1 .hl{color:var(--blue);position:relative;white-space:nowrap}
-.choose-head h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.28em;
-  background:rgba(255,90,45,.22);border-radius:3px;z-index:-1}
+.choose-head h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.28em;background:rgba(255,90,45,.22);border-radius:3px;z-index:-1}
 .choose-head p{color:var(--muted);max-width:640px;margin:0 auto;font-size:1rem}
-/* the name field — the hook */
-.bizbox{background:var(--card);border:1px solid var(--line-soft);border-radius:16px;padding:20px 22px;
-  max-width:560px;margin:0 auto 26px;box-shadow:0 8px 26px rgba(30,63,166,.09);text-align:center}
-.bizbox label{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:9px}
-.bizbox input{width:100%;padding:14px 16px;border:2px solid var(--blue);border-radius:11px;font-size:1.05rem;
-  font-weight:600;text-align:center;outline:none;font-family:var(--disp)}
+.bizbox{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:20px 22px;max-width:560px;margin:0 auto 40px;box-shadow:0 8px 26px rgba(30,63,166,.09);text-align:center;position:relative}
+.bizbox::after{content:"";position:absolute;right:6px;bottom:6px;width:12px;height:12px;border-right:2px solid var(--grid);border-bottom:2px solid var(--grid)}
+.bizbox label{display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.bizbox input{width:100%;padding:13px 16px;border:0;border-bottom:2.5px solid var(--blue);background:var(--paper);font-size:1.05rem;font-weight:600;text-align:center;outline:none;font-family:var(--disp);border-radius:3px 3px 0 0}
 .bizbox input::placeholder{color:var(--faint);font-weight:400}
 .bizhint{display:block;font-size:.8rem;color:var(--muted);margin-top:10px}
-.choose-proof{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:34px}
-.choose-proof span{font-size:.86rem;color:var(--muted);background:var(--card);border:1px solid var(--line-soft);
-  border-radius:12px;padding:14px 16px;line-height:1.5}
-.choose-proof b{color:var(--ink)}
-.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
-.tcard{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:26px 24px 22px;
-  display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);
-  transition:transform .14s,box-shadow .14s,border-color .14s;border-top:4px solid var(--acc)}
+.choose-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px 18px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:20px 20px 18px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,27,51,.05);transition:transform .14s,box-shadow .14s,border-color .14s;position:relative;margin-top:22px;font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer}
+.tcard::before{content:attr(data-who);position:absolute;top:-21px;left:10px;background:var(--card);border:1px solid var(--line);border-bottom:1px solid var(--card);border-radius:6px 6px 0 0;padding:3px 12px 2px;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.tcard::after{content:"";position:absolute;right:6px;bottom:6px;width:12px;height:12px;border-right:2px solid var(--grid);border-bottom:2px solid var(--grid)}
 .tcard:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 16px 40px rgba(15,27,51,.13)}
-.tico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
-  background:color-mix(in srgb,var(--acc) 12%,#fff);color:var(--acc);margin-bottom:15px}
-.tico svg{width:23px;height:23px}
-.twho{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
-.tcard{font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer;border-left:0;border-right:0;border-bottom:0}
-.tcard .th2{display:block;font-size:1.2rem;font-weight:700;margin:5px 0 9px;letter-spacing:-.01em}
-.tcard .tp{display:block;color:var(--muted);font-size:.9rem;line-height:1.55;margin-bottom:15px}
-.tfeats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.tfeats i{font-style:normal;font-size:.72rem;font-weight:600;background:var(--paper);border:1px solid var(--line-soft);
-  border-radius:999px;padding:4px 10px;color:var(--muted)}
+.tico{width:44px;height:44px;border-radius:3px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--acc) 11%,#fff);color:var(--acc);margin-bottom:13px;border:1px solid color-mix(in srgb,var(--acc) 25%,#fff)}
+.tico svg{width:22px;height:22px}
+.tcard .th2{display:block;font-size:1.18rem;font-weight:700;margin:2px 0 8px;letter-spacing:-.01em}
+.tcard .tp{display:block;color:var(--muted);font-size:.89rem;line-height:1.55;margin-bottom:14px}
+.tfeats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tfeats i{font-style:normal;font-family:var(--mono);font-size:.64rem;letter-spacing:.04em;background:var(--paper);border:1px solid var(--line-soft);border-radius:4px;padding:3px 9px;color:var(--muted)}
 .tgo{margin-top:auto;display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:.9rem;color:var(--acc)}
 .tgo svg{width:15px;height:15px}
+.choose-proof{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:38px}
+.choose-proof span{font-size:.86rem;color:var(--muted);background:var(--card);border:1px solid var(--line-soft);border-radius:3px;padding:14px 16px;line-height:1.5}
+.choose-proof b{color:var(--ink)}
 .choose-foot{text-align:center;color:var(--muted);font-size:.9rem;margin-top:30px}
 .choose-foot a{color:var(--blue);font-weight:600;text-decoration:underline}
-/* login */
-.login-wrap{min-height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse 70% 60% at 70% 10%,rgba(46,91,219,.10),transparent 60%)}
-.login{background:var(--card);border:1px solid var(--line-soft);border-radius:18px;padding:38px 34px;width:min(400px,100%);box-shadow:0 4px 12px rgba(15,27,51,.05),0 30px 70px rgba(30,63,166,.14)}
-.login .mark{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.login .mark svg{width:34px;height:34px}
-.login .mark b{font-size:1.25rem;font-weight:700}
-.login .mark b em{font-style:normal;color:var(--blue)}
-.login p.sub{color:var(--muted);font-size:.9rem;margin-bottom:24px}
-.login label{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.login input{width:100%;padding:12px 15px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);margin-bottom:16px}
-.login input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(46,91,219,.12)}
-.login button{width:100%;background:var(--signal);color:#fff;border:0;border-radius:999px;padding:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 22px rgba(255,90,45,.3)}
-.login .hint{margin-top:18px;background:var(--blue-tint);border-radius:10px;padding:12px 14px;font-size:.85rem;color:var(--blue-deep)}
-.login .hint code{font-family:var(--mono);font-weight:600}
-.err{color:#B32222;font-size:.86rem;margin-bottom:12px}
-/* shell */
-.shell{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 40px)}
-.side{background:#0F1B33;color:#B9C5E4;padding:18px 0;display:flex;flex-direction:column}
-.side .logo{display:flex;align-items:center;gap:9px;padding:0 18px 16px;color:#fff;font-weight:700;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px}
-.side .logo svg{width:22px;height:22px}
-.side a{display:flex;align-items:center;gap:11px;padding:10px 18px;font-size:.92rem;transition:background .15s}
-.side a svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;opacity:.85}
-.side a:hover{background:rgba(255,255,255,.06);color:#fff}
-.side a.on{background:rgba(91,140,255,.18);color:#fff;border-left:3px solid #5B8CFF;padding-left:15px}
-.side .pos-link{margin-top:12px;color:#9BE8BE;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
-.side .pos-link:hover{background:rgba(11,128,67,.28);color:#fff}
-.side .foot{margin-top:auto;padding:16px 18px 0;font-size:.76rem;color:#7D8CB0;border-top:1px solid rgba(255,255,255,.08)}
-.side .foot a{color:#9DBAFF}
-.side .foot a{padding:0;display:inline;color:#9DBAFF}
-.main{padding:26px clamp(16px,3vw,34px);overflow-x:auto}
-.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.head h1{font-size:1.5rem;letter-spacing:-.02em}
-.head .co{color:var(--muted);font-size:.86rem;font-family:var(--mono)}
-.user{display:flex;align-items:center;gap:9px;font-size:.88rem;color:var(--muted)}
-.user .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2E5BDB,#5B8CFF);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;box-shadow:0 1px 3px rgba(15,27,51,.05)}
-.kpi .l{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
-.kpi .v{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
-.kpi .d{font-size:.78rem;margin-top:3px;font-weight:600}
-.up{color:#178A50}.down{color:#D93636}
-.panel{background:var(--card);border:1px solid var(--line-soft);border-radius:13px;padding:18px 20px;box-shadow:0 1px 3px rgba(15,27,51,.05);margin-bottom:16px}
-.panel h2{font-size:1rem;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.panel h2 span{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:400}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:8px 10px;border-bottom:1.5px solid var(--line)}
-td{padding:11px 10px;border-bottom:1px solid var(--line-soft);font-size:.9rem}
-tr:last-child td{border-bottom:0}
-tbody tr:hover{background:var(--paper)}
-.num{text-align:right;font-variant-numeric:tabular-nums}
-.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:.72rem;font-weight:700}
-.paid{background:#DCF5E7;color:#14713F}.due{background:#FFF0D9;color:#925E10}.overdue{background:#FDE3E3;color:#B32222}.low{background:#FDE3E3;color:#B32222}.ok{background:#DCF5E7;color:#14713F}
-.btn-sm{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:5px 13px;font-size:.76rem;font-weight:600;cursor:pointer}
-.btn-sm:hover{background:var(--blue-deep)}
-.fbr{display:inline-flex;align-items:center;gap:6px;background:#DCF5E7;color:#14713F;border-radius:999px;padding:3px 11px;font-size:.68rem;font-weight:700;font-family:var(--mono)}
-.fbr::before{content:"";width:6px;height:6px;border-radius:50%;background:#14713F}
-.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.kcol{background:var(--paper);border-radius:11px;padding:12px}
-.kcol h3{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:10px}
-.kcard{background:#fff;border:1px solid var(--line-soft);border-radius:9px;padding:11px 12px;margin-bottom:9px;box-shadow:0 1px 2px rgba(15,27,51,.05)}
-.kcard b{display:block;font-size:.88rem;margin-bottom:2px}
-.kcard span{font-size:.79rem;color:var(--muted)}
-.kcard .amt{display:block;font-weight:700;color:var(--blue);margin-top:5px;font-variant-numeric:tabular-nums}
-.toast{background:#DCF5E7;border:1px solid #9ADFBB;color:#14713F;border-radius:11px;padding:12px 16px;margin-bottom:16px;font-weight:600;font-size:.9rem}
-.qr{width:74px;height:74px;border-radius:6px;background:repeating-linear-gradient(0deg,#0F1B33 0 4px,transparent 4px 8px),repeating-linear-gradient(90deg,#0F1B33 0 4px,#fff 4px 8px);opacity:.9}
-.note{color:var(--muted);font-size:.84rem;margin-top:10px}
-/* save-my-demo lead capture */
+/* save panel */
 .save-panel{background:linear-gradient(155deg,#12224A,#0F1B33);border:0;color:#fff}
+.save-panel .sheet-tab{background:#12224A;border-color:rgba(255,255,255,.2);border-bottom-color:#12224A;color:#9DBAFF}
+.save-panel::after{border-color:rgba(91,140,255,.35)}
 .save-lede{color:rgba(233,238,249,.82);font-size:.92rem;margin-bottom:16px;max-width:62ch}
 .save-lede b{color:#fff}
 .save-form{display:flex;gap:10px;flex-wrap:wrap}
-.save-form input{flex:1;min-width:170px;padding:11px 15px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.10);color:#fff}
+.save-form input{flex:1;min-width:170px;padding:11px 15px;border:1px solid rgba(255,255,255,.22);border-radius:6px;background:rgba(255,255,255,.10);color:#fff}
 .save-form input::placeholder{color:rgba(233,238,249,.55)}
 .save-form input:focus{outline:none;border-color:#5B8CFF;background:rgba(255,255,255,.16)}
-.save-form button{background:#25D366;color:#fff;border:0;border-radius:999px;padding:11px 24px;font-weight:700;cursor:pointer;white-space:nowrap}
+.save-form button{background:#25D366;color:#fff;border:0;border-radius:6px;padding:11px 24px;font-weight:700;cursor:pointer;white-space:nowrap}
 .save-form button:hover{background:#1FBA59}
 .save-form button:disabled{opacity:.65;cursor:default}
-.save-done{background:rgba(37,211,102,.16);border:1px solid rgba(37,211,102,.45);border-radius:11px;padding:13px 16px;font-size:.92rem}
-.save-warn{background:rgba(255,90,45,.16);border:1px solid rgba(255,90,45,.5);border-radius:11px;padding:12px 15px;font-size:.9rem;margin-top:12px;color:#FFD3C4}
+.save-done{background:rgba(37,211,102,.16);border:1px solid rgba(37,211,102,.45);border-radius:6px;padding:13px 16px;font-size:.92rem}
+.save-warn{background:rgba(255,90,45,.16);border:1px solid rgba(255,90,45,.5);border-radius:6px;padding:12px 15px;font-size:.9rem;margin-top:12px;color:#FFD3C4}
 .save-alt{margin-top:14px;font-size:.86rem;color:rgba(233,238,249,.65)}
 .save-alt a{color:#7BE49E;font-weight:600}
-@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}.save-form input{min-width:100%}.save-form button{width:100%}}
-@media(max-width:700px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;padding:8px;align-items:center}.side .logo{border:0;margin:0;padding:0 12px}.side .foot{display:none}.side a{white-space:nowrap;padding:8px 12px}.side a.on{border-left:0;border-bottom:2px solid #5B8CFF;padding-left:12px}}
+/* ---------- responsive ---------- */
+/* Below 1500px the sheet-number captions make the tab row overflow; the tabs
+   matter more than their captions, so the captions go first. */
+@media(max-width:1500px){.wtab i{display:none}.wtab{padding:13px 11px}}
+@media(max-width:1080px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .rail{position:static;border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:start;order:9}
+  .rail .rnote{border-top:0;padding-top:0;grid-column:1/-1}
+}
+@media(max-width:900px){.meters{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}.save-form input{min-width:100%}.save-form button{width:100%}}
+@media(max-width:700px){
+  .wplate{display:none}
+  .sheet{padding:16px 14px 18px}
+  .sheet-act{position:static;margin:-6px 0 12px;justify-content:flex-start;flex-wrap:wrap}
+  td{padding:9px 7px;font-size:.86rem}
+}
 </style>
 </head>
 <body>
@@ -563,7 +616,7 @@ tbody tr:hover{background:var(--paper)}
 <div class="demo-bar">
   <span><b>VectorERP live demo</b> — sample data, nothing you do here is saved</span>
   <?php if ($authed && !$bare && $p !== 'choose'): ?><a href="?p=choose">↔ Switch demo</a><?php endif; ?>
-  <a href="/">← Back to vectorsolution.it</a>
+  <a href="/">← vectorsolution.it</a>
   <?php if ($authed && !$bare && $p !== 'choose'): ?><a href="#save" style="background:#0B8043;border-color:#0B8043">💾 Save my demo data</a><?php endif; ?>
   <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I have seen the VectorERP demo and would like to discuss it for my business.') ?>" target="_blank" rel="noopener">Discuss this for my business →</a>
 </div>
@@ -589,9 +642,8 @@ tbody tr:hover{background:var(--paper)}
 
       <div class="choose-grid">
         <?php foreach ($TRACKS as $key => [$title, $who, $colour, $blurb, $feats, $icon]): ?>
-          <button type="submit" name="track" value="<?= $e($key) ?>" class="tcard" style="--acc:<?= $e($colour) ?>">
+          <button type="submit" name="track" value="<?= $e($key) ?>" class="tcard" style="--acc:<?= $e($colour) ?>" data-who="<?= $e($who) ?>">
             <span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $icon ?>"/></svg></span>
-            <span class="twho"><?= $e($who) ?></span>
             <span class="th2"><?= $e($title) ?></span>
             <span class="tp"><?= $e($blurb) ?></span>
             <span class="tfeats"><?php foreach ($feats as $f): ?><i><?= $e($f) ?></i><?php endforeach; ?></span>
@@ -609,52 +661,56 @@ tbody tr:hover{background:var(--paper)}
     <p class="choose-foot">Not sure which fits? <a href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I want to see the VectorERP demo but not sure which one fits my business.') ?>" target="_blank" rel="noopener">Ask us on WhatsApp</a> — tell us what you do and we will point you at the right one.</p>
   </div>
 <?php else: ?>
-  <div class="shell">
-    <nav class="side">
-      <span class="logo">
-        <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#5B8CFF"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#5B8CFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#5B8CFF"/></svg>
-        VectorERP
-      </span>
-      <?php foreach ($NAV as $key => [$label, $path]): ?>
-        <a href="?p=<?= $key ?>" class="<?= $p === $key ? 'on' : '' ?>">
-          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="<?= $path ?>"/></svg><?= $e($label) ?>
-        </a>
-      <?php endforeach; ?>
-      <a href="pos.php" class="pos-link">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 5h13M10 21a1 1 0 100-2 1 1 0 000 2zM17 21a1 1 0 100-2 1 1 0 000 2z"/></svg>Retail POS
+
+  <nav class="wbar">
+    <div class="wbar-in">
+      <a class="wbrand" href="?p=choose" title="Switch demo">
+        <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/></svg>
+        Vector<em>ERP</em>
       </a>
-      <div class="foot"><a href="?p=choose">↔ Switch demo</a> · <a href="?logout=1">Sign out &amp; reset</a></div>
-    </nav>
-
-    <main class="main">
-      <div class="head">
-        <div>
-          <h1><?= $e($p === 'new_invoice' ? 'New Invoice' : ($NAV[$p][0] ?? 'Dashboard')) ?></h1>
-          <p class="co"><?= $e($DATA['company']['name']) ?> · STRN <?= $e($DATA['company']['strn']) ?> · FY <?= $e($DATA['company']['fy']) ?></p>
-        </div>
-        <div class="user"><span class="av">DM</span> Demo User · Administrator</div>
+      <div class="wtabs">
+        <?php $n = 0; foreach ($NAV as $key => [$label, $hint]): $n++; ?>
+          <a href="?p=<?= $key ?>" class="wtab <?= $p === $key || ($p === 'new_invoice' && $key === 'invoices') ? 'on' : '' ?>">
+            <i>SHEET <?= str_pad((string)$n, 2, '0', STR_PAD_LEFT) ?> · <?= $e(strtoupper($hint)) ?></i>
+            <b><?= $e($label) ?></b>
+          </a>
+        <?php endforeach; ?>
+        <a href="pos.php" class="wtab till">
+          <i>COUNTER · TILL</i>
+          <b>Open POS</b>
+        </a>
       </div>
+      <div class="wplate">
+        <b><?= $e($DATA['company']['name']) ?></b>
+        <span>STRN <?= $e($DATA['company']['strn']) ?> · FY <?= $e($DATA['company']['fy']) ?> · <a href="?logout=1" style="color:var(--blue)">reset</a></span>
+      </div>
+    </div>
+  </nav>
 
-      <?php if (isset($_GET['done'])): ?>
-        <div class="toast">✓ <?= $e((string)$_GET['done']) ?> marked as paid — the ledger and receivables updated instantly. (Demo only: this resets when you sign out.)</div>
-      <?php endif; ?>
-      <?php if (isset($_GET['created'])): ?>
-        <div class="toast">✓ Invoice <?= $e((string)$_GET['created']) ?> created with its FBR number — now click <b>PDF</b> on it to see the printed sales tax invoice.
-          <a href="#save" style="display:inline-block;margin-left:10px;background:#178A50;color:#fff;border-radius:999px;padding:5px 15px;font-weight:700;font-size:.85rem">Like it? Save my demo data →</a>
-        </div>
-      <?php endif; ?>
-      <?php if (isset($_GET['full'])): ?>
-        <div class="toast" style="background:#FFF0D9;border-color:#F2CE8E;color:#925E10">The demo allows up to 10 invoices per session — sign out and back in for a fresh company.</div>
-      <?php endif; ?>
+  <div class="stage<?= $p === 'custom' ? ' noRail' : '' ?>">
+
+    <?php if (isset($_GET['done'])): ?>
+      <div class="toast">✓ <?= $e((string)$_GET['done']) ?> marked as paid — the ledger and receivables updated instantly. (Demo only: this resets when you sign out.)</div>
+    <?php endif; ?>
+    <?php if (isset($_GET['created'])): ?>
+      <div class="toast">✓ Invoice <?= $e((string)$_GET['created']) ?> created with its FBR number — now click <b>PDF</b> on it to see the printed sales tax invoice.
+        <a href="#save" style="display:inline-block;margin-left:10px;background:#178A50;color:#fff;border-radius:6px;padding:5px 15px;font-weight:700;font-size:.85rem">Like it? Save my demo data →</a>
+      </div>
+    <?php endif; ?>
+    <?php if (isset($_GET['full'])): ?>
+      <div class="toast warn">The demo allows up to 10 invoices per session — sign out and back in for a fresh company.</div>
+    <?php endif; ?>
+
+    <div class="col-main" style="min-width:0">
 
       <?php if ($p === 'dashboard'): ?>
-        <div class="kpis">
+        <div class="meters">
           <?php foreach ($DATA['kpis'] as $k): ?>
-            <div class="kpi"><div class="l"><?= $e($k['label']) ?></div><div class="v"><?= $e($k['value']) ?></div><div class="d <?= $e($k['dir']) ?>"><?= $e($k['delta']) ?></div></div>
+            <div class="meter"><div class="l"><?= $e($k['label']) ?></div><div class="v"><?= $e($k['value']) ?></div><div class="d <?= $e($k['dir']) ?>"><?= $e($k['delta']) ?></div></div>
           <?php endforeach; ?>
         </div>
-        <div class="panel">
-          <h2>Recent invoices <span>FBR digital invoicing active</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 02 · <b>Recent invoices</b> · FBR active</span>
           <table>
             <thead><tr><th>Invoice</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr></thead>
             <tbody>
@@ -670,8 +726,8 @@ tbody tr:hover{background:var(--paper)}
             </tbody>
           </table>
         </div>
-        <div class="panel">
-          <h2>Stock alerts <span>below reorder level</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 03 · <b>Stock alerts</b> · below reorder</span>
           <table>
             <thead><tr><th>Item</th><th>Location</th><th class="num">On hand</th><th class="num">Reorder at</th></tr></thead>
             <tbody>
@@ -683,14 +739,13 @@ tbody tr:hover{background:var(--paper)}
         </div>
 
       <?php elseif ($p === 'invoices'): ?>
-        <div class="panel">
-          <h2>Sales tax invoices
-            <span style="display:inline-flex;gap:10px;align-items:center">every invoice registered with FBR
-              <a class="btn-sm" style="background:var(--signal);padding:7px 16px;font-size:.82rem" href="?p=new_invoice">+ New Invoice</a>
-            </span>
-          </h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 02 · <b>Sales tax invoices</b> · FY <?= $e($DATA['company']['fy']) ?></span>
+          <div class="sheet-act">
+            <a class="btn-sm btn-act" href="?p=new_invoice">+ New Invoice</a>
+          </div>
           <table>
-            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Sales tax 18%</th><th class="num">Total</th><th>Status</th><th></th><th></th></tr></thead>
+            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Tax 18%</th><th class="num">Total</th><th>Status</th><th></th><th></th></tr></thead>
             <tbody>
             <?php foreach ($allInvoices as $inv):
               $st = isset($paid[$inv['no']]) ? 'paid' : $inv['status']; ?>
@@ -702,7 +757,7 @@ tbody tr:hover{background:var(--paper)}
                 <td class="num"><?= $rs($inv['tax']) ?></td>
                 <td class="num"><b><?= $rs($inv['excl'] + $inv['tax']) ?></b></td>
                 <td><span class="pill <?= $e($st) ?>"><?= $st === 'due' ? 'Due' : ucfirst($st) ?></span></td>
-                <td><a class="btn-sm" style="background:#0F1B33" target="_blank" href="?p=print_invoice&no=<?= urlencode($inv['no']) ?>">PDF</a></td>
+                <td><a class="btn-sm btn-dark" target="_blank" href="?p=print_invoice&no=<?= urlencode($inv['no']) ?>">PDF</a></td>
                 <td><?php if ($st !== 'paid'): ?><a class="btn-sm" href="?pay=<?= urlencode($inv['no']) ?>">Mark paid</a><?php endif; ?></td>
               </tr>
             <?php endforeach; ?>
@@ -710,8 +765,8 @@ tbody tr:hover{background:var(--paper)}
           </table>
           <p class="note">Try it: click <b>PDF</b> on any invoice to see the printed sales tax invoice — with FBR number and QR — exactly as your customer receives it. Or click <b>Mark paid</b> and watch the status update.</p>
         </div>
-        <div class="panel">
-          <h2>INV-2041 — as printed for the customer <span>FBR number + QR on every invoice</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Document · <b>INV-2041 as printed</b></span>
           <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
             <div style="flex:1;min-width:280px">
               <p style="margin-bottom:10px"><span class="fbr">FBR INVOICE <?= $e(substr($DATA['invoices'][0]['fbr'], 0, 14)) ?>…</span></p>
@@ -719,7 +774,7 @@ tbody tr:hover{background:var(--paper)}
                 <thead><tr><th>Item</th><th>HS code</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr></thead>
                 <tbody>
                 <?php $sub = 0; foreach ($DATA['invoice_lines']['INV-2041'] as $l): $amt = $l['qty'] * $l['rate']; $sub += $amt; ?>
-                  <tr><td><?= $e($l['item']) ?></td><td style="font-family:var(--mono);font-size:.8rem"><?= $e($l['hs']) ?></td><td class="num"><?= $l['qty'] ?> <?= $e($l['uom']) ?></td><td class="num"><?= number_format($l['rate']) ?></td><td class="num"><?= number_format($amt) ?></td></tr>
+                  <tr><td><?= $e($l['item']) ?></td><td class="mono"><?= $e($l['hs']) ?></td><td class="num"><?= $l['qty'] ?> <?= $e($l['uom']) ?></td><td class="num"><?= number_format($l['rate']) ?></td><td class="num"><?= number_format($amt) ?></td></tr>
                 <?php endforeach; ?>
                   <tr><td colspan="4" class="num" style="color:var(--muted)">Subtotal</td><td class="num"><?= $rs($sub) ?></td></tr>
                   <tr><td colspan="4" class="num" style="color:var(--muted)">Sales tax @ 18%</td><td class="num"><?= $rs((int)round($sub * 0.18)) ?></td></tr>
@@ -736,26 +791,25 @@ tbody tr:hover{background:var(--paper)}
 
       <?php elseif ($p === 'new_invoice'): ?>
         <?php if (isset($_GET['err'])): ?>
-          <div class="toast" style="background:#FDE3E3;border-color:#F0A9A9;color:#B32222">Please give a customer name and at least one line with description, quantity and rate.</div>
+          <div class="toast err" style="margin-top:0">Please give a customer name and at least one line with description, quantity and rate.</div>
         <?php endif; ?>
-        <form class="panel" method="post" action="?p=new_invoice" id="niForm">
-          <h2>Create a sales tax invoice <span>FBR number assigned on save</span></h2>
+        <form class="sheet" method="post" action="?p=new_invoice" id="niForm">
+          <span class="sheet-tab">Sheet 02 · <b>New sales tax invoice</b> · FBR number on save</span>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:16px">
             <div>
-              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Customer</label>
-              <input name="party" list="ni-parties" required placeholder="Type or pick a customer"
-                     style="width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;background:#fff">
+              <label class="lab">Customer</label>
+              <input class="in" name="party" list="ni-parties" required placeholder="Type or pick a customer">
               <datalist id="ni-parties">
                 <?php foreach (array_unique(array_column($allInvoices, 'party')) as $pt): ?><option value="<?= $e($pt) ?>"><?php endforeach; ?>
               </datalist>
             </div>
             <div>
-              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Date</label>
-              <input value="<?= $e(date('d M Y')) ?>" disabled style="width:100%;padding:10px 14px;border:1.5px solid var(--line-soft);border-radius:9px;background:var(--paper);color:var(--muted)">
+              <label class="lab">Date</label>
+              <input class="in" value="<?= $e(date('d M Y')) ?>" disabled>
             </div>
             <div>
-              <label style="display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Invoice No.</label>
-              <input value="INV-<?= 2042 + count($custom) ?> (auto)" disabled style="width:100%;padding:10px 14px;border:1.5px solid var(--line-soft);border-radius:9px;background:var(--paper);color:var(--muted)">
+              <label class="lab">Invoice No.</label>
+              <input class="in" value="INV-<?= 2042 + count($custom) ?> (auto)" disabled>
             </div>
           </div>
           <table id="niTable">
@@ -763,11 +817,11 @@ tbody tr:hover{background:var(--paper)}
             <tbody>
               <?php for ($r = 0; $r < 3; $r++): ?>
               <tr>
-                <td><input name="idesc[]" placeholder="e.g. Cotton fabric — 40s count" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px"></td>
-                <td><input name="ihs[]" placeholder="5208.1100" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:.8rem"></td>
-                <td><input name="iuom[]" placeholder="Than" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px"></td>
-                <td><input name="iqty[]" type="number" min="0" step="any" placeholder="0" class="ni-qty" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;text-align:right"></td>
-                <td><input name="irate[]" type="number" min="0" step="any" placeholder="0" class="ni-rate" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;text-align:right"></td>
+                <td><input class="in" name="idesc[]" placeholder="e.g. Cotton fabric — 40s count"></td>
+                <td><input class="in mono" name="ihs[]" placeholder="5208.1100"></td>
+                <td><input class="in" name="iuom[]" placeholder="Than"></td>
+                <td><input class="in ni-qty" name="iqty[]" type="number" min="0" step="any" placeholder="0" style="text-align:right"></td>
+                <td><input class="in ni-rate" name="irate[]" type="number" min="0" step="any" placeholder="0" style="text-align:right"></td>
                 <td class="num ni-line" style="font-variant-numeric:tabular-nums;color:var(--muted)">—</td>
               </tr>
               <?php endfor; ?>
@@ -779,9 +833,9 @@ tbody tr:hover{background:var(--paper)}
             </tfoot>
           </table>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <button type="button" class="btn-sm" style="background:var(--paper);color:var(--ink);border:1px solid var(--line)" id="niAdd">+ Add line</button>
-            <button type="submit" class="btn-sm" style="background:var(--signal);padding:8px 22px;font-size:.86rem">Save invoice &amp; assign FBR number</button>
-            <a class="btn-sm" style="background:var(--paper);color:var(--muted);border:1px solid var(--line)" href="?p=invoices">Cancel</a>
+            <button type="button" class="btn-sm btn-ghost" id="niAdd">+ Add line</button>
+            <button type="submit" class="btn-sm btn-act">Save invoice &amp; assign FBR number</button>
+            <a class="btn-sm btn-ghost" style="color:var(--muted)" href="?p=invoices">Cancel</a>
           </div>
           <p class="note">Fill any lines you like — totals and tax calculate as you type. On save the invoice appears in your list with its FBR number, ready to print as PDF.</p>
         </form>
@@ -813,8 +867,8 @@ tbody tr:hover{background:var(--paper)}
         </script>
 
       <?php elseif ($p === 'inventory'): ?>
-        <div class="panel">
-          <h2>Stock across all locations <span>3 warehouses · live</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 03 · <b>Stock register</b> · 3 locations</span>
           <table>
             <thead><tr><th>Item</th><th>Location</th><th class="num">On hand</th><th class="num">Reorder at</th><th class="num">Stock value</th><th>Status</th></tr></thead>
             <tbody>
@@ -833,8 +887,8 @@ tbody tr:hover{background:var(--paper)}
         </div>
 
       <?php elseif ($p === 'crm'): ?>
-        <div class="panel">
-          <h2>Sales pipeline <span>no inquiry lost in a WhatsApp chat</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 04 · <b>Sales pipeline</b> · no inquiry lost</span>
           <div class="kanban">
             <?php foreach ($DATA['pipeline'] as $stage => $cards): ?>
               <div class="kcol">
@@ -848,12 +902,11 @@ tbody tr:hover{background:var(--paper)}
         </div>
 
       <?php elseif ($p === 'ledger'): ?>
-        <div class="panel">
-          <h2>Cash &amp; bank ledger
-            <span style="display:inline-flex;gap:10px;align-items:center">financial year 1 July – 30 June
-              <a class="btn-sm" style="background:#0F1B33" target="_blank" href="?p=print_report">Sales Register PDF</a>
-            </span>
-          </h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 05 · <b>Cash &amp; bank ledger</b> · FY 1 Jul – 30 Jun</span>
+          <div class="sheet-act">
+            <a class="btn-sm btn-dark" target="_blank" href="?p=print_report">Sales Register PDF</a>
+          </div>
           <table>
             <thead><tr><th>Date</th><th>Narration</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Balance</th></tr></thead>
             <tbody>
@@ -871,8 +924,8 @@ tbody tr:hover{background:var(--paper)}
         </div>
 
       <?php elseif ($p === 'payroll'): ?>
-        <div class="panel">
-          <h2>Payroll — August 2026 <span>EOBI deducted · salary slips ready</span></h2>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 06 · <b>Payroll — August 2026</b> · EOBI deducted</span>
           <table>
             <thead><tr><th>Employee</th><th>Designation</th><th class="num">Days</th><th class="num">Basic</th><th class="num">Allowances</th><th class="num">EOBI</th><th class="num">Net payable</th></tr></thead>
             <tbody>
@@ -892,9 +945,10 @@ tbody tr:hover{background:var(--paper)}
         </div>
 
       <?php elseif ($p === 'custom'): ?>
-        <div class="panel">
-          <h2>When nothing off-the-shelf fits <span>what a custom build actually looks like</span></h2>
-          <p class="note" style="margin-bottom:18px">There is no sample screen for this one, because custom work has no standard screen — it is shaped around how <em>you</em> work. So here is honestly what we have built for other businesses, and what the process looks like.</p>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 07 · <b>Custom builds</b> · shaped around you</span>
+          <h2>When nothing off-the-shelf fits</h2>
+          <p class="note" style="margin:0 0 18px">There is no sample screen for this one, because custom work has no standard screen — it is shaped around how <em>you</em> work. So here is honestly what we have built for other businesses, and what the process looks like.</p>
           <div class="cust-grid">
             <div class="cust">
               <h3>Field staff app</h3>
@@ -928,8 +982,9 @@ tbody tr:hover{background:var(--paper)}
         </div>
       <?php endif; ?>
 
-      <div class="panel save-panel" id="save">
-        <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF">— set up with your own business</span></h2>
+      <div class="sheet save-panel" id="save">
+        <span class="sheet-tab">Next step · <b>Your own setup</b></span>
+        <h2 style="color:#fff">Save my demo data <span style="color:#9DBAFF;font-weight:400;font-size:.85rem">— set up with your own business</span></h2>
         <p class="save-lede">Leave your name and WhatsApp number — we'll set VectorERP up with <b>your own</b> products, parties and opening balances, and send you a private login. Free, no obligation.</p>
         <form class="save-form" id="save-form" action="../contact-submit.php" method="post" autocomplete="on">
           <input type="text" name="website" tabindex="-1" aria-hidden="true" autocomplete="off" style="position:absolute;left:-9999px">
@@ -972,7 +1027,28 @@ tbody tr:hover{background:var(--paper)}
         });
       })();
       </script>
-    </main>
+    </div>
+
+    <?php if ($p !== 'custom'): ?>
+    <aside class="rail" aria-label="FBR compliance">
+      <span class="rt">FBR — Return Aug 2026</span>
+      <div class="rbox">
+        <span class="rv"><?= $rs($railTax) ?></span>
+        <span class="rl">sales tax collected this period</span>
+      </div>
+      <div class="rbox">
+        <span class="rok"><?= $railFiled ?> of <?= count($allInvoices) ?> invoices filed</span>
+        <span class="rl">every invoice carries its FBR number &amp; QR</span>
+      </div>
+      <div class="rbox">
+        <span class="rv" style="color:<?= $railDueN ? '#925E10' : '#14713F' ?>"><?= $rs($railDue) ?></span>
+        <span class="rl"><?= $railDueN ?> invoice<?= $railDueN === 1 ? '' : 's' ?> awaiting payment</span>
+      </div>
+      <p class="rnote"><b>Corrections:</b> a filed invoice can be amended within FBR's 72-hour window — after that it stands in the return. VectorERP tracks the window for you.</p>
+      <a class="rwa" href="https://wa.me/<?= WA ?>?text=<?= rawurlencode('Hello, I am looking at the VectorERP demo — can we talk about FBR integration for my business?') ?>" target="_blank" rel="noopener">Ask about FBR setup →</a>
+    </aside>
+    <?php endif; ?>
+
   </div>
 <?php endif; ?>
 </body>
