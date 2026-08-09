@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/main.css?v=20260809a">
+  <link rel="stylesheet" href="css/main.css?v=20260809b">
   <link rel="stylesheet" href="css/product.css?v=20260809a">
   <style>
     .steps-rail { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; background: var(--card); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
@@ -50,13 +50,65 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "FBR Digital Invoicing Integration",
-    "serviceType": "FBR e-invoicing integration for ERP and POS systems",
-    "description": "We connect your ERP, POS or custom software to FBR digital invoicing via PRAL — sandbox testing, HS codes, QR on every invoice — so your first live invoice goes through instead of bouncing.",
-    "provider": { "@id": "https://vectorsolution.it/#organization" },
-    "areaServed": { "@type": "Country", "name": "Pakistan" },
-    "url": "https://vectorsolution.it/fbr"
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://vectorsolution.it/#organization",
+        "name": "VectorIT",
+        "url": "https://vectorsolution.it/",
+        "logo": "https://vectorsolution.it/assets/logo-square.png",
+        "sameAs": ["https://www.facebook.com/profile.php?id=61592773269310"]
+      },
+      {
+        "@type": "Service",
+        "name": "FBR Digital Invoicing Integration",
+        "serviceType": "FBR e-invoicing integration for ERP and POS systems",
+        "description": "We connect your ERP, POS or custom software to FBR digital invoicing via PRAL — sandbox testing, HS codes, QR on every invoice — so your first live invoice goes through instead of bouncing.",
+        "provider": { "@id": "https://vectorsolution.it/#organization" },
+        "areaServed": { "@type": "Country", "name": "Pakistan" },
+        "url": "https://vectorsolution.it/fbr"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is this the same as the old POS integration for retailers?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No — the Tier-1 retailer POS regime came first and still applies to large retailers. Digital invoicing under SRO 69(I)/2025 is broader: it covers sales-tax-registered businesses generally, B2B invoices included. Many businesses now need both. We handle either." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do we have to buy new software?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. If your current ERP or POS works for you, we integrate it directly with FBR. Replacing software is only worth it if the current system is already failing you — we'll tell you honestly which case you're in." }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens when FBR's system is down or an invoice is rejected?",
+            "acceptedAnswer": { "@type": "Answer", "text": "FBR's rules allow invoices issued during an outage to be uploaded within 24 hours of service being restored, and corrections are only possible within 72 hours under STGO 01/2026 — after that it needs Commissioner approval. In practice rejections are almost always an HS code or unit-of-measure mapping problem, which we fix once and it stops recurring. On a support retainer we watch your filings and deal with rejections inside the correction window. Your billing never has to stop — the invoice is raised, and the filing follows." }
+          },
+          {
+            "@type": "Question",
+            "name": "Are you an FBR licensed integrator? Will we pay per-invoice fees?",
+            "acceptedAnswer": { "@type": "Answer", "text": "We're your software provider and technical team — the integration itself runs through PRAL, FBR's own licensed integrator, which is free of charge by law. That means no per-invoice fees on the government side (commercial licensed integrators are reported to charge in the region of Rs 10 per invoice — the PRAL route avoids that entirely). Our fee is for the engineering: connecting your software, passing sandbox testing, and supporting you after go-live — fixed, quoted in writing." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is there any benefit to offset the cost?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes — Section 64D of the Income Tax Ordinance (Finance Act 2026) gives a 10% tax credit on what you spend to integrate, covering hardware, software, and implementation. Keep the invoices we issue you; your tax consultant claims it in the year of installation." }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does integration take?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A standard ERP/POS integration typically runs 2–4 weeks including sandbox testing. VectorERP customers are FBR-live from day one of go-live." }
+          },
+          {
+            "@type": "Question",
+            "name": "What does it cost?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Depends on your software and invoice volume — a fixed quote after a 30-minute call, in rupees, in writing. VectorERP Business-plan customers get FBR integration included." }
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
@@ -99,8 +151,8 @@
       <div class="wrap p-hero-grid">
         <div>
           <p class="hero-eyebrow"><span class="dot"></span> FBR Digital Invoicing · Integration Service</p>
-          <h1>FBR e-invoicing deadlines have passed. <span style="color:var(--blue)">We get you compliant — fast.</span></h1>
-          <p class="lede">Every sales-tax registered business in Pakistan is now required to issue invoices through FBR's digital invoicing system — the last phase ended 31 December 2025, and enforcement started in 2026. We connect your existing ERP, POS, or custom software to FBR, or hand you VectorERP with it built in. Sandbox to go-live, handled by us.</p>
+          <h1>FBR digital invoicing deadlines have passed. <span style="color:var(--blue)">We get you compliant — fast.</span></h1>
+          <p class="lede">Every sales-tax registered business in Pakistan is now required to issue invoices through FBR's digital invoicing system — the last phase ended 31 December 2025, and enforcement started in 2026. We connect your existing ERP, POS, or custom software to FBR, or hand you <a href="/" style="color:var(--blue);font-weight:600">VectorERP</a> with it built in. Sandbox to go-live, handled by us.</p>
           <div class="hero-ctas">
             <a class="btn btn-primary" href="/contact">Get FBR-ready
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
@@ -215,7 +267,7 @@
           <article class="card reveal reveal-delay-1">
             <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg></div>
             <h3>Connect your existing software</h3>
-            <p>Already running Odoo, ERPNext, QuickBooks, a POS, or custom software? We build the bridge: your system keeps working exactly as it does — invoices just start registering with FBR in real time.</p>
+            <p>Already running Odoo, ERPNext, QuickBooks, a POS, or custom software? We build the bridge: your system keeps working exactly as it does — invoices just start registering with FBR in real time. Need the system itself rebuilt first? That's our <a href="/services" style="color:var(--blue);font-weight:600">ERP implementation service</a>.</p>
             <div class="card-tags"><span class="tag">Any ERP / POS</span><span class="tag">Custom software too</span></div>
           </article>
           <article class="card reveal reveal-delay-2">
@@ -346,7 +398,9 @@
           <h4>Product</h4>
           <ul>
             <li><a href="/#modules">Modules</a></li>
-            <li><a href="/fbr">FBR Invoicing</a></li>
+            <li><a href="/fbr" aria-current="page">FBR Invoicing</a></li>
+            <li><a href="/demo/">Live Demo</a></li>
+            <li><a href="/work">Our Work</a></li>
             <li><a href="/#pricing">Pricing</a></li>
             <li><a href="/services">Implementation services</a></li>
           </ul>
