@@ -15,3 +15,5 @@ deployment:
     - /bin/cp -f .well-known/security.txt $DEPLOYPATH/.well-known/
     - /bin/mkdir -p $DEPLOYPATH/demo
     - /bin/cp -Rf demo/. $DEPLOYPATH/demo/
+    - /bin/mkdir -p $DEPLOYPATH/blog
+    - /bin/cp -Rf blog/. $DEPLOYPATH/blog/

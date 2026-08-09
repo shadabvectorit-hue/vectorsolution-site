@@ -1,0 +1,177 @@
+/* VectorIT blog — article and index styles. Loads after main.css and leans on
+   its tokens; nothing here redefines a token. */
+
+/* ---------- index: posts as sheets on the drafting board ---------- */
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 34px 22px;
+  margin-top: 10px;
+}
+.post-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 24px 24px 22px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.14s, box-shadow 0.14s, border-color 0.14s;
+}
+.post-card::before {
+  content: attr(data-tag);
+  position: absolute;
+  top: -23px;
+  left: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom: 1px solid var(--card);
+  border-radius: 6px 6px 0 0;
+  padding: 3px 13px 2px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.post-card::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  width: 13px;
+  height: 13px;
+  border-right: 2px solid var(--grid);
+  border-bottom: 2px solid var(--grid);
+}
+.post-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--blue);
+  box-shadow: var(--shadow-md);
+}
+.post-card h2 {
+  font-size: 1.22rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+.post-card h2 a { color: inherit; }
+.post-card h2 a::after { content: ""; position: absolute; inset: 0; }
+.post-card p { color: var(--muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px; }
+.post-meta {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  color: var(--faint);
+  display: flex;
+  gap: 14px;
+}
+
+/* ---------- article ---------- */
+.post-hero { padding: clamp(48px, 8vh, 84px) 0 clamp(20px, 4vh, 36px); }
+.post-hero h1 { font-size: clamp(1.9rem, 4vw, 2.9rem); line-height: 1.18; max-width: 21ch; margin-bottom: 18px; }
+.post-hero .lede { max-width: 62ch; }
+.post-hero .post-meta { margin-top: 22px; }
+
+.prose { max-width: 720px; }
+.prose > * + * { margin-top: 1.15em; }
+.prose h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+  letter-spacing: -0.01em;
+  margin-top: 2em;
+  padding-top: 0.9em;
+  border-top: 1px solid var(--line-soft);
+}
+.prose h3 { font-size: 1.12rem; margin-top: 1.6em; }
+.prose p, .prose li { color: var(--muted); line-height: 1.75; font-size: 1.02rem; }
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose a { color: var(--blue); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(46, 91, 219, 0.3); text-underline-offset: 3px; }
+.prose a:hover { text-decoration-color: var(--blue); }
+.prose ul, .prose ol { padding-left: 22px; display: grid; gap: 9px; }
+.prose ul li::marker { color: var(--signal); }
+.prose ol li::marker { color: var(--blue); font-family: var(--font-mono); font-size: 0.85em; }
+
+/* facts the reader must not miss — drawn like a stamped note on the sheet */
+.callout {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: 4px;
+  background: var(--card);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+.callout b { color: var(--ink); }
+.callout.warn { border-left-color: var(--signal); }
+.callout p { font-size: 0.96rem; }
+
+/* register-style tables, same language as the demo */
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.94rem; }
+.prose th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 8px 12px;
+  border-bottom: 1.5px solid var(--ink);
+}
+.prose td { padding: 11px 12px; border-bottom: 1px solid var(--line-soft); color: var(--muted); vertical-align: top; }
+.prose td:first-child { color: var(--ink); font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+
+/* sources — honest citations at the foot of every article */
+.sources {
+  margin-top: 2.4em;
+  border-top: 1px solid var(--line);
+  padding-top: 1.2em;
+}
+.sources h2 { border: 0; padding: 0; margin: 0 0 0.6em; font-size: 0.72rem; font-family: var(--font-mono); letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint); }
+.sources ol { padding-left: 20px; display: grid; gap: 6px; }
+.sources li { font-size: 0.86rem; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+
+/* CTA band at the end of each article */
+.post-cta {
+  margin-top: clamp(40px, 6vh, 60px);
+  background: linear-gradient(155deg, #12224A, #0F1B33);
+  border-radius: var(--radius);
+  color: #fff;
+  padding: clamp(28px, 4vw, 44px);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 1.5fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.post-cta h2 { color: #fff; font-size: clamp(1.25rem, 2.4vw, 1.6rem); margin-bottom: 8px; }
+.post-cta p { color: rgba(233, 238, 249, 0.8); font-size: 0.96rem; }
+.post-cta .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* prev/next + back links */
+.post-nav {
+  max-width: 720px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.92rem;
+}
+.post-nav a { color: var(--blue); font-weight: 600; }
+
+.disclaimer {
+  max-width: 720px;
+  margin-top: 26px;
+  font-size: 0.82rem;
+  color: var(--faint);
+  line-height: 1.6;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .post-cta { grid-template-columns: 1fr; }
+  .post-grid { grid-template-columns: 1fr; }
+}

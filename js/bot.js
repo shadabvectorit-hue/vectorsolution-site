@@ -184,7 +184,7 @@
     if (busy) return;
     busy = true;
     var tip = typingBubble();
-    fetch("chat.php", {
+    fetch("/chat.php", {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ message: text, sid: sid })
@@ -280,7 +280,7 @@
       var data = new FormData();
       Object.keys(lead).forEach(function (k) { data.append(k, lead[k]); });
       data.set("message", "[" + lead.lang + "] " + (lead.message || (stage === "partial" ? "(chat started — not finished)" : "(bot lead)")));
-      fetch("contact-submit.php", { method: "POST", body: data, headers: { Accept: "application/json" } })
+      fetch("/contact-submit.php", { method: "POST", body: data, headers: { Accept: "application/json" } })
         .then(function (r) { if (!r.ok) console.warn("VectorIT: lead not stored (HTTP " + r.status + ")"); })
         .catch(function () { console.warn("VectorIT: lead could not be sent — WhatsApp handover still carries it"); });
     } catch (e) { /* the WhatsApp handover still carries everything */ }
