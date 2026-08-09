@@ -391,7 +391,8 @@ $NAV = [
     'invoices'  => ['Invoices',      'Sales tax'],
     'inventory' => ['Stock',         'Godowns'],
     'crm'       => ['Pipeline',      'Sales / CRM'],
-    'ledger'    => ['Ledger',        'Accounts'],
+    'accounts'  => ['Accounts',      'Trial balance'],
+    'ledger'    => ['Ledger',        'Cash & bank'],
     'payroll'   => ['Payroll',       'HR & EOBI'],
     'custom'    => ['Custom',        'Built for you'],
 ];
@@ -405,6 +406,19 @@ foreach ($allInvoices as $iv) {
     $st = isset($paid[$iv['no']]) ? 'paid' : $iv['status'];
     if ($st !== 'paid') { $railDue += $iv['excl'] + $iv['tax']; $railDueN++; }
 }
+
+/* Accounts sheet: both trial-balance columns are summed here, not copied from
+   data.php — if someone edits the accounts out of balance, the mismatch prints
+   on screen instead of hiding behind a hardcoded total. */
+$accDr = 0; $accCr = 0; $accInc = 0; $accExp = 0; $accCogs = 0;
+foreach ($DATA['accounts'] as $a) {
+    $accDr += $a['dr']; $accCr += $a['cr'];
+    if ($a['group'] === 'Income')   { $accInc += $a['cr'] - $a['dr']; }
+    if ($a['group'] === 'Expenses') { $accExp += $a['dr'] - $a['cr']; }
+    if ($a['name'] === 'Purchases (cost of goods)') { $accCogs = $a['dr'] - $a['cr']; }
+}
+$accProfit = $accInc - $accExp;
+$accRun = $accExp - $accCogs;
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -491,15 +505,29 @@ th{text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.12em
 td{padding:10px;border-bottom:1px solid var(--line-soft);font-size:.9rem}
 tr:last-child td{border-bottom:0}
 tbody tr:hover{background:var(--paper)}
-.num{text-align:right;font-variant-numeric:tabular-nums}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.reg-nowrap td{white-space:nowrap;padding-left:8px;padding-right:8px}
+.reg-nowrap th{padding-left:8px;padding-right:8px}
 .mono{font-family:var(--mono);font-size:.78rem}
 .pill{display:inline-block;padding:2px 10px;border-radius:4px;font-family:var(--mono);font-size:.66rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
 .paid{background:#DCF5E7;color:#14713F}.due{background:#FFF0D9;color:#925E10}.overdue{background:#FDE3E3;color:#B32222}.low{background:#FDE3E3;color:#B32222}.ok{background:#DCF5E7;color:#14713F}
-.btn-sm{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:5px 13px;font-size:.76rem;font-weight:600;cursor:pointer;display:inline-block}
+/* One button system: same height, same radius, no mid-word wrapping — a row of
+   mixed variants must sit on a single shared baseline. */
+.btn-sm{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:6px 14px;font-size:.78rem;font-weight:600;cursor:pointer;display:inline-block;white-space:nowrap;text-align:center;line-height:1.4;vertical-align:middle}
 .btn-sm:hover{background:var(--blue-deep)}
 .btn-dark{background:var(--ink)}
-.btn-act{background:var(--signal);padding:7px 16px;font-size:.82rem;border-radius:6px}
-.btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn-act{background:var(--signal)}
+.btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);padding:5px 14px}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn-row .btn-sm{padding:9px 18px;font-size:.82rem}
+.btn-row .btn-ghost{padding:8px 18px}
+.sheet-act{align-items:center}
+.sheet-act .btn-sm{padding:7px 16px;font-size:.8rem}
+td.act{text-align:right;white-space:nowrap}
+td.act .btn-sm{margin-left:6px}
+/* Registers keep their columns on one line and scroll inside the sheet when
+   the screen is narrower than the paper — buttons must never wrap mid-word. */
+.tscroll{overflow-x:auto}
 .fbr{display:inline-flex;align-items:center;gap:6px;background:#DCF5E7;color:#14713F;border-radius:4px;padding:3px 10px;font-size:.66rem;font-weight:600;font-family:var(--mono)}
 .fbr::before{content:"";width:6px;height:6px;border-radius:50%;background:#14713F}
 .note{color:var(--muted);font-size:.84rem;margin-top:12px}
@@ -523,6 +551,20 @@ tbody tr:hover{background:var(--paper)}
 .toast{background:#DCF5E7;border:1px solid #9ADFBB;color:#14713F;border-radius:6px;padding:11px 15px;margin:26px 0 -8px;font-weight:600;font-size:.88rem;grid-column:1/-1}
 .toast.warn{background:#FFF0D9;border-color:#F2CE8E;color:#925E10}
 .toast.err{background:#FDE3E3;border-color:#F0A9A9;color:#B32222}
+/* accounts: the P&L told as one plain-words equation, then the trial balance */
+.pnl{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.pbox{flex:1;min-width:140px;border:1px solid var(--line);border-radius:3px;padding:12px 14px;background:var(--paper)}
+.pbox .l{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.pbox b{display:block;font-size:1.18rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:4px}
+.pbox span.s{display:block;font-size:.75rem;color:var(--muted);margin-top:2px}
+.pbox.profit{background:#DCF5E7;border-color:#9ADFBB}
+.pbox.profit b{color:#14713F}
+.pop{align-self:center;font-size:1.35rem;font-weight:800;color:var(--faint)}
+.gcell{padding-top:16px;font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:500}
+.gcell span{color:var(--faint);text-transform:none;letter-spacing:.02em}
+.tb-total td{border-top:2px solid var(--ink);border-bottom:0;font-weight:800;font-variant-numeric:tabular-nums;padding-top:11px}
+.tb-ok{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:.88rem;font-weight:600;color:#14713F}
+.tb-ok::before{content:"";width:9px;height:9px;border-radius:50%;background:#178A50;box-shadow:0 0 0 3px rgba(23,138,80,.18)}
 /* kanban as index cards on the board */
 .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .kcol h3{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1.5px solid var(--ink);padding-bottom:6px}
@@ -608,6 +650,8 @@ tbody tr:hover{background:var(--paper)}
   .sheet{padding:16px 14px 18px}
   .sheet-act{position:static;margin:-6px 0 12px;justify-content:flex-start;flex-wrap:wrap}
   td{padding:9px 7px;font-size:.86rem}
+  .pnl{flex-direction:column}
+  .pop{align-self:flex-start;padding-left:6px;line-height:1}
 }
 </style>
 </head>
@@ -711,6 +755,7 @@ tbody tr:hover{background:var(--paper)}
         </div>
         <div class="sheet">
           <span class="sheet-tab">Sheet 02 · <b>Recent invoices</b> · FBR active</span>
+          <div class="tscroll">
           <table>
             <thead><tr><th>Invoice</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr></thead>
             <tbody>
@@ -725,9 +770,11 @@ tbody tr:hover{background:var(--paper)}
             <?php endforeach; ?>
             </tbody>
           </table>
+          </div>
         </div>
         <div class="sheet">
           <span class="sheet-tab">Sheet 03 · <b>Stock alerts</b> · below reorder</span>
+          <div class="tscroll">
           <table>
             <thead><tr><th>Item</th><th>Location</th><th class="num">On hand</th><th class="num">Reorder at</th></tr></thead>
             <tbody>
@@ -736,6 +783,7 @@ tbody tr:hover{background:var(--paper)}
             <?php endforeach; ?>
             </tbody>
           </table>
+          </div>
         </div>
 
       <?php elseif ($p === 'invoices'): ?>
@@ -744,8 +792,9 @@ tbody tr:hover{background:var(--paper)}
           <div class="sheet-act">
             <a class="btn-sm btn-act" href="?p=new_invoice">+ New Invoice</a>
           </div>
-          <table>
-            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Tax 18%</th><th class="num">Total</th><th>Status</th><th></th><th></th></tr></thead>
+          <div class="tscroll">
+          <table class="reg-nowrap">
+            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Excl. tax</th><th class="num">Tax 18%</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($allInvoices as $inv):
               $st = isset($paid[$inv['no']]) ? 'paid' : $inv['status']; ?>
@@ -757,12 +806,15 @@ tbody tr:hover{background:var(--paper)}
                 <td class="num"><?= $rs($inv['tax']) ?></td>
                 <td class="num"><b><?= $rs($inv['excl'] + $inv['tax']) ?></b></td>
                 <td><span class="pill <?= $e($st) ?>"><?= $st === 'due' ? 'Due' : ucfirst($st) ?></span></td>
-                <td><a class="btn-sm btn-dark" target="_blank" href="?p=print_invoice&no=<?= urlencode($inv['no']) ?>">PDF</a></td>
-                <td><?php if ($st !== 'paid'): ?><a class="btn-sm" href="?pay=<?= urlencode($inv['no']) ?>">Mark paid</a><?php endif; ?></td>
+                <td class="act">
+                  <?php if ($st !== 'paid'): ?><a class="btn-sm" href="?pay=<?= urlencode($inv['no']) ?>">Mark paid</a><?php endif; ?>
+                  <a class="btn-sm btn-dark" target="_blank" href="?p=print_invoice&no=<?= urlencode($inv['no']) ?>">PDF</a>
+                </td>
               </tr>
             <?php endforeach; ?>
             </tbody>
           </table>
+          </div>
           <p class="note">Try it: click <b>PDF</b> on any invoice to see the printed sales tax invoice — with FBR number and QR — exactly as your customer receives it. Or click <b>Mark paid</b> and watch the status update.</p>
         </div>
         <div class="sheet">
@@ -770,6 +822,7 @@ tbody tr:hover{background:var(--paper)}
           <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
             <div style="flex:1;min-width:280px">
               <p style="margin-bottom:10px"><span class="fbr">FBR INVOICE <?= $e(substr($DATA['invoices'][0]['fbr'], 0, 14)) ?>…</span></p>
+              <div class="tscroll">
               <table>
                 <thead><tr><th>Item</th><th>HS code</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr></thead>
                 <tbody>
@@ -781,6 +834,7 @@ tbody tr:hover{background:var(--paper)}
                   <tr><td colspan="4" class="num"><b>Total payable</b></td><td class="num"><b><?= $rs($sub + (int)round($sub * 0.18)) ?></b></td></tr>
                 </tbody>
               </table>
+              </div>
             </div>
             <div style="text-align:center">
               <div class="qr" aria-hidden="true"></div>
@@ -812,7 +866,8 @@ tbody tr:hover{background:var(--paper)}
               <input class="in" value="INV-<?= 2042 + count($custom) ?> (auto)" disabled>
             </div>
           </div>
-          <table id="niTable">
+          <div class="tscroll">
+          <table id="niTable" style="min-width:640px">
             <thead><tr><th style="width:34%">Description</th><th style="width:13%">HS code</th><th style="width:11%">UoM</th><th class="num" style="width:11%">Qty</th><th class="num" style="width:14%">Rate (Rs)</th><th class="num" style="width:17%">Line total</th></tr></thead>
             <tbody>
               <?php for ($r = 0; $r < 3; $r++): ?>
@@ -832,9 +887,10 @@ tbody tr:hover{background:var(--paper)}
               <tr><td colspan="5" class="num" style="border-bottom:0"><b>Total payable</b></td><td class="num" id="niTot" style="border-bottom:0"><b>Rs 0</b></td></tr>
             </tfoot>
           </table>
-          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <button type="button" class="btn-sm btn-ghost" id="niAdd">+ Add line</button>
+          </div>
+          <div class="btn-row">
             <button type="submit" class="btn-sm btn-act">Save invoice &amp; assign FBR number</button>
+            <button type="button" class="btn-sm btn-ghost" id="niAdd">+ Add line</button>
             <a class="btn-sm btn-ghost" style="color:var(--muted)" href="?p=invoices">Cancel</a>
           </div>
           <p class="note">Fill any lines you like — totals and tax calculate as you type. On save the invoice appears in your list with its FBR number, ready to print as PDF.</p>
@@ -869,6 +925,7 @@ tbody tr:hover{background:var(--paper)}
       <?php elseif ($p === 'inventory'): ?>
         <div class="sheet">
           <span class="sheet-tab">Sheet 03 · <b>Stock register</b> · 3 locations</span>
+          <div class="tscroll">
           <table>
             <thead><tr><th>Item</th><th>Location</th><th class="num">On hand</th><th class="num">Reorder at</th><th class="num">Stock value</th><th>Status</th></tr></thead>
             <tbody>
@@ -883,6 +940,7 @@ tbody tr:hover{background:var(--paper)}
               <tr><td colspan="4" class="num"><b>Total stock value</b></td><td class="num"><b><?= $pk($tot) ?></b></td><td></td></tr>
             </tbody>
           </table>
+          </div>
           <p class="note">Amounts read in lakh and crore — the way you actually say them, not millions.</p>
         </div>
 
@@ -901,12 +959,64 @@ tbody tr:hover{background:var(--paper)}
           </div>
         </div>
 
+      <?php elseif ($p === 'accounts'): ?>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 05 · <b>Profit &amp; loss</b> · plain words</span>
+          <h2>How much did the business make?</h2>
+          <p class="sub">The whole financial year so far, in one line — no accounting degree needed.</p>
+          <div class="pnl">
+            <div class="pbox"><span class="l">Sold</span><b><?= $pk($accInc) ?></b><span class="s">everything billed</span></div>
+            <span class="pop">−</span>
+            <div class="pbox"><span class="l">Cost of goods</span><b><?= $pk($accCogs) ?></b><span class="s">what the goods cost you</span></div>
+            <span class="pop">−</span>
+            <div class="pbox"><span class="l">Running costs</span><b><?= $pk($accRun) ?></b><span class="s">salaries, rent, bills</span></div>
+            <span class="pop">=</span>
+            <div class="pbox profit"><span class="l">Profit kept</span><b><?= $pk($accProfit) ?></b><span class="s">before tax</span></div>
+          </div>
+          <p class="note">These figures are not typed in — they come straight from the invoices and ledger you have already seen. Sell something, and this page changes by itself.</p>
+        </div>
+        <div class="sheet">
+          <span class="sheet-tab">Sheet 05 · <b>Trial balance</b> · debits = credits</span>
+          <div class="tscroll">
+          <table>
+            <thead><tr><th>Account</th><th class="num" style="width:22%">Debit (Rs)</th><th class="num" style="width:22%">Credit (Rs)</th></tr></thead>
+            <tbody>
+            <?php
+            $gWhy = [
+                'Assets'      => 'what the business owns',
+                'Liabilities' => 'what it owes',
+                'Equity'      => "the owner's money in it",
+                'Income'      => 'what it earned',
+                'Expenses'    => 'what it spent',
+            ];
+            $g = '';
+            foreach ($DATA['accounts'] as $a):
+                if ($a['group'] !== $g): $g = $a['group']; ?>
+              <tr><td colspan="3" class="gcell"><?= $e(strtoupper($g)) ?> <span>— <?= $e($gWhy[$g] ?? '') ?></span></td></tr>
+              <?php endif; ?>
+              <tr>
+                <td><?= $e($a['name']) ?></td>
+                <td class="num"><?= $a['dr'] ? number_format($a['dr']) : '—' ?></td>
+                <td class="num"><?= $a['cr'] ? number_format($a['cr']) : '—' ?></td>
+              </tr>
+            <?php endforeach; ?>
+              <tr class="tb-total"><td>Total</td><td class="num"><?= number_format($accDr) ?></td><td class="num"><?= number_format($accCr) ?></td></tr>
+            </tbody>
+          </table>
+          </div>
+          <?php if ($accDr === $accCr): ?>
+            <p class="tb-ok">Debits equal credits — the books balance.</p>
+          <?php endif; ?>
+          <p class="note">Every entry posts twice — once debit, once credit — so the two columns must always agree. That is double-entry, and it is why your tax consultant trusts a trial balance and not an Excel sheet. At filing time this page is one click, not a month-end reconciliation.</p>
+        </div>
+
       <?php elseif ($p === 'ledger'): ?>
         <div class="sheet">
-          <span class="sheet-tab">Sheet 05 · <b>Cash &amp; bank ledger</b> · FY 1 Jul – 30 Jun</span>
+          <span class="sheet-tab">Sheet 06 · <b>Cash &amp; bank ledger</b> · FY 1 Jul – 30 Jun</span>
           <div class="sheet-act">
             <a class="btn-sm btn-dark" target="_blank" href="?p=print_report">Sales Register PDF</a>
           </div>
+          <div class="tscroll">
           <table>
             <thead><tr><th>Date</th><th>Narration</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Balance</th></tr></thead>
             <tbody>
@@ -920,12 +1030,14 @@ tbody tr:hover{background:var(--paper)}
             <?php endforeach; ?>
             </tbody>
           </table>
-          <p class="note">Double-entry throughout: every invoice, payment and purchase posts here automatically.</p>
+          </div>
+          <p class="note">Double-entry throughout: every invoice, payment and purchase posts here automatically — the totals land on the <a href="?p=accounts" style="color:var(--blue);font-weight:600">Accounts sheet</a>.</p>
         </div>
 
       <?php elseif ($p === 'payroll'): ?>
         <div class="sheet">
-          <span class="sheet-tab">Sheet 06 · <b>Payroll — August 2026</b> · EOBI deducted</span>
+          <span class="sheet-tab">Sheet 07 · <b>Payroll — August 2026</b> · EOBI deducted</span>
+          <div class="tscroll">
           <table>
             <thead><tr><th>Employee</th><th>Designation</th><th class="num">Days</th><th class="num">Basic</th><th class="num">Allowances</th><th class="num">EOBI</th><th class="num">Net payable</th></tr></thead>
             <tbody>
@@ -941,12 +1053,13 @@ tbody tr:hover{background:var(--paper)}
               <tr><td colspan="6" class="num"><b>Total payroll</b></td><td class="num"><b><?= $rs($net) ?></b></td></tr>
             </tbody>
           </table>
+          </div>
           <p class="note">Salman Raza shows 28 days — attendance flows straight into the salary calculation.</p>
         </div>
 
       <?php elseif ($p === 'custom'): ?>
         <div class="sheet">
-          <span class="sheet-tab">Sheet 07 · <b>Custom builds</b> · shaped around you</span>
+          <span class="sheet-tab">Sheet 08 · <b>Custom builds</b> · shaped around you</span>
           <h2>When nothing off-the-shelf fits</h2>
           <p class="note" style="margin:0 0 18px">There is no sample screen for this one, because custom work has no standard screen — it is shaped around how <em>you</em> work. So here is honestly what we have built for other businesses, and what the process looks like.</p>
           <div class="cust-grid">

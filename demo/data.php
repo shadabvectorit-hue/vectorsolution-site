@@ -61,6 +61,25 @@ return [
         ],
     ],
 
+    /* Trial balance, FY to date. The figures tie to the rest of the demo on
+       purpose — cash, receivables and stock match the dashboard KPIs — and the
+       two columns MUST sum equal: the page recomputes both totals and shows
+       them, so an unbalanced edit here would be visible on screen. */
+    'accounts' => [
+        ['group' => 'Assets',      'name' => 'Cash & bank',              'dr' => 1284500,  'cr' => 0],
+        ['group' => 'Assets',      'name' => 'Trade receivables',        'dr' => 915200,   'cr' => 0],
+        ['group' => 'Assets',      'name' => 'Stock in hand',            'dr' => 18600000, 'cr' => 0],
+        ['group' => 'Assets',      'name' => 'Furniture & equipment',    'dr' => 650000,   'cr' => 0],
+        ['group' => 'Liabilities', 'name' => 'Trade payables',           'dr' => 0,        'cr' => 2240700],
+        ['group' => 'Liabilities', 'name' => 'Sales tax payable',        'dr' => 0,        'cr' => 615000],
+        ['group' => 'Equity',      'name' => "Owner's capital",          'dr' => 0,        'cr' => 15000000],
+        ['group' => 'Income',      'name' => 'Sales',                    'dr' => 0,        'cr' => 30542000],
+        ['group' => 'Expenses',    'name' => 'Purchases (cost of goods)','dr' => 24800000, 'cr' => 0],
+        ['group' => 'Expenses',    'name' => 'Salaries & wages',         'dr' => 1392000,  'cr' => 0],
+        ['group' => 'Expenses',    'name' => 'Shop & godown rent',       'dr' => 540000,   'cr' => 0],
+        ['group' => 'Expenses',    'name' => 'Electricity & utilities',  'dr' => 216000,   'cr' => 0],
+    ],
+
     'ledger' => [
         ['date' => '01 Jul 2026', 'narration' => 'Opening balance',                  'debit' => 0,      'credit' => 0,      'balance' => 1845000],
         ['date' => '08 Jul 2026', 'narration' => 'Sales — INV-2031',                  'debit' => 312000, 'credit' => 0,      'balance' => 2157000],
