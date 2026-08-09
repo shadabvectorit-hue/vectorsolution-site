@@ -1,6 +1,16 @@
-/* VectorIT chat bot — picks a language, qualifies the visitor, saves the lead,
-   then hands over to the real WhatsApp number so the conversation lands on the
-   owner's phone. Languages: English · Roman Urdu · اردو (RTL). */
+/* VectorIT chat widget.
+
+   Two modes, because the AI must never be a single point of failure:
+
+   AI mode (default)  — every message goes to chat.php, the same brain that
+                        answers WhatsApp. One assistant, one set of prices,
+                        one lead inbox, whichever door the visitor uses.
+   Scripted fallback  — if the AI is off (kill switch, missing key, server
+                        trouble) the original name→number→need flow takes
+                        over, so the site never loses its chat entirely.
+
+   Languages: English · Roman Urdu · اردو (RTL). In AI mode the model matches
+   whatever the visitor writes; the packs below exist for the fallback. */
 (function () {
   "use strict";
 
@@ -8,7 +18,7 @@
   var launcher = document.querySelector(".wa-float");
   if (!launcher) return;
 
-  /* ---------- language packs ---------- */
+  /* ---------- language packs (fallback flow only) ---------- */
   var L = {
     en: {
       dir: "ltr", label: "English",
@@ -101,17 +111,18 @@
   var input = panel.querySelector("#bot-text");
   var sub = panel.querySelector("#bot-sub");
 
-  var t = null;                 // active language pack
-  var leadId = "b" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  var lead = { source: "bot", leadId: leadId, stage: "partial", lang: "", name: "", whatsapp: "", service: "", budget: "", message: "" };
-  var step = 0;
-  var started = false;
+  /* ---------- shared bubbles ---------- */
+  var t = null;                 // active language pack (fallback only)
 
   function say(text, delay) {
     setTimeout(function () {
       var m = document.createElement("div");
       m.className = "bot-msg bot";
-      if (t && t.dir === "rtl") { m.dir = "rtl"; m.classList.add("rtl"); }
+      // dir=auto so an Urdu reply flows right-to-left and an English one does
+      // not, without anyone having picked a language first.
+      m.dir = "auto";
+      m.style.whiteSpace = "pre-wrap";
+      if (t && t.dir === "rtl") m.classList.add("rtl");
       m.textContent = text;
       msgs.appendChild(m);
       msgs.scrollTop = msgs.scrollHeight;
@@ -120,13 +131,104 @@
   function userSay(text) {
     var m = document.createElement("div");
     m.className = "bot-msg user";
-    // dir="auto" — never force RTL on what the visitor typed, or a phone number
-    // written "0336 313 8686" is displayed back to them reversed.
-    if (t && t.dir === "rtl") { m.dir = "auto"; m.classList.add("rtl"); }
+    m.dir = "auto";
     m.textContent = text;
     msgs.appendChild(m);
     msgs.scrollTop = msgs.scrollHeight;
   }
+  function waButton(href, label) {
+    var wrap = document.createElement("div");
+    wrap.className = "bot-msg bot";
+    var a = document.createElement("a");
+    a.className = "bot-wa-link";
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3z"/></svg><span>' + label + "</span>";
+    wrap.appendChild(a);
+    msgs.appendChild(wrap);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  /* ================================================================
+     AI MODE — the same assistant that answers WhatsApp
+     ================================================================ */
+  var aiMode = true;
+  var busy = false;
+  var greeted = false;
+  // The session id ties the thread together server-side; sessionStorage keeps
+  // the conversation alive across page moves but dies with the tab, which is
+  // the right lifetime for a sales chat.
+  var sid = "";
+  try { sid = sessionStorage.getItem("vit_sid") || ""; } catch (e) {}
+
+  function aiGreet() {
+    if (greeted) return;
+    greeted = true;
+    say("Assalam o Alaikum! 👋  Hello!");
+    say("Poochhiye jo poochna hai — English, Roman Urdu, یا اردو۔\nAsk me anything — prices, FBR invoicing, the demo.", 450);
+    form.hidden = false;
+    input.focus();
+  }
+
+  function typingBubble() {
+    var m = document.createElement("div");
+    m.className = "bot-msg bot";
+    m.textContent = "…";
+    msgs.appendChild(m);
+    msgs.scrollTop = msgs.scrollHeight;
+    return m;
+  }
+
+  function sendAI(text) {
+    if (busy) return;
+    busy = true;
+    var tip = typingBubble();
+    fetch("chat.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ message: text, sid: sid })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        tip.remove();
+        busy = false;
+        if (j && j.ok) {
+          if (j.sid) { sid = j.sid; try { sessionStorage.setItem("vit_sid", sid); } catch (e) {} }
+          // The model occasionally writes **bold**; the widget renders plain
+          // text, so the markers would show as literal asterisks.
+          say(String(j.text || "").replace(/\*\*/g, ""));
+          if (j.handover) {
+            waButton(j.wa || ("https://wa.me/" + WA_NUMBER), "WhatsApp par baat karein / Continue on WhatsApp");
+          }
+        } else if (j && j.text) {
+          // e.g. the rate limiter's "slow down" — a message, not a failure.
+          say(String(j.text));
+        } else {
+          fallbackToScript();
+        }
+      })
+      .catch(function () {
+        tip.remove();
+        busy = false;
+        fallbackToScript();
+      });
+  }
+
+  /* ================================================================
+     SCRIPTED FALLBACK — the original flow, unchanged
+     ================================================================ */
+  var leadId = "b" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  var lead = { source: "bot", leadId: leadId, stage: "partial", lang: "", name: "", whatsapp: "", service: "", budget: "", message: "" };
+  var step = 0;
+  var scriptStarted = false;
+
+  function fallbackToScript() {
+    aiMode = false;
+    say("Ek second — main aap ko seedhe tareeqe se aage le chalta hoon.", 100);
+    scriptedStart();
+  }
+
   function quick(options, handler, delay) {
     setTimeout(function () {
       var wrap = document.createElement("div");
@@ -148,11 +250,9 @@
     }, delay || 350);
   }
 
-  /* ---------- step 0: language ---------- */
-  function start() {
-    if (started) return;
-    started = true;
-    say("Assalam o Alaikum! 👋  Hello!");
+  function scriptedStart() {
+    if (scriptStarted) return;
+    scriptStarted = true;
     say("Aap kis zabaan mein baat karna chahenge? / Which language would you prefer?", 450);
     quick([L.en.label, L.ur_rm.label, L.ur.label], function (choice) {
       t = choice === L.en.label ? L.en : (choice === L.ur_rm.label ? L.ur_rm : L.ur);
@@ -190,25 +290,14 @@
     say(t.thanks(lead.name));
     say(t.handover, 600);
     setTimeout(function () {
-      var wrap = document.createElement("div");
-      wrap.className = "bot-msg bot";
-      if (t.dir === "rtl") { wrap.dir = "rtl"; wrap.classList.add("rtl"); }
-      var a = document.createElement("a");
-      a.className = "bot-wa-link";
-      a.href = waLink();
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3z"/></svg><span>' + t.waBtn + "</span>";
-      wrap.appendChild(a);
-      msgs.appendChild(wrap);
-      msgs.scrollTop = msgs.scrollHeight;
+      waButton(waLink(), t.waBtn);
       form.hidden = true;
     }, 1300);
     saveLead("complete");
     step = 99;
   }
 
-  function handleText(text) {
+  function handleScripted(text) {
     if (step === 1) {
       lead.name = text;
       say(t.askPhone(text));
@@ -241,34 +330,35 @@
     }
   }
 
+  /* ---------- input ---------- */
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var text = input.value.trim();
     if (!text) return;
     input.value = "";
     userSay(text);
-    handleText(text);
+    if (aiMode) sendAI(text);
+    else handleScripted(text);
     if (!form.hidden) input.focus();
   });
 
+  /* ---------- launcher ---------- */
   // The launcher looks like a WhatsApp link but opens this panel, so screen
   // readers must be told what it really does.
   launcher.setAttribute("role", "button");
   launcher.setAttribute("aria-haspopup", "dialog");
   launcher.setAttribute("aria-expanded", "false");
   launcher.setAttribute("aria-label", "Open chat — English, Roman Urdu or اردو");
-  panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", "Chat with VectorIT");
   panel.setAttribute("tabindex", "-1");
 
   function setOpen(open) {
     panel.classList.toggle("open", open);
     launcher.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
-      // Focus the panel itself, not the first control: the language buttons are
-      // rendered on a timer and do not exist yet at this point.
+      // Focus the panel itself, not the first control: bubbles render on a
+      // timer and do not exist yet at this point.
       panel.focus();
-      start();
+      aiGreet();
     } else {
       launcher.focus();
     }
