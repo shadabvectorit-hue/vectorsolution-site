@@ -73,6 +73,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
         $_SESSION['inq_csrf'] = bin2hex(random_bytes(16));
         vit_rate_clear('login');
         vit_audit('admin_login_ok');
+        // Redirect-after-post, and specifically to a bare URL. The login form
+        // posts back to wherever the expired session left the owner — which can
+        // be ?export=csv, and $_GET is populated on a POST too. Without this
+        // redirect the very response to the password would be a CSV download,
+        // leaving the login form on screen looking as if nothing happened.
+        header('Location: inquiries.php');
+        exit;
     } else {
         $err = 'Wrong password.';
         vit_audit('admin_login_failed');
@@ -81,42 +88,128 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pass'])) {
 }
 $authed = !empty($_SESSION['inq_ok']);
 
-/* ---------- delete a lead ---------- */
-if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['del'])) {
+/* ---------- delete: one or many ----------
+   The table posts an array of selections, each "linehash|leadId". Deleting by
+   the exact line AND by leadId in the same pass matters: a bot lead is saved
+   twice (partial, then complete), and removing only the line the owner can see
+   would leave its half-finished twin to reappear on the next reload. */
+if ($authed && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['sel'])) {
     $ok = !empty($_SESSION['inq_csrf']) && hash_equals((string)$_SESSION['inq_csrf'], (string)($_POST['csrf'] ?? ''));
-    $key = preg_replace('/[^a-f0-9]/', '', (string)$_POST['del']);
-    $leadId = trim(mb_substr((string)($_POST['leadId'] ?? ''), 0, 40));
+    $hashes = [];
+    $leadIds = [];
+    if ($ok && is_array($_POST['sel'])) {
+        foreach ($_POST['sel'] as $sel) {
+            if (!is_string($sel)) continue;
+            $parts = explode('|', $sel, 2);
+            $h = preg_replace('/[^a-f0-9]/', '', $parts[0]);
+            if (strlen($h) === 16) $hashes[$h] = true;
+            $id = trim(mb_substr($parts[1] ?? '', 0, 40));
+            if ($id !== '') $leadIds[$id] = true;
+        }
+    }
     $removed = 0;
-    if ($ok && $key !== '') {
+    if ($ok && ($hashes || $leadIds)) {
         $lf = VIT_PRIVATE . '/inquiries.jsonl';
         $fh = @fopen($lf, 'c+');
         if ($fh && flock($fh, LOCK_EX)) {
             $keep = [];
+            $gone = [];   // who was deleted — the audit line is the only record left
             rewind($fh);
             while (($line = fgets($fh)) !== false) {
                 $trim = rtrim($line, "\r\n");
                 if ($trim === '') continue;
-                // Match the exact line, or every line of the same chat so a
-                // half-finished bot lead does not reappear after its twin goes.
-                $isTarget = substr(sha1($trim), 0, 16) === $key;
-                if (!$isTarget && $leadId !== '') {
+                $isTarget = isset($hashes[substr(sha1($trim), 0, 16)]);
+                $row = null;
+                if (!$isTarget && $leadIds) {
                     $row = json_decode($trim, true);
-                    if (is_array($row) && (string)($row['leadId'] ?? '') === $leadId) $isTarget = true;
+                    if (is_array($row) && isset($leadIds[(string)($row['leadId'] ?? '')])) $isTarget = true;
                 }
-                if ($isTarget) { $removed++; } else { $keep[] = $trim; }
+                if ($isTarget) {
+                    $removed++;
+                    if (count($gone) < 50) {
+                        $row = is_array($row) ? $row : json_decode($trim, true);
+                        $gone[] = mb_substr((string)(is_array($row) ? ($row['name'] ?? $row['whatsapp'] ?? $row['email'] ?? '?') : '?'), 0, 40);
+                    }
+                } else {
+                    $keep[] = $trim;
+                }
             }
             if ($removed > 0) {
+                /* The payload is built BEFORE the truncate, so an out-of-memory
+                   here dies with the file intact rather than after emptying it.
+                   The write is then verified byte-for-byte: this file is the
+                   only copy of every lead, and a short write (disk full, worker
+                   killed) reported as success would be silent data loss. On
+                   failure a recovery copy is dropped beside it and audited. */
+                $payload = $keep ? implode("\n", $keep) . "\n" : '';
                 ftruncate($fh, 0);
                 rewind($fh);
-                fwrite($fh, $keep ? implode("\n", $keep) . "\n" : '');
+                $written = fwrite($fh, $payload);
                 fflush($fh);
+                if ($written !== strlen($payload)) {
+                    @file_put_contents(VIT_PRIVATE . '/inquiries.recovery-' . time() . '.jsonl', $payload);
+                    vit_audit('lead_delete_writefail', ['expected' => strlen($payload), 'written' => (int)$written]);
+                }
             }
             flock($fh, LOCK_UN);
         }
         if ($fh) fclose($fh);
-        vit_audit('lead_deleted', ['n' => $removed, 'name' => mb_substr((string)($_POST['who'] ?? ''), 0, 60)]);
+        vit_audit('lead_deleted', ['n' => $removed, 'selected' => count($hashes), 'who' => $gone ?? []]);
     }
     header('Location: inquiries.php?deleted=' . $removed);
+    exit;
+}
+
+/* ---------- the leads, newest first ----------
+   Loaded before the export branch so both the page and the CSV see the same
+   deduplicated list: a completed chat supersedes its own earlier partial save. */
+$leads = [];
+if ($authed) {
+    $file = VIT_PRIVATE . '/inquiries.jsonl';
+    if (is_file($file)) {
+        $seen = [];
+        foreach (array_reverse(vit_tail_lines($file, 41943040)) as $line) {
+            $row = json_decode($line, true);
+            if (!is_array($row)) continue;
+            $id = (string)($row['leadId'] ?? '');
+            if ($id !== '') {
+                if (isset($seen[$id])) continue;
+                $seen[$id] = true;
+            }
+            $row['_k'] = substr(sha1($line), 0, 16);   // handle for the delete checkbox
+            $leads[] = $row;
+        }
+    }
+}
+
+/* ---------- export ----------
+   Same session gate as the page; a read, so no CSRF token needed. The BOM is
+   for Excel, which otherwise renders Urdu names as mojibake. Cells that start
+   with a formula character are prefixed with an apostrophe — a spreadsheet
+   that executes '=HYPERLINK(...)' pasted by a visitor into the contact form
+   is this page's problem to prevent, not the spreadsheet user's to notice. */
+// GET-only: $_GET is populated from the query string even on a POST, and the
+// login form posts back to whatever URL the owner was on when the session
+// expired — which must never be answered with a file download.
+if ($authed && isset($_GET['export']) && ($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="vectorit-inquiries-' . date('Y-m-d') . '.csv"');
+    header('Cache-Control: no-store');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");
+    $cols = ['time', 'source', 'lang', 'stage', 'name', 'whatsapp', 'email', 'company', 'service', 'budget', 'message'];
+    $guard = static function ($v): string {
+        $v = (string)$v;
+        return ($v !== '' && strpbrk($v[0], "=+-@\t\r") !== false) ? "'" . $v : $v;
+    };
+    fputcsv($out, ['Time', 'Source', 'Language', 'Stage', 'Name', 'Mobile / WhatsApp', 'Email', 'Company', 'Need', 'Budget', 'Message']);
+    foreach ($leads as $l) {
+        $row = [];
+        foreach ($cols as $c) $row[] = $guard($l[$c] ?? '');
+        fputcsv($out, $row);
+    }
+    fclose($out);
+    vit_audit('leads_exported', ['n' => count($leads)]);
     exit;
 }
 
@@ -185,26 +278,6 @@ if ($authed) {
         $sec['ips'] = array_slice($sec['ips'], 0, 5, true);
     }
 }
-
-$leads = [];
-if ($authed) {
-    $file = VIT_PRIVATE . '/inquiries.jsonl';
-    if (is_file($file)) {
-        $seen = [];
-        // Newest first; a completed chat supersedes its own earlier partial save.
-        foreach (array_reverse(vit_tail_lines($file, 41943040)) as $line) {
-            $row = json_decode($line, true);
-            if (!is_array($row)) continue;
-            $id = (string)($row['leadId'] ?? '');
-            if ($id !== '') {
-                if (isset($seen[$id])) continue;
-                $seen[$id] = true;
-            }
-            $row['_k'] = substr(sha1($line), 0, 16);   // handle for the delete button
-            $leads[] = $row;
-        }
-    }
-}
 $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 ?><!DOCTYPE html>
 <html lang="en">
@@ -215,27 +288,42 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 <title>Inquiries — VectorIT</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #F7F9FC; color: #0F1B33; margin: 0; padding: 24px; }
-  .wrap { max-width: 1100px; margin: 0 auto; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
   h1 { font-size: 1.4rem; } h1 small { color: #55617D; font-weight: 400; font-size: .85rem; }
   .login { max-width: 340px; margin: 12vh auto; background: #fff; border: 1px solid #E3E9F5; border-radius: 14px; padding: 28px; box-shadow: 0 12px 32px rgba(15,27,51,.08); }
   input[type=password] { width: 100%; box-sizing: border-box; padding: 11px 14px; border: 1.5px solid #C9D4EA; border-radius: 9px; font-size: 1rem; margin: 10px 0 14px; }
   button { background: #2E5BDB; color: #fff; border: 0; border-radius: 999px; padding: 11px 22px; font-size: .95rem; font-weight: 600; cursor: pointer; }
   .err { color: #B32222; font-size: .9rem; }
   .card { background: #fff; border: 1px solid #E3E9F5; border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(15,27,51,.05); }
-  .card b { font-size: 1.05rem; }
   .meta { color: #55617D; font-size: .8rem; margin: 4px 0 8px; }
   .tag { display: inline-block; background: #E8EEFC; color: #1E3FA6; border-radius: 999px; padding: 2px 10px; font-size: .75rem; margin-right: 6px; }
-  .msg { white-space: pre-wrap; font-size: .92rem; }
   a { color: #2E5BDB; }
-  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
   .empty { color: #55617D; padding: 40px; text-align: center; }
-  .card { position: relative; }
-  .del-form { position: absolute; right: 14px; bottom: 12px; margin: 0; }
-  .del { background: none; color: #B0BACD; border: 1px solid #E3E9F5; border-radius: 7px;
-         padding: 4px 11px; font-size: .76rem; font-weight: 600; cursor: pointer; }
-  .del:hover { background: #FDECEC; color: #B32222; border-color: #E4B7B7; }
   .done { background: #E7F5EC; border: 1px solid #B7DEC6; color: #0B6B39; border-radius: 10px;
           padding: 11px 15px; margin-bottom: 14px; font-size: .9rem; }
+
+  /* ---- the table ---- */
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .toolbar .grow { flex: 1; }
+  .btn-2 { background: #fff; color: #2E5BDB; border: 1.5px solid #C9D4EA; border-radius: 999px;
+           padding: 9px 18px; font-size: .88rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn-2:hover { border-color: #2E5BDB; }
+  .btn-danger { background: #fff; color: #B32222; border: 1.5px solid #E4B7B7; border-radius: 999px;
+                padding: 9px 18px; font-size: .88rem; font-weight: 600; cursor: pointer; }
+  .btn-danger:disabled { color: #B0BACD; border-color: #E3E9F5; cursor: default; }
+  .btn-danger:not(:disabled):hover { background: #FDECEC; }
+  .tbl-wrap { background: #fff; border: 1px solid #E3E9F5; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(15,27,51,.05); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 980px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #EEF2FA; vertical-align: top; }
+  th { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #55617D; background: #F9FBFE;
+       position: sticky; top: 0; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  tr:hover td { background: #F9FBFE; }
+  td.nowrap { white-space: nowrap; }
+  td .msg { white-space: pre-wrap; max-width: 380px; color: #3A4761; }
+  td .name { font-weight: 700; }
+  .chk { width: 17px; height: 17px; accent-color: #2E5BDB; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -259,7 +347,7 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 
     <?php if (isset($_GET['deleted'])): ?>
       <?php $n = (int)$_GET['deleted']; ?>
-      <div class="done"><?= $n > 0 ? '✓ Deleted — ' . $n . ' record' . ($n === 1 ? '' : 's') . ' removed.' : 'Nothing was deleted (the entry may already be gone).' ?></div>
+      <div class="done"><?= $n > 0 ? '✓ Deleted — ' . $n . ' record' . ($n === 1 ? '' : 's') . ' removed.' : 'Nothing was deleted (the entries may already be gone).' ?></div>
     <?php endif; ?>
 
     <?php if ($stats): ?>
@@ -307,35 +395,94 @@ $e = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
     </div>
     <?php endif; ?>
     <?php endif; ?>
+
     <?php if (!$leads): ?>
-      <div class="card empty">No inquiries yet. They will appear here the moment someone submits the contact form or finishes the chat bot.</div>
-    <?php endif; ?>
-    <?php foreach ($leads as $l): ?>
-      <div class="card">
-        <b><?= $e($l['name'] ?? '') ?></b>
-        <span class="tag"><?= $e($l['source'] ?? '') ?></span>
-        <?php if (!empty($l['lang'])): ?><span class="tag"><?= $e($l['lang']) ?></span><?php endif; ?>
-        <?php if (($l['stage'] ?? '') === 'partial'): ?><span class="tag" style="background:#FFF0D9;color:#925E10">chat not finished — follow up</span><?php endif; ?>
-        <?php if (!empty($l['service'])): ?><span class="tag"><?= $e($l['service']) ?></span><?php endif; ?>
-        <?php if (!empty($l['budget'])): ?><span class="tag"><?= $e($l['budget']) ?></span><?php endif; ?>
-        <div class="meta">
-          <?= $e($l['time'] ?? '') ?>
-          <?php if (!empty($l['company'])): ?> · <?= $e($l['company']) ?><?php endif; ?>
-        </div>
-        <div class="meta">
-          <?php if (!empty($l['whatsapp'])): ?>📱 <a href="https://wa.me/<?= $e(preg_replace('/\D/', '', $l['whatsapp'])) ?>" target="_blank" rel="noopener"><?= $e($l['whatsapp']) ?></a> &nbsp;<?php endif; ?>
-          <?php if (!empty($l['email'])): ?>✉️ <a href="mailto:<?= $e($l['email']) ?>"><?= $e($l['email']) ?></a><?php endif; ?>
-        </div>
-        <?php if (!empty($l['message'])): ?><div class="msg"><?= $e($l['message']) ?></div><?php endif; ?>
-        <form method="post" class="del-form" onsubmit="return confirm('Delete this inquiry permanently? This cannot be undone.')">
-          <input type="hidden" name="csrf" value="<?= $e($_SESSION['inq_csrf'] ?? '') ?>">
-          <input type="hidden" name="del" value="<?= $e($l['_k'] ?? '') ?>">
-          <input type="hidden" name="leadId" value="<?= $e($l['leadId'] ?? '') ?>">
-          <input type="hidden" name="who" value="<?= $e($l['name'] ?? '') ?>">
-          <button type="submit" class="del">Delete</button>
-        </form>
+      <div class="card empty">No inquiries yet. They will appear here the moment someone submits the contact form, finishes the chat, or messages the WhatsApp number.</div>
+    <?php else: ?>
+
+    <form method="post" id="leads-form"
+          onsubmit="return confirm('Delete ' + document.querySelectorAll('.row-chk:checked').length + ' selected inquiry(ies) permanently? This cannot be undone.')">
+      <input type="hidden" name="csrf" value="<?= $e($_SESSION['inq_csrf'] ?? '') ?>">
+
+      <div class="toolbar">
+        <button type="submit" class="btn-danger" id="del-btn" disabled>Delete selected</button>
+        <span class="meta" id="sel-count"></span>
+        <span class="grow"></span>
+        <a class="btn-2" href="?export=csv">⬇ Export CSV</a>
       </div>
-    <?php endforeach; ?>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="chk" id="chk-all" title="Select all"></th>
+              <th>Time</th>
+              <th>Name</th>
+              <th>Mobile / WhatsApp</th>
+              <th>Email</th>
+              <th>Source</th>
+              <th>Need</th>
+              <th>Budget</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php foreach ($leads as $l): ?>
+            <tr>
+              <td><input type="checkbox" class="chk row-chk" name="sel[]"
+                         value="<?= $e(($l['_k'] ?? '') . '|' . ($l['leadId'] ?? '')) ?>"></td>
+              <td class="nowrap"><?= $e($l['time'] ?? '') ?></td>
+              <td>
+                <span class="name"><?= $e($l['name'] ?? '') ?></span>
+                <?php if (($l['stage'] ?? '') === 'partial'): ?><br><span class="tag" style="background:#FFF0D9;color:#925E10">not finished</span><?php endif; ?>
+                <?php if (!empty($l['company'])): ?><br><span class="meta"><?= $e($l['company']) ?></span><?php endif; ?>
+              </td>
+              <td class="nowrap">
+                <?php if (!empty($l['whatsapp'])): ?>
+                  <a href="https://wa.me/<?= $e(preg_replace('/\D/', '', (string)$l['whatsapp'])) ?>" target="_blank" rel="noopener"><?= $e($l['whatsapp']) ?></a>
+                <?php endif; ?>
+              </td>
+              <td class="nowrap">
+                <?php if (!empty($l['email'])): ?><a href="mailto:<?= $e($l['email']) ?>"><?= $e($l['email']) ?></a><?php endif; ?>
+              </td>
+              <td class="nowrap">
+                <span class="tag"><?= $e($l['source'] ?? '') ?></span>
+                <?php if (!empty($l['lang'])): ?><span class="tag"><?= $e($l['lang']) ?></span><?php endif; ?>
+              </td>
+              <td><?= $e($l['service'] ?? '') ?></td>
+              <td class="nowrap"><?= $e($l['budget'] ?? '') ?></td>
+              <td><div class="msg"><?= $e($l['message'] ?? '') ?></div></td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </form>
+
+    <script>
+    (function () {
+      var all = document.getElementById('chk-all');
+      var rows = Array.prototype.slice.call(document.querySelectorAll('.row-chk'));
+      var btn = document.getElementById('del-btn');
+      var count = document.getElementById('sel-count');
+      function refresh() {
+        var n = rows.filter(function (c) { return c.checked; }).length;
+        btn.disabled = n === 0;
+        btn.textContent = n ? 'Delete selected (' + n + ')' : 'Delete selected';
+        count.textContent = n ? n + ' of ' + rows.length + ' selected' : '';
+        all.checked = n === rows.length && n > 0;
+        all.indeterminate = n > 0 && n < rows.length;
+      }
+      all.addEventListener('change', function () {
+        rows.forEach(function (c) { c.checked = all.checked; });
+        refresh();
+      });
+      rows.forEach(function (c) { c.addEventListener('change', refresh); });
+      refresh();
+    })();
+    </script>
+
+    <?php endif; ?>
   </div>
 <?php endif; ?>
 </body>
