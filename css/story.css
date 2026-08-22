@@ -522,7 +522,7 @@ body.has-sticky .wa-float { display: none; }
   height: 60px;
   border-color: rgba(255, 90, 45, 0.75);
 }
-body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
+/* the ring trails the REAL cursor — hiding the native one read as "no cursor" */
 
 /* ---------- horizontal modules scrub (JS adds .hscrub on desktop) ---------- */
 .hscrub { overflow: hidden; }
