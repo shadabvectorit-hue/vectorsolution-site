@@ -114,26 +114,10 @@
 
   gsap.registerPlugin(ScrollTrigger);
 
-  /* Lenis smooth scroll, wired to ScrollTrigger the documented way.
-     anchors:true makes same-page #links scroll through Lenis instead of
-     fighting it — without it, clicking "Pricing" in the nav snaps back. */
-  if (typeof window.Lenis !== "undefined") {
-    var lenis = new Lenis({ lerp: 0.25, anchors: true });
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
-    gsap.ticker.lagSmoothing(0);
-    window.__lenis = lenis;
-    /* Arriving from another page at /#pricing etc.: land on the target. */
-    if (location.hash) {
-      var target = document.getElementById(location.hash.slice(1));
-      if (target) {
-        requestAnimationFrame(function () {
-          lenis.scrollTo(target, { immediate: true, force: true });
-        });
-      }
-    }
-  }
-
+  /* No smooth-scroll library. The reference site this design chases runs on
+     native scroll — the rubbery feel of a lerped scroller was the one thing
+     the owner kept flagging. Scrub values on each timeline provide all the
+     easing the animations need; the page itself answers the wheel directly. */
   /* Drafted underlines: plot in once when the heading arrives. */
   document.querySelectorAll(".drafted svg path").forEach(function (p) {
     var len = p.getTotalLength();
@@ -293,11 +277,13 @@
     var track = modSec.querySelector(".modules");
     gsap.to(track, {
       x: function () { return -(track.scrollWidth - modSec.clientWidth + 60); },
+      /* scrub distance is 0.55x the travel: the row moves faster than the page,
+         so the pin never reads as "scrolling stopped" */
       ease: "none",
       scrollTrigger: {
         trigger: modSec,
         start: "top top",
-        end: function () { return "+=" + (track.scrollWidth - modSec.clientWidth + 200); },
+        end: function () { return "+=" + Math.round((track.scrollWidth - modSec.clientWidth) * 0.55 + 200); },
         pin: true,
         scrub: 0.5,
         invalidateOnRefresh: true
