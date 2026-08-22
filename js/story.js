@@ -15,7 +15,7 @@
   "use strict";
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var desktop = window.matchMedia("(min-width: 1024px) and (hover: hover)").matches;
+  var desktop = window.matchMedia("(min-width: 1024px)").matches;
   var hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
 
   /* ---------- sticky CTA bar: every tier, IntersectionObserver only ---------- */
@@ -277,10 +277,6 @@
     var rWords = rlab.querySelectorAll(".rw");
     rWords.forEach(function (w) { w.setAttribute("data-t", w.textContent); });
 
-    var rArm = rlab.querySelector(".rarm");
-    var rSh = rlab.querySelector("#ra-shoulder");
-    var rFo = rlab.querySelector("#ra-fore");
-    var rHa = rlab.querySelector("#ra-hand");
     var rLap = rlab.querySelector(".rlap");
     var rLid = rlab.querySelector(".rlap-lid");
     var rScr = rlab.querySelector(".rlap-screen");
@@ -291,11 +287,6 @@
     var rCaps = rlab.querySelectorAll(".rcap");
     var rTail = rlab.querySelector(".rlab-tail");
 
-    /* joints rotate around their pins */
-    gsap.set(rSh, { svgOrigin: "836 450", rotation: 34 });
-    gsap.set(rFo, { svgOrigin: "500 262", rotation: -46 });
-    gsap.set(rHa, { svgOrigin: "268 470", rotation: 24 });
-    gsap.set(rArm, { xPercent: 42 });
     gsap.set(rLap, { yPercent: 135, rotation: -3 });
     gsap.set(rLid, { rotationX: -88 });
     gsap.set([rKpis, rRows], { opacity: 0, y: 12 });
@@ -319,7 +310,7 @@
       scrollTrigger: {
         trigger: rlab,
         start: "top top",
-        end: "+=560%",
+        end: "+=520%",
         pin: true,
         scrub: 0.5,
         invalidateOnRefresh: true
@@ -327,62 +318,54 @@
       defaults: { ease: "none" }
     });
 
-    /* 0–14%: the arm reaches in */
-    rtl.to(rArm, { xPercent: 0, duration: 8 }, 0)
-       .to(rSh, { rotation: -6, svgOrigin: "836 450", duration: 10 }, 0)
-       .to(rFo, { rotation: 14, svgOrigin: "500 262", duration: 10 }, 1)
-       .to(rHa, { rotation: -10, svgOrigin: "268 470", duration: 10 }, 2)
-       .to(rCaps[0], { opacity: 1, duration: 3 }, 1)
+    /* 0–8%: the terminal rises to center stage */
+    rtl.to(rCaps[0], { opacity: 1, duration: 3 }, 0)
+       .to(rLap, { yPercent: 0, rotation: 0, duration: 8, ease: "power1.out" }, 0)
 
-       /* 10–18%: the terminal is placed */
-       .to(rLap, { yPercent: 0, rotation: 0, duration: 7, ease: "power1.out" }, 9)
+       /* 8–18%: the lid opens, the screen blooms */
+       .to(rLid, { rotationX: 0, duration: 9, ease: "power1.inOut" }, 8)
+       .to(rScr, { boxShadow: "0 0 90px rgba(91,140,255,0.4)", duration: 6 }, 13)
+       .to(rCaps[0], { opacity: 0, duration: 2 }, 15)
 
-       /* 18–26%: the lid opens, the screen blooms */
-       .to(rLid, { rotationX: 0, duration: 8, ease: "power1.inOut" }, 17)
-       .to(rScr, { boxShadow: "0 0 90px rgba(91,140,255,0.4)", duration: 6 }, 21)
-       .to(rCaps[0], { opacity: 0, duration: 2 }, 20)
+       /* 16–26%: boot sequence */
+       .to(rBoot, { opacity: 1, duration: 2 }, 16)
+       .to(rCaps[1], { opacity: 1, duration: 3 }, 17)
+       .fromTo(rBar, { scaleX: 0 }, { scaleX: 1, duration: 6 }, 18)
+       .to(rBoot, { opacity: 0, duration: 3 }, 25)
 
-       /* 24–34%: boot sequence */
-       .to(rBoot, { opacity: 1, duration: 2 }, 24)
-       .to(rCaps[1], { opacity: 1, duration: 3 }, 25)
-       .fromTo(rBar, { scaleX: 0 }, { scaleX: 1, duration: 6 }, 26)
-       .to(rBoot, { opacity: 0, duration: 3 }, 33)
+       /* 26–34%: the ERP is live */
+       .to(rKpis, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 27)
+       .to(rRows, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 30)
+       .to(rCaps[1], { opacity: 0, duration: 2 }, 32)
+       .to(rCaps[2], { opacity: 1, duration: 3 }, 33)
+       /* 34–36%: captions hand over to capabilities */
+       .to(rCaps[2], { opacity: 0, duration: 2 }, 34)
+       .to(rCaps[3], { opacity: 1, duration: 3 }, 36);
 
-       /* 34–44%: the ERP is live */
-       .to(rKpis, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 35)
-       .to(rRows, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 38)
-       .to(rCaps[1], { opacity: 0, duration: 2 }, 40)
-       .to(rCaps[2], { opacity: 1, duration: 3 }, 42.5)
-
-       /* 44–45%: captions hand over to capabilities */
-       .to(rCaps[2], { opacity: 0, duration: 2 }, 44)
-       .to(rCaps[3], { opacity: 1, duration: 3 }, 45);
-
-    /* 45–70%: the module series plays INSIDE the laptop screen */
+    /* 36–72%: the module series plays INSIDE the laptop screen — each slide
+       arrives like a carousel card: icon pops, title rises, then it glides out */
     if (slides.length) {
-      var slot = 25 / slides.length;
+      var slot = 36 / slides.length;
       slides.forEach(function (s, i) {
-        var t = 45 + i * slot;
-        rtl.to(s, { opacity: 1, duration: 0.6 }, t)
-           .to(s, { opacity: 0, duration: 0.6 }, t + slot - 0.6);
+        var t = 36 + i * slot;
+        var icon = s.querySelector(".rs-icon");
+        var h4 = s.querySelector("h4");
+        var p = s.querySelector("p");
+        rtl.fromTo(s, { opacity: 0, xPercent: 6 }, { opacity: 1, xPercent: 0, duration: slot * 0.28 }, t)
+           .fromTo(icon, { scale: 0.35, y: 26 }, { scale: 1, y: 0, ease: "back.out(1.7)", duration: slot * 0.3 }, t + slot * 0.04)
+           .fromTo(h4, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: slot * 0.26 }, t + slot * 0.12)
+           .fromTo(p, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: slot * 0.26 }, t + slot * 0.2)
+           .to(s, { opacity: 0, xPercent: -7, duration: slot * 0.24 }, t + slot * 0.76);
       });
     }
+    /* the laptop holds center stage while the names build on the right */
 
-    /* 70–78%: the arm presents; the terminal steps aside for the big words */
-    rtl.to(rSh, { rotation: -22, svgOrigin: "836 450", duration: 6 }, 70)
-       .to(rFo, { rotation: 36, svgOrigin: "500 262", duration: 6 }, 70)
-       .to(rHa, { rotation: 4, svgOrigin: "268 470", duration: 6 }, 70)
-       .to(rLap, { x: "-4%", scale: 0.94, duration: 6 }, 70);
-
-    /* 52–96%: the services light up, one by one */
-    var wStart = 78;
+    /* 72–96%: the service names appear on the right, one by one, and stay */
+    gsap.set(rWords, { opacity: 0, x: 70 });
+    var wStart = 72;
     var wSlot = (96 - wStart) / rWords.length;
     rWords.forEach(function (w, i) {
-      var at = wStart + i * wSlot;
-      rtl.to(w, { "--on": 1, duration: wSlot * 0.45 }, at);
-      if (i < rWords.length - 1) {
-        rtl.to(w, { "--on": 0, duration: wSlot * 0.4 }, at + wSlot * 0.62);
-      }
+      rtl.to(w, { opacity: 1, x: 0, duration: wSlot * 0.8, ease: "power2.out" }, wStart + i * wSlot);
     });
 
     /* 94–100%: the invitation */
