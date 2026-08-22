@@ -1,0 +1,424 @@
+/* VectorIT — homepage scroll story. Loads after main.css/product.css and only
+   ADDS: kinetic hero type, the drafting signature, marquee, counters, the dark
+   FBR chapter, and the sticky CTA bar. Nothing here restyles other pages.
+
+   Motion contract: initial hidden states for scrub/stagger elements are set by
+   js/story.js (GSAP), never here — with JavaScript off, every element below is
+   fully visible and the page reads as a normal document. The .reveal system
+   from main.css keeps handling simple fade-ups. */
+
+:root {
+  --night: #0A1226;
+  --night-ink: #E9EEF9;
+  --night-muted: rgba(233, 238, 249, 0.66);
+}
+
+/* ---------- hero: kinetic type ---------- */
+.p-hero h1.kin { overflow: hidden; padding-bottom: 0.08em; }
+/* Each word animates its variable width axis from condensed to full — the
+   Archivo axis IS the brand's kinetic move; no second typeface needed. */
+.kin .w {
+  display: inline-block;
+  font-variation-settings: "wdth" 105;
+  will-change: transform, opacity;
+}
+.hero-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 34px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.hero-cue::before {
+  content: "";
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(var(--blue), transparent);
+  animation: cue-drop 1.8s ease-in-out infinite;
+}
+@keyframes cue-drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* The plotter: an SVG vector-mark that draws itself across the hero on load —
+   the page literally drafts its own logo. Sits behind the headline column. */
+.plotter {
+  position: absolute;
+  right: clamp(8px, 4vw, 60px);
+  top: 40px;
+  width: clamp(120px, 14vw, 210px);
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
+}
+.plotter path, .plotter circle { vector-effect: non-scaling-stroke; }
+.p-hero { position: relative; }
+.p-hero .wrap { position: relative; z-index: 1; }
+
+/* drafted underline — chapter headings get a hand-plotted rule that draws in */
+.drafted { position: relative; display: inline-block; }
+.drafted svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.18em;
+  width: 100%;
+  height: 0.32em;
+  overflow: visible;
+}
+.drafted svg path {
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+/* ---------- work marquee ---------- */
+.marquee {
+  border-block: 1px solid var(--line-soft);
+  background: var(--card);
+  overflow: hidden;
+  padding-block: 16px;
+}
+.marquee-track {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marquee-run 36s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 4vw, 56px);
+  padding-inline: clamp(14px, 2vw, 28px);
+  white-space: nowrap;
+}
+.marquee-row span {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.marquee-row span::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--blue);
+  transform: rotate(45deg);
+  opacity: 0.6;
+}
+@keyframes marquee-run {
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- problem strip: the old way, struck through as you scroll ---------- */
+.oldway {
+  padding-block: clamp(70px, 11vh, 120px);
+  overflow: hidden;
+}
+.oldway .wrap { max-width: 1000px; }
+.oldway-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em 0.55em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 5.2vw, 4.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--ink);
+}
+.oldway-line .strike { position: relative; color: var(--faint); }
+.oldway-line .strike i {
+  position: absolute;
+  left: -3%;
+  top: 54%;
+  width: 106%;
+  height: 0.09em;
+  background: var(--signal);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.oldway-line .keep { color: var(--blue); }
+.oldway p.after {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  max-width: 56ch;
+}
+
+/* ---------- counters strip ---------- */
+.counters {
+  border-block: 1px solid var(--line-soft);
+  background: var(--card);
+  padding-block: clamp(44px, 7vh, 70px);
+}
+.counters .wrap {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(18px, 3vw, 44px);
+}
+.counter { position: relative; padding-left: 16px; }
+.counter::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+.counter b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.counter b sub {
+  font-size: 0.45em;
+  font-weight: 700;
+  vertical-align: baseline;
+  color: var(--muted);
+  margin-left: 2px;
+}
+.counter span {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ---------- the FBR chapter: chaos -> filed, in the dark ---------- */
+.fbr-cinema {
+  background:
+    radial-gradient(ellipse 90% 60% at 70% 20%, rgba(46, 91, 219, 0.16), transparent 60%),
+    var(--night);
+  color: var(--night-ink);
+  padding-block: clamp(90px, 14vh, 160px);
+  position: relative;
+  overflow: hidden;
+}
+/* film grain, pure CSS — no image request */
+.fbr-cinema::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: repeating-conic-gradient(rgba(255,255,255,0.9) 0% 0.0001%, transparent 0.0002% 0.05%);
+  background-size: 157px 157px;
+  mix-blend-mode: overlay;
+}
+.fbr-cinema .fig { color: #9DBAFF; }
+.fbr-cinema .fig .fig-dim { color: rgba(157, 186, 255, 0.55); }
+.fbr-cinema h2 {
+  color: #fff;
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+.fbr-cinema .lede { color: var(--night-muted); }
+.fbr-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  margin-top: clamp(36px, 6vh, 64px);
+}
+/* left: the day at the counter, drawn as a jagged line that flattens */
+.fbr-wave-wrap { position: relative; }
+.fbr-wave-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(233, 238, 249, 0.5);
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+.fbr-wave { width: 100%; height: auto; display: block; }
+.fbr-wave .jag { stroke: var(--signal); }
+.fbr-wave .flat { stroke: #2FBF71; }
+/* right: the invoice card that ends the chaos */
+.fbr-doc {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 26px 28px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  position: relative;
+  max-width: 420px;
+  justify-self: center;
+  width: 100%;
+}
+.fbr-doc .d-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+.fbr-doc .d-head b { font-size: 1.02rem; letter-spacing: -0.01em; }
+.fbr-doc .d-head span { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); }
+.fbr-doc .d-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--muted);
+  padding-block: 7px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.fbr-doc .d-row b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fbr-doc .d-fbr {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #14713F;
+  background: #DCF5E7;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.fbr-doc .d-fbr::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #178A50;
+}
+.fbr-stamp {
+  position: absolute;
+  top: -18px;
+  right: -14px;
+  border: 3px solid #2FBF71;
+  color: #2FBF71;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.22em;
+  padding: 7px 14px;
+  transform: rotate(8deg);
+  background: rgba(10, 18, 38, 0.03);
+}
+.fbr-facts {
+  margin-top: clamp(36px, 6vh, 60px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 3vw, 36px);
+}
+.fbr-fact {
+  border: 1px solid rgba(233, 238, 249, 0.16);
+  border-radius: 8px;
+  padding: 16px 18px;
+  background: rgba(233, 238, 249, 0.04);
+}
+.fbr-fact b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #9DBAFF;
+  margin-bottom: 7px;
+}
+.fbr-fact span { font-size: 0.92rem; color: var(--night-muted); line-height: 1.55; }
+.fbr-cinema .cta-row { margin-top: clamp(30px, 5vh, 48px); display: flex; gap: 14px; flex-wrap: wrap; }
+
+/* ---------- sticky CTA bar ---------- */
+.sticky-cta {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 140%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(15, 27, 51, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 9px 10px 9px 22px;
+  box-shadow: 0 18px 50px rgba(10, 18, 38, 0.4);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  opacity: 0;
+  max-width: min(94vw, 560px);
+}
+.sticky-cta.on { transform: translate(-50%, 0); opacity: 1; }
+.sticky-cta .s-txt { font-size: 0.88rem; font-weight: 600; white-space: nowrap; }
+.sticky-cta .s-txt em {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #9DBAFF;
+  display: block;
+  letter-spacing: 0.06em;
+}
+.sticky-cta .btn-sm {
+  background: var(--signal);
+  color: #fff;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sticky-cta .btn-sm:hover { background: var(--signal-hover); }
+.sticky-cta .s-wa {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #0B8043;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sticky-cta .s-wa svg { width: 20px; height: 20px; fill: #fff; }
+
+/* When the sticky bar is on screen, lift the WhatsApp float out of its way. */
+body.has-sticky .wa-float { display: none; }
+
+/* ---------- responsive + reduced motion ---------- */
+@media (max-width: 900px) {
+  .counters .wrap { grid-template-columns: 1fr 1fr; }
+  .fbr-stage { grid-template-columns: 1fr; }
+  .fbr-doc { justify-self: start; }
+  .fbr-facts { grid-template-columns: 1fr; }
+  .plotter { display: none; }
+}
+@media (max-width: 620px) {
+  .sticky-cta .s-txt em { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
+  .hero-cue::before { animation: none; }
+  .oldway-line .strike i { transform: none; }
+  .sticky-cta { transition: none; }
+}

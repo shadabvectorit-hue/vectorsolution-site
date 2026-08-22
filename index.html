@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/main.css?v=20260809b">
   <link rel="stylesheet" href="css/product.css?v=20260809a">
   <link rel="stylesheet" href="css/scene.css?v=20260809a">
+  <link rel="stylesheet" href="css/story.css?v=20260823a">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -160,10 +161,15 @@
   <main>
     <!-- ============ PRODUCT HERO ============ -->
     <section class="p-hero">
+      <svg class="plotter" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <circle data-draw cx="30" cy="34" r="8" stroke="#2E5BDB" stroke-width="3"/>
+        <path data-draw d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path data-draw d="M91 32 L91.6 50.3 L75.6 42.1 Z" stroke="#2E5BDB" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
       <div class="wrap p-hero-grid">
         <div>
           <p class="hero-eyebrow"><span class="dot"></span> VectorERP · Austin, TX &amp; Karachi</p>
-          <h1>Run your whole business on <span style="color:var(--blue)">one screen.</span></h1>
+          <h1 class="kin"><span class="w">Run</span> <span class="w">your</span> <span class="w">whole</span> <span class="w">business</span> <span class="w">on</span> <span class="w" style="color:var(--blue)">one&nbsp;screen.</span></h1>
           <p class="urdu" style="font-size:1.15rem;color:var(--faint);margin-bottom:18px">آپ کا کاروبار، آپ کا کنٹرول — ایک اسکرین پر</p>
           <p class="lede">Accounting, FBR-ready invoicing, inventory, sales, and payroll — in one platform your team learns in a day. Deployed for enterprises serving OGDC, PPL and Engro, and for shops on a single counter.</p>
           <div class="hero-ctas">
@@ -177,6 +183,7 @@
             <b>Replaces</b>
             <span>Excel registers</span><span>Separate accounting software</span><span>WhatsApp order lists</span><span>The diary on the counter</span>
           </div>
+          <p class="hero-cue">Scroll — the story draws itself</p>
         </div>
 
         <!-- dashboard mockup -->
@@ -238,6 +245,45 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ WORK MARQUEE ============ -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <div class="marquee-row">
+          <span>GenCom Compression Services — dual-entity ERP</span>
+          <span>Karachi Institute of Heart Diseases</span>
+          <span>Prime Nexus Logistics · Austin, TX</span>
+          <span>FBR digital invoicing — live</span>
+          <span>VB6-to-web legacy rescue</span>
+          <span>Hospital booking portal</span>
+          <span>Field-staff expense app · PK &amp; Dubai</span>
+        </div>
+        <div class="marquee-row">
+          <span>GenCom Compression Services — dual-entity ERP</span>
+          <span>Karachi Institute of Heart Diseases</span>
+          <span>Prime Nexus Logistics · Austin, TX</span>
+          <span>FBR digital invoicing — live</span>
+          <span>VB6-to-web legacy rescue</span>
+          <span>Hospital booking portal</span>
+          <span>Field-staff expense app · PK &amp; Dubai</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ THE OLD WAY, STRUCK OUT ============ -->
+    <section class="oldway" id="oldway" aria-label="What VectorERP replaces">
+      <div class="wrap">
+        <p class="oldway-line">
+          <span class="strike">Excel registers.<i></i></span>
+          <span class="strike">The counter diary.<i></i></span>
+          <span class="strike">WhatsApp order lists.<i></i></span>
+          <span class="strike">Loose parchis.<i></i></span>
+          <span class="strike">Five softwares.<i></i></span>
+          <span class="keep">One screen.</span>
+        </p>
+        <p class="after">Every one of them almost works — until the day they disagree with each other. Keep scrolling: this is what replacing the pile actually looks like.</p>
       </div>
     </section>
 
@@ -429,7 +475,7 @@
       <div class="wrap">
         <div class="section-head reveal">
           <p class="fig">Modules <span class="fig-dim">— one platform, every department</span></p>
-          <h2>Accounting to Point of Sale. Actually connected.</h2>
+          <h2>Accounting to Point of Sale. <span class="drafted">Actually connected.<svg viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 6 Q 30 2 55 5 T 98 4"/></svg></span></h2>
           <p class="lede">Start with what you need today, switch on more when you grow. Every module shares one database — enter data once, see it everywhere.</p>
         </div>
         <div class="modules">
@@ -445,6 +491,72 @@
           <article class="module reveal"><div class="m-icon hue-ecm"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.6 12.4a2 2 0 002 1.6h8.8a2 2 0 002-1.6L22 7H6"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg></div><h3>E-commerce</h3><p>Your Daraz and website orders land in the same stock and accounting as the shop counter.</p></article>
           <article class="module reveal"><div class="m-icon hue-rpt"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 16v-5M13 16V8M18 16v-9"/></svg></div><h3>Reports</h3><p>Profit &amp; loss, aging, stock valuation, salesman performance — live, not month-end.</p></article>
           <article class="module reveal"><div class="m-icon hue-hlp"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-9 8.36 8.5 8.5 0 01-3.4-.66L3 21l1.8-5.6A8.38 8.38 0 013.5 11.5a8.5 8.5 0 018.5-8.5 8.5 8.5 0 019 8.5z"/></svg></div><h3>Helpdesk</h3><p>Customer complaints tracked to resolution — with the full sales history beside every ticket.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REAL NUMBERS ============ -->
+    <section class="counters" aria-label="VectorERP in numbers">
+      <div class="wrap">
+        <div class="counter">
+          <b data-tick="18">18<sub>%</sub></b>
+          <span>sales tax calculated, printed and reconciled the FBR way — Third Schedule and exemptions included</span>
+        </div>
+        <div class="counter">
+          <b data-tick="1999">1,999<sub>Rs</sub></b>
+          <span>per user per month on Starter — setup, migration and training included</span>
+        </div>
+        <div class="counter">
+          <b data-tick="12">12<sub>modules</sub></b>
+          <span>on one shared database — enter data once, see it everywhere</span>
+        </div>
+        <div class="counter">
+          <b data-tick="72">72<sub>hrs</sub></b>
+          <span>the FBR correction window, tracked on every filed invoice</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FBR CHAPTER — THE DARK ROOM ============ -->
+    <section class="fbr-cinema" aria-labelledby="fbrc-h">
+      <div class="wrap">
+        <p class="fig">Chapter <span class="fig-dim">— FBR digital invoicing</span></p>
+        <h2 id="fbrc-h">The 6pm rejected invoice, ended.</h2>
+        <p class="lede" style="max-width:62ch">Since 31 December 2025, every sales-tax-registered business files invoices with FBR in real time. This is the moment a business goes compliant — and what staying compliant looks like afterwards.</p>
+        <div class="fbr-stage">
+          <div class="fbr-wave-wrap">
+            <p class="fbr-wave-label"><span>A day at the counter</span><span>without → with VectorERP</span></p>
+            <svg class="fbr-wave" viewBox="0 0 600 220" fill="none" aria-hidden="true">
+              <path class="jag" d="M0 120 L40 60 L70 170 L110 40 L150 150 L190 70 L230 190 L270 55 L310 160 L350 30 L390 170 L430 80 L470 150 L510 50 L560 130 L600 90" stroke-width="3"/>
+              <path class="flat" d="M0 110 L600 110" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="fbr-doc">
+            <span class="fbr-stamp">FILED</span>
+            <div class="d-head"><b>Sales Tax Invoice</b><span>INV-2041</span></div>
+            <div class="d-row"><span>Value excluding tax</span><b>Rs 385,000</b></div>
+            <div class="d-row"><span>Sales tax @ 18%</span><b>Rs 69,300</b></div>
+            <div class="d-row"><span>Total payable</span><b>Rs 454,300</b></div>
+            <div class="d-fbr">FBR 7000007DI17541… · QR printed</div>
+          </div>
+        </div>
+        <div class="fbr-facts">
+          <div class="fbr-fact">
+            <b>72-hour window</b>
+            <span>A filed invoice can be corrected within 72 hours. VectorERP tracks the window on every invoice, so a 6pm mistake is fixed before it hardens into the return.</span>
+          </div>
+          <div class="fbr-fact">
+            <b>When FBR is down</b>
+            <span>Invoices mark themselves offline and upload within 24 hours of service coming back. Your counter never stops billing.</span>
+          </div>
+          <div class="fbr-fact">
+            <b>Section 64D credit</b>
+            <span>Finance Act 2026 gives a 10% tax credit on what you spend to integrate — claimed in the year of installation. Keep the invoices; your consultant does the rest.</span>
+          </div>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/fbr">How we get you FBR-ready</a>
+          <a class="btn btn-ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.35)" href="/blog/who-must-use-fbr-digital-invoicing">Who must comply — with sources</a>
         </div>
       </div>
     </section>
@@ -753,7 +865,7 @@
       <div class="wrap">
         <div class="section-head reveal" style="text-align:center">
           <p class="fig" style="justify-content:center">Pricing <span class="fig-dim">— in rupees, like it should be</span></p>
-          <h2 style="margin-inline:auto">Straight pricing. No hidden charges. In writing.</h2>
+          <h2 style="margin-inline:auto">Straight pricing. No hidden charges. <span class="drafted">In writing.<svg viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 5 Q 28 2 52 5 T 98 4"/></svg></span></h2>
           <p class="lede" style="margin-inline:auto">Every plan includes setup, Excel data migration, Urdu or English training, and FBR-update maintenance — nothing billed as a "surprise extra" later. Prefer to own it outright? A one-time lifetime license is available on every plan — just ask.</p>
         </div>
         <div class="plans">
@@ -922,7 +1034,19 @@
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.5-.3-4.9.9 1-4.7-.3-.5c-.9-1.5-1.4-3.2-1.4-4.9 0-5.2 4.3-9.5 9.6-9.5s9.6 4.3 9.6 9.5-4.3 9.8-9.6 9.8zm5.3-7.2c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
     <span>WhatsApp us</span>
   </a>
+  <div class="sticky-cta" role="complementary" aria-label="Quick actions">
+    <span class="s-txt">Free live demo — no sign-up<em>Rs 1,999 / user · FBR-ready</em></span>
+    <a class="btn-sm" href="demo/">Open the demo</a>
+    <a class="s-wa" href="https://wa.me/923022219093?text=Assalam%20o%20Alaikum%2C%20I%20am%20looking%20at%20VectorERP%20—%20can%20we%20talk%3F" target="_blank" rel="noopener" aria-label="WhatsApp us">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.5-.3-4.9.9 1-4.7-.3-.5c-.9-1.5-1.4-3.2-1.4-4.9 0-5.2 4.3-9.5 9.6-9.5s9.6 4.3 9.6 9.5-4.3 9.8-9.6 9.8zm5.3-7.2c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+    </a>
+  </div>
+
   <script src="js/main.js?v=20260809a"></script>
   <script src="js/bot.js?v=20260809b" defer></script>
+  <script src="js/vendor/gsap.min.js?v=20260823a" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20260823a" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20260823a" defer></script>
+  <script src="js/story.js?v=20260823a" defer></script>
 </body>
 </html>
