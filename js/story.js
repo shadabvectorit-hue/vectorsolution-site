@@ -356,17 +356,18 @@
            .fromTo(h4, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: slot * 0.26 }, t + slot * 0.12)
            .fromTo(p, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: slot * 0.26 }, t + slot * 0.2)
            .to(s, { opacity: 0, xPercent: -7, duration: slot * 0.24 }, t + slot * 0.76);
+        /* the matching name lights up on the right as its slide plays */
+        if (rWords[i]) {
+          rtl.to(rWords[i], { opacity: 1, x: 0, duration: slot * 0.5, ease: "power2.out" }, t + slot * 0.1);
+        }
       });
     }
     /* the laptop holds center stage while the names build on the right */
 
-    /* 72–96%: the service names appear on the right, one by one, and stay */
+    /* the finale name lands after the series, in blue */
     gsap.set(rWords, { opacity: 0, x: 70 });
-    var wStart = 72;
-    var wSlot = (96 - wStart) / rWords.length;
-    rWords.forEach(function (w, i) {
-      rtl.to(w, { opacity: 1, x: 0, duration: wSlot * 0.8, ease: "power2.out" }, wStart + i * wSlot);
-    });
+    var fin = rWords[rWords.length - 1];
+    if (fin) { rtl.to(fin, { opacity: 1, x: 0, duration: 4, ease: "power2.out" }, 76); }
 
     /* 94–100%: the invitation */
     rtl.to(rTail, { opacity: 1, duration: 4 }, 95);

@@ -674,7 +674,8 @@ body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
     z-index: 3;
     margin: 0;
   }
-  .rw { font-size: clamp(3rem, 7.2vh, 6rem); line-height: 1.06; position: relative; }
+  .rw { font-size: clamp(1.7rem, 4.4vh, 3rem); line-height: 1.22; position: relative; }
+  .rw-final { font-size: clamp(2rem, 5.2vh, 3.6rem); }
   .rlab-tail {
     position: absolute;
     right: 5%;
