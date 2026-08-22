@@ -268,3 +268,10 @@ body.home-dark > * { position: relative; z-index: 1; }
 }
 .home-dark .partner-strip b { color: var(--ink); }
 .home-dark .partner-strip a { color: var(--blue); }
+
+/* ---------- depth layer at night ---------- */
+.home-dark .ghost-type { -webkit-text-stroke: 1.5px rgba(91, 140, 255, 0.22); text-shadow: 0 0 80px rgba(46, 91, 219, 0.12); }
+.home-dark .ring-badge text { fill: var(--faint); }
+.home-dark .ring-badge .rb-core { box-shadow: 0 0 24px rgba(91, 140, 255, 0.5); }
+.home-dark .cursor-dot { mix-blend-mode: screen; }
+.home-dark .cursor-ring { mix-blend-mode: screen; }

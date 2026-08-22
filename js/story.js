@@ -159,18 +159,8 @@
     }
   }
 
-  /* Module cards: drafted in as a stagger instead of one blunt fade. */
-  var modules = document.querySelectorAll(".modules .module");
-  if (modules.length) {
-    gsap.set(modules, { opacity: 0, y: 26 });
-    ScrollTrigger.batch(modules, {
-      start: "top 86%",
-      onEnter: function (batch) {
-        gsap.to(batch, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06, ease: "power2.out", overwrite: true });
-      }
-    });
-    modules.forEach(function (m) { m.classList.remove("reveal"); m.classList.add("visible"); });
-  }
+  /* Module cards enter via the horizontal scrub below; their .reveal class
+     still fades each one in as it arrives from the right. */
 
   /* ---------- FBR chapter: the day flattens, the invoice files ---------- */
   var cinema = document.querySelector(".fbr-cinema");
@@ -213,6 +203,118 @@
       y: -46,
       ease: "none",
       scrollTrigger: { trigger: ".p-hero", start: "top top", end: "bottom top", scrub: 0.6 }
+    });
+  }
+
+  /* ---------- the terminal is an object: mouse-tilt in 3D ---------- */
+  if (mock) {
+    var heroEl = document.querySelector(".p-hero");
+    var qx = gsap.quickTo(mock, "rotationY", { duration: 0.7, ease: "power3.out" });
+    var qy = gsap.quickTo(mock, "rotationX", { duration: 0.7, ease: "power3.out" });
+    heroEl.addEventListener("mousemove", function (e) {
+      var r = heroEl.getBoundingClientRect();
+      qx(((e.clientX - r.left) / r.width - 0.5) * 10);
+      qy(((e.clientY - r.top) / r.height - 0.5) * -8);
+    });
+    heroEl.addEventListener("mouseleave", function () { qx(0); qy(0); });
+  }
+
+  /* Ghost type drifts slower than the page — depth between layers. */
+  var ghost = document.querySelector(".ghost-type");
+  if (ghost) {
+    gsap.to(ghost, {
+      y: 120,
+      ease: "none",
+      scrollTrigger: { trigger: ".p-hero", start: "top top", end: "bottom top", scrub: 0.4 }
+    });
+  }
+
+  /* ---------- cursor follower: dot tracks, ring lags ---------- */
+  var dot = document.createElement("div");
+  var ring = document.createElement("div");
+  dot.className = "cursor-dot";
+  ring.className = "cursor-ring";
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+  document.body.classList.add("has-cursor");
+  var dx = gsap.quickTo(dot, "x", { duration: 0.08, ease: "power2.out" });
+  var dy = gsap.quickTo(dot, "y", { duration: 0.08, ease: "power2.out" });
+  var rx = gsap.quickTo(ring, "x", { duration: 0.38, ease: "power3.out" });
+  var ry = gsap.quickTo(ring, "y", { duration: 0.38, ease: "power3.out" });
+  window.addEventListener("mousemove", function (e) {
+    dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY);
+  });
+  document.addEventListener("mouseover", function (e) {
+    ring.classList.toggle("is-link", !!e.target.closest("a, button, summary"));
+  });
+
+  /* ---------- magnetic CTAs ---------- */
+  document.querySelectorAll(".hero-ctas .btn, .cta-band .btn, .fbr-cinema .btn").forEach(function (b) {
+    var bx = gsap.quickTo(b, "x", { duration: 0.4, ease: "power3.out" });
+    var by = gsap.quickTo(b, "y", { duration: 0.4, ease: "power3.out" });
+    b.addEventListener("mousemove", function (e) {
+      var r = b.getBoundingClientRect();
+      bx((e.clientX - r.left - r.width / 2) * 0.28);
+      by((e.clientY - r.top - r.height / 2) * 0.34);
+    });
+    b.addEventListener("mouseleave", function () {
+      gsap.to(b, { x: 0, y: 0, duration: 0.55, ease: "elastic.out(1, 0.45)" });
+    });
+  });
+
+  /* ---------- headings rise word by word ---------- */
+  document.querySelectorAll("main h2").forEach(function (h) {
+    if (h.closest(".scene") || h.classList.contains("sr-only")) { return; }
+    if (h.children.length > 0) {
+      /* headings with markup inside (drafted underlines etc.) rise whole */
+      gsap.set(h, { opacity: 0, y: 30 });
+      gsap.to(h, {
+        opacity: 1, y: 0, duration: 0.7, ease: "power2.out",
+        scrollTrigger: { trigger: h, start: "top 84%" }
+      });
+      return;
+    }
+    var words = h.textContent.split(/\s+/).filter(Boolean);
+    h.innerHTML = words.map(function (w) {
+      return '<span class="h2w"><i>' + w.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</i></span>";
+    }).join(" ");
+    var parts = h.querySelectorAll(".h2w > i");
+    gsap.set(parts, { yPercent: 110 });
+    gsap.to(parts, {
+      yPercent: 0, duration: 0.65, stagger: 0.055, ease: "power3.out",
+      scrollTrigger: { trigger: h, start: "top 84%" }
+    });
+  });
+
+  /* ---------- modules: vertical scroll drives a horizontal row ---------- */
+  var modSec = document.getElementById("modules");
+  if (modSec) {
+    modSec.classList.add("hscrub");
+    var track = modSec.querySelector(".modules");
+    gsap.to(track, {
+      x: function () { return -(track.scrollWidth - modSec.clientWidth + 60); },
+      ease: "none",
+      scrollTrigger: {
+        trigger: modSec,
+        start: "top top",
+        end: function () { return "+=" + (track.scrollWidth - modSec.clientWidth + 200); },
+        pin: true,
+        scrub: 0.5,
+        invalidateOnRefresh: true
+      }
+    });
+  }
+
+  /* The filed invoice levitates once its entrance has played. */
+  var fdoc = document.querySelector(".fbr-doc");
+  if (fdoc) {
+    gsap.to(fdoc, {
+      y: "-=10",
+      duration: 3.2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      scrollTrigger: { trigger: ".fbr-cinema", start: "center center" }
     });
   }
 })();

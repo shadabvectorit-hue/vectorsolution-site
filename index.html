@@ -24,8 +24,8 @@
   <link rel="stylesheet" href="css/main.css?v=20260809b">
   <link rel="stylesheet" href="css/product.css?v=20260809a">
   <link rel="stylesheet" href="css/scene.css?v=20260823b">
-  <link rel="stylesheet" href="css/story.css?v=20260823a">
-  <link rel="stylesheet" href="css/dark.css?v=20260823a">
+  <link rel="stylesheet" href="css/story.css?v=20260823c">
+  <link rel="stylesheet" href="css/dark.css?v=20260823c">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -162,6 +162,7 @@
   <main>
     <!-- ============ PRODUCT HERO ============ -->
     <section class="p-hero">
+      <div class="ghost-type" aria-hidden="true">VECTOR<br>ERP</div>
       <svg class="plotter" viewBox="0 0 120 120" fill="none" aria-hidden="true">
         <circle data-draw cx="30" cy="34" r="8" stroke="#2E5BDB" stroke-width="3"/>
         <path data-draw d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -186,9 +187,18 @@
           </div>
           <p class="hero-cue">Scroll — the story draws itself</p>
         </div>
+        <a class="ring-badge" href="demo/" aria-label="Open the live demo — no sign-up">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <defs><path id="rb-circle" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+            <text><textPath href="#rb-circle">OPEN THE LIVE DEMO · NO SIGN-UP · FREE ·&#160;</textPath></text>
+          </svg>
+          <span class="rb-core" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+          </span>
+        </a>
 
         <!-- dashboard mockup -->
-        <div class="mock-wrap reveal">
+        <div class="mock-wrap reveal tilt3d">
           <div class="float-card fc-1">
             <div class="f-label">Cash position</div>
             <div class="f-val">Rs 12,84,500 <em>▲ 8.2%</em></div>
@@ -1048,6 +1058,6 @@
   <script src="js/vendor/gsap.min.js?v=20260823a" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js?v=20260823a" defer></script>
   <script src="js/vendor/lenis.min.js?v=20260823a" defer></script>
-  <script src="js/story.js?v=20260823b" defer></script>
+  <script src="js/story.js?v=20260823c" defer></script>
 </body>
 </html>
