@@ -544,3 +544,185 @@ body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
   .ring-badge svg:first-child { animation: none; }
   .cursor-dot, .cursor-ring { display: none; }
 }
+
+/* ================= THE ROBOT LAB ================= */
+/* Base styles are the static document: laptop open, services readable, arm
+   hidden on small screens. The desktop media block turns it into a stage; JS
+   arms the choreography (.rlab-armed) and pins the section. */
+
+.rlab { border-block: 1px solid var(--line-soft); overflow: clip; position: relative; }
+.rlab-stage { position: relative; padding: clamp(60px, 9vh, 110px) clamp(20px, 5vw, 60px); }
+
+/* --- the terminal --- */
+.rlap { width: min(520px, 100%); margin-inline: auto; perspective: 1300px; }
+.rlap-lid { transform-origin: 50% 100%; }
+.rlap-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #05090F;
+  border: 2px solid #22335C;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  font-size: clamp(9px, 2.4vw, 13px);
+  box-shadow: 0 0 0 rgba(91, 140, 255, 0);
+}
+.rlap-base {
+  height: 13px;
+  background: linear-gradient(#2A3A5E, #101A36 70%, #0B1226);
+  border: 2px solid #22335C;
+  border-top: none;
+  border-radius: 2px 2px 14px 14px;
+}
+.rscr-app { position: absolute; inset: 0; padding: 7% 8%; display: flex; flex-direction: column; gap: 6%; color: #C8D6F0; }
+.ra-top { display: flex; align-items: center; gap: 8px; }
+.ra-top svg { width: 1.6em; height: 1.6em; }
+.ra-top b { font-weight: 800; font-size: 1.15em; color: #E8EFFC; }
+.ra-top b em { font-style: normal; color: #5B8CFF; }
+.ra-live {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  color: #2FBF71;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ra-live::before { content: ""; width: 0.55em; height: 0.55em; border-radius: 50%; background: #2FBF71; animation: ra-pulse 2s ease-in-out infinite; }
+@keyframes ra-pulse { 50% { opacity: 0.25; } }
+.ra-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6%; }
+.ra-kpis > div { background: #0C1424; border: 1px solid #1C2A4C; border-radius: 6px; padding: 7% 9%; }
+.ra-kpis i { display: block; font-style: normal; font-family: var(--font-mono); font-size: 0.62em; letter-spacing: 0.1em; text-transform: uppercase; color: #6E80A6; margin-bottom: 4px; }
+.ra-kpis b { font-weight: 800; font-size: 1.02em; color: #E8EFFC; white-space: nowrap; }
+.ra-rows { display: grid; gap: 0; margin-top: auto; }
+.ra-rows > div { display: flex; justify-content: space-between; align-items: center; padding: 4.5% 2%; border-top: 1px solid #16223F; }
+.ra-rows span { font-size: 0.92em; }
+.ra-rows em { font-style: normal; font-family: var(--font-mono); font-size: 0.68em; letter-spacing: 0.08em; }
+.ra-rows em.ok { color: #2FBF71; }
+.ra-rows em.due { color: #F2A63C; }
+.rscr-boot {
+  position: absolute;
+  inset: 0;
+  background: #05090F;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  opacity: 0; /* decorative boot flash, shown only mid-choreography */
+  pointer-events: none;
+}
+.rscr-boot svg { width: 15%; }
+.rscr-boot span { font-family: var(--font-mono); font-size: 1em; letter-spacing: 0.22em; color: #E8EFFC; }
+.rscr-boot .rb-bar { display: block; width: 34%; height: 3px; background: rgba(91, 140, 255, 0.2); border-radius: 2px; overflow: hidden; }
+.rscr-boot .rb-bar u { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #2E5BDB, #5B8CFF); transform: scaleX(0); transform-origin: left; }
+.rlap-glare { position: absolute; inset: 0; background: linear-gradient(112deg, rgba(255, 255, 255, 0.10), transparent 40%); opacity: 0.12; pointer-events: none; }
+
+/* --- the arm (hidden on small screens) --- */
+.rarm { display: none; }
+.ra-glow { animation: ra-pulse 2.6s ease-in-out infinite; }
+
+/* --- the services, set big --- */
+.rwords { margin-top: clamp(34px, 6vh, 60px); display: block; }
+.rw {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(2.1rem, 8.4vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.rw.rw-final { color: var(--blue); }
+.rlab-tail { margin-top: 18px; color: var(--muted); font-size: 0.98rem; }
+.rlab-tail a { color: var(--blue); font-weight: 600; }
+.rlab-caps { display: none; }
+.mote { display: none; }
+
+/* ---------- desktop: the stage ---------- */
+@media (min-width: 1024px) {
+  .rlab-stage { min-height: 100svh; padding: 0; }
+
+  .rarm {
+    display: block;
+    position: absolute;
+    right: -3%;
+    top: -3%;
+    height: 106%;
+    width: auto;
+    z-index: 2;
+    pointer-events: none;
+    filter: drop-shadow(0 0 26px rgba(46, 91, 219, 0.35));
+  }
+  .rlap {
+    position: absolute;
+    left: 7%;
+    bottom: 9%;
+    width: clamp(400px, 37vw, 580px);
+    margin: 0;
+    z-index: 1;
+  }
+  .rwords {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: right;
+    z-index: 3;
+    margin: 0;
+  }
+  .rw { font-size: clamp(3rem, 7.2vh, 6rem); line-height: 1.06; position: relative; }
+  .rlab-tail {
+    position: absolute;
+    right: 5%;
+    bottom: 7%;
+    text-align: right;
+    z-index: 3;
+    margin: 0;
+  }
+  .rlab-caps { display: block; position: absolute; left: 7%; top: 8%; z-index: 3; height: 1.2em; }
+  .rcap {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    opacity: 0;
+  }
+  .rcap::before { content: "— "; color: var(--signal); }
+
+  .mote { display: block; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #5B8CFF; opacity: 0.28; animation: mote-drift 14s linear infinite; }
+  .mote.m1 { left: 18%; top: 82%; }
+  .mote.m2 { left: 40%; top: 90%; animation-duration: 17s; animation-delay: 3s; }
+  .mote.m3 { left: 62%; top: 86%; animation-duration: 12s; animation-delay: 6s; }
+  .mote.m4 { left: 30%; top: 95%; animation-duration: 19s; animation-delay: 1.5s; }
+  .mote.m5 { left: 74%; top: 92%; animation-duration: 15s; animation-delay: 8s; }
+  @keyframes mote-drift { to { transform: translateY(-90vh); opacity: 0; } }
+
+  /* armed by JS: services become outlined ghosts that light up one by one */
+  .rlab-armed .rw {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(91, 140, 255, 0.34);
+  }
+  .rlab-armed .rw::after {
+    content: attr(data-t);
+    position: absolute;
+    inset: 0;
+    color: var(--ink);
+    -webkit-text-stroke: 0;
+    text-shadow: 0 0 34px rgba(91, 140, 255, 0.55);
+    opacity: var(--on, 0);
+  }
+  .rlab-armed .rw-final::after { color: var(--blue); text-shadow: 0 0 44px rgba(91, 140, 255, 0.8); }
+  .rlab-armed .rlab-tail { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ra-live::before, .ra-glow { animation: none; }
+  .mote { display: none; }
+}

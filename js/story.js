@@ -291,6 +291,110 @@
     });
   }
 
+  /* ---------- THE ROBOT LAB: arm deploys the terminal, then the services ---------- */
+  var rlab = document.querySelector(".rlab");
+  if (rlab) {
+    rlab.classList.add("rlab-armed");
+    var rWords = rlab.querySelectorAll(".rw");
+    rWords.forEach(function (w) { w.setAttribute("data-t", w.textContent); });
+
+    var rArm = rlab.querySelector(".rarm");
+    var rSh = rlab.querySelector("#ra-shoulder");
+    var rFo = rlab.querySelector("#ra-fore");
+    var rHa = rlab.querySelector("#ra-hand");
+    var rLap = rlab.querySelector(".rlap");
+    var rLid = rlab.querySelector(".rlap-lid");
+    var rScr = rlab.querySelector(".rlap-screen");
+    var rBoot = rlab.querySelector(".rscr-boot");
+    var rBar = rlab.querySelector(".rb-bar u");
+    var rKpis = rlab.querySelectorAll(".ra-kpis > div");
+    var rRows = rlab.querySelectorAll(".ra-rows > div");
+    var rCaps = rlab.querySelectorAll(".rcap");
+    var rTail = rlab.querySelector(".rlab-tail");
+
+    /* joints rotate around their pins */
+    gsap.set(rSh, { svgOrigin: "836 450", rotation: 34 });
+    gsap.set(rFo, { svgOrigin: "500 262", rotation: -46 });
+    gsap.set(rHa, { svgOrigin: "268 470", rotation: 24 });
+    gsap.set(rArm, { xPercent: 42 });
+    gsap.set(rLap, { yPercent: 135, rotation: -3 });
+    gsap.set(rLid, { rotationX: -88 });
+    gsap.set([rKpis, rRows], { opacity: 0, y: 12 });
+
+    var rtl = gsap.timeline({
+      scrollTrigger: {
+        trigger: rlab,
+        start: "top top",
+        end: "+=420%",
+        pin: true,
+        scrub: 0.5,
+        invalidateOnRefresh: true
+      },
+      defaults: { ease: "none" }
+    });
+
+    /* 0–14%: the arm reaches in */
+    rtl.to(rArm, { xPercent: 0, duration: 8 }, 0)
+       .to(rSh, { rotation: -6, svgOrigin: "836 450", duration: 10 }, 0)
+       .to(rFo, { rotation: 14, svgOrigin: "500 262", duration: 10 }, 1)
+       .to(rHa, { rotation: -10, svgOrigin: "268 470", duration: 10 }, 2)
+       .to(rCaps[0], { opacity: 1, duration: 3 }, 1)
+
+       /* 10–18%: the terminal is placed */
+       .to(rLap, { yPercent: 0, rotation: 0, duration: 7, ease: "power1.out" }, 9)
+
+       /* 18–26%: the lid opens, the screen blooms */
+       .to(rLid, { rotationX: 0, duration: 8, ease: "power1.inOut" }, 17)
+       .to(rScr, { boxShadow: "0 0 90px rgba(91,140,255,0.4)", duration: 6 }, 21)
+       .to(rCaps[0], { opacity: 0, duration: 2 }, 20)
+
+       /* 24–34%: boot sequence */
+       .to(rBoot, { opacity: 1, duration: 2 }, 24)
+       .to(rCaps[1], { opacity: 1, duration: 3 }, 25)
+       .fromTo(rBar, { scaleX: 0 }, { scaleX: 1, duration: 6 }, 26)
+       .to(rBoot, { opacity: 0, duration: 3 }, 33)
+
+       /* 34–44%: the ERP is live */
+       .to(rKpis, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 35)
+       .to(rRows, { opacity: 1, y: 0, duration: 4, stagger: 1.2 }, 38)
+       .to(rCaps[1], { opacity: 0, duration: 2 }, 40)
+       .to(rCaps[2], { opacity: 1, duration: 3 }, 42.5)
+
+       /* 44–52%: the arm presents; the terminal steps aside */
+       .to(rSh, { rotation: -22, svgOrigin: "836 450", duration: 8 }, 44)
+       .to(rFo, { rotation: 36, svgOrigin: "500 262", duration: 8 }, 44)
+       .to(rHa, { rotation: 4, svgOrigin: "268 470", duration: 8 }, 44)
+       .to(rLap, { x: "-4%", scale: 0.94, duration: 8 }, 44)
+       .to(rCaps[2], { opacity: 0, duration: 2 }, 48)
+       .to(rCaps[3], { opacity: 1, duration: 3 }, 50);
+
+    /* 52–96%: the services light up, one by one */
+    var wStart = 52;
+    var wSlot = (96 - wStart) / rWords.length;
+    rWords.forEach(function (w, i) {
+      var at = wStart + i * wSlot;
+      rtl.to(w, { "--on": 1, duration: wSlot * 0.45 }, at);
+      if (i < rWords.length - 1) {
+        rtl.to(w, { "--on": 0, duration: wSlot * 0.4 }, at + wSlot * 0.62);
+      }
+    });
+
+    /* 94–100%: the invitation */
+    rtl.to(rTail, { opacity: 1, duration: 4 }, 95);
+
+    /* QA hook: ?lab=0.4 freezes the choreography at that progress. */
+    var labDbg = new URLSearchParams(location.search).get("lab");
+    if (labDbg !== null) {
+      rtl.scrollTrigger.kill(true);
+      rtl.progress(Math.min(Math.max(parseFloat(labDbg) || 0, 0), 1));
+      rlab.style.position = "fixed";
+      rlab.style.inset = "0";
+      rlab.style.zIndex = "90";
+      rlab.style.background = "var(--paper)";
+      document.body.style.overflow = "hidden";
+    }
+  }
+
   /* The filed invoice levitates once its entrance has played. */
   var fdoc = document.querySelector(".fbr-doc");
   if (fdoc) {
