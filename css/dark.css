@@ -274,3 +274,15 @@ body.home-dark > * { position: relative; z-index: 1; }
 .home-dark .ring-badge text { fill: var(--faint); }
 .home-dark .ring-badge .rb-core { box-shadow: 0 0 24px rgba(91, 140, 255, 0.5); }
 /* cursor blend modes removed: blending the cursor forced full-page recomposites */
+
+/* ---------- mobile nav dropdown: the panel was white with pale links ---------- */
+@media (max-width: 820px) {
+  .home-dark .nav-links {
+    background: rgba(6, 13, 31, 0.98);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.65);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .home-dark .nav-links li a { color: var(--ink); }
+  .home-dark .nav-links .nav-cta a { color: #fff; }
+}
