@@ -658,9 +658,9 @@ body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
   }
   .rlap {
     position: absolute;
-    left: 7%;
-    bottom: 9%;
-    width: clamp(400px, 37vw, 580px);
+    left: 5%;
+    bottom: 6%;
+    width: clamp(560px, 46vw, 780px);
     margin: 0;
     z-index: 1;
   }
@@ -729,3 +729,47 @@ body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
 
 /* when the 3D arm is live, the flat SVG arm in the lab stands down */
 body.has-arm3d .rarm { display: none !important; }
+
+/* ---------- module slides inside the laptop screen ---------- */
+.rslides { position: absolute; inset: 0; pointer-events: none; }
+.rslide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4%;
+  text-align: center;
+  background: #05090F;
+  opacity: 0; /* JS drives; without JS the dashboard stays on screen */
+  padding: 6%;
+}
+.rslide .rs-icon {
+  width: 17%;
+  aspect-ratio: 1;
+  border-radius: 18%;
+  display: grid;
+  place-items: center;
+  background: rgba(91, 140, 255, 0.14);
+  border: 1px solid rgba(91, 140, 255, 0.4);
+  box-shadow: 0 0 30px rgba(46, 91, 219, 0.35);
+}
+.rslide .rs-icon svg { width: 55%; height: 55%; stroke: #8FB3FF; fill: none; }
+.rslide h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2em;
+  letter-spacing: -0.01em;
+  color: #E8EFFC;
+}
+.rslide p { font-size: 1.05em; color: #93A5CC; max-width: 34em; line-height: 1.5; }
+.rslide .rs-no {
+  position: absolute;
+  top: 5%;
+  right: 6%;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  letter-spacing: 0.18em;
+  color: #4B5B85;
+}

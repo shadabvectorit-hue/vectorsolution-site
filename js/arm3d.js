@@ -132,27 +132,50 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
     wrist.position.x = L2;
     wrist.add(joint(0.3));
 
-    var palm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.42, 0.34), SILVER);
+    var palm = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.16, 0.46), SILVER);
     palm.position.x = 0.42;
     hand.add(palm);
-    /* three fingers: two above, one thumb below — each a 2-segment claw */
-    [[0.13, 0.11], [0.13, -0.11], [-0.16, 0]].forEach(function (fp, i) {
+    /* five fingers: pinky to index along the edge, plus an opposable thumb —
+       each finger is two segments; curl bends both, the index can stay
+       extended for a pointing gesture */
+    var F = [
+      { z: -0.165, len: 0.30, index: false },
+      { z: -0.055, len: 0.37, index: false },
+      { z: 0.055,  len: 0.39, index: false },
+      { z: 0.165,  len: 0.35, index: true }
+    ];
+    F.forEach(function (fp) {
       var f = new THREE.Group();
-      f.position.set(0.62, fp[0], fp[1]);
-      var seg1 = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.09, 0.1), SILVER);
-      seg1.position.x = 0.17;
-      f.add(seg1);
-      var knuckle = new THREE.Group();
-      knuckle.position.x = 0.34;
-      var seg2 = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.075, 0.09), GRAPHITE);
-      seg2.position.x = 0.13;
-      knuckle.add(seg2);
-      f.add(knuckle);
-      f.userData.knuckle = knuckle;
-      f.userData.dir = i === 2 ? -1 : 1;
+      f.position.set(0.62, 0, fp.z);
+      var l1 = fp.len * 0.55, l2 = fp.len * 0.45;
+      var s1 = new THREE.Mesh(new THREE.BoxGeometry(l1, 0.085, 0.082), SILVER);
+      s1.position.x = l1 / 2;
+      f.add(s1);
+      var kn = new THREE.Group();
+      kn.position.x = l1;
+      var s2 = new THREE.Mesh(new THREE.BoxGeometry(l2, 0.075, 0.074), GRAPHITE);
+      s2.position.x = l2 / 2;
+      kn.add(s2);
+      f.add(kn);
+      f.userData = { knuckle: kn, dir: 1, index: fp.index };
       fingers.push(f);
       hand.add(f);
     });
+    var th = new THREE.Group();
+    th.position.set(0.3, -0.03, 0.25);
+    th.rotation.x = -0.95; /* the thumb folds across the palm, opposing the fingers */
+    var t1 = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.09, 0.088), SILVER);
+    t1.position.x = 0.12;
+    th.add(t1);
+    var tkn = new THREE.Group();
+    tkn.position.x = 0.24;
+    var t2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.08, 0.078), GRAPHITE);
+    t2.position.x = 0.1;
+    tkn.add(t2);
+    th.add(tkn);
+    th.userData = { knuckle: tkn, dir: -1, index: false };
+    fingers.push(th);
+    hand.add(th);
     var tip = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), GLOWBLUE);
     tip.position.x = 0.66;
     hand.add(tip);
@@ -204,12 +227,12 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
 
   /* ---------- beats: which element the hand is reaching for ---------- */
   var BEATS = [
-    { sel: ".p-hero",      el: null,                      grip: 0.5, roll: 0.0 },
-    { sel: ".oldway",      el: ".oldway-line",            grip: 0.35, roll: 0.1, dx: 60, dy: 20 },
-    { sel: ".rlab",        el: ".rlap-screen",            grip: 0.75, roll: 0.25, dx: 40, dy: -20 },
-    { sel: "#modules",     el: "#modules .section-head h2", grip: 0.3, roll: -0.9, dx: 80, dy: 10 },
-    { sel: ".fbr-cinema",  el: ".fbr-doc",                grip: 0.3, roll: 0.45, dx: 30, dy: -10 },
-    { sel: ".cta-band",    el: ".cta-band .btn-primary",  grip: 0.02, roll: 0.0, dx: 10, dy: -6 }
+    { sel: ".p-hero",     el: null,                     grip: 0.3,  point: 0, roll: 0.0 },
+    { sel: ".oldway",     el: ".oldway-line",           grip: 0.25, point: 0, roll: 0.1,  dx: 60, dy: 20 },
+    { sel: ".rlab",       el: ".rlap-screen",           grip: 0.5,  point: 1, roll: 0.2,  dx: 50, dy: -10 },
+    { sel: ".counters",   el: ".counters .counter",     grip: 0.45, point: 1, roll: -0.5, dx: 70, dy: 0 },
+    { sel: ".fbr-cinema", el: ".fbr-doc",               grip: 0.3,  point: 0, roll: 0.4,  dx: 30, dy: -10 },
+    { sel: ".cta-band",   el: ".cta-band .btn-primary", grip: 0.65, point: 0, roll: 0.0,  dx: 10, dy: -6 }
   ];
   var beat = 0;                       /* float 0..5, written by ScrollTriggers */
   BEATS.forEach(function (b, i) {
@@ -226,7 +249,7 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
   });
 
   /* ---------- pose state, lerped every frame ---------- */
-  var cur = { sh: 1.7, el: -2.3, wrAim: 0.4, roll: 0, grip: 0.5, rise: 0, rx: 0, ry: 0 };
+  var cur = { sh: 1.7, el: -2.3, wrAim: 0.4, roll: 0, grip: 0.5, point: 0, rise: 0, rx: 0, ry: 0 };
   var smooth = function (a, b, k) { return a + (b - a) * k; };
 
   function anchor() {
@@ -279,6 +302,7 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
     }
     var tGrip = smooth(A.grip, B.grip, f);
     var tRoll = smooth(A.roll, B.roll, f);
+    var tPoint = smooth(A.point || 0, B.point || 0, f);
 
     var k = Math.min(1, dt * 5.5);
     cur.sh = smooth(cur.sh, tSh, k);
@@ -286,6 +310,7 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
     cur.wrAim = smooth(cur.wrAim, tAim, k);
     cur.roll = smooth(cur.roll, tRoll, k);
     cur.grip = smooth(cur.grip, tGrip, k);
+    cur.point = smooth(cur.point, tPoint, k);
     cur.rise = smooth(cur.rise, rise, Math.min(1, dt * 3));
     cur.rx = base.x;
     cur.ry = base.y;
@@ -306,9 +331,11 @@ import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
     wrist.rotation.z = cur.wrAim;
     wrist.rotation.x = cur.roll;
     fingers.forEach(function (fg) {
-      var open = 0.15 + cur.grip * 0.55;
-      fg.rotation.z = fg.userData.dir * open;
-      fg.userData.knuckle.rotation.z = -fg.userData.dir * open * 1.2;
+      var closure = cur.grip;
+      if (fg.userData.index) { closure *= (1 - cur.point); }
+      var a = 0.1 + closure * 1.15;
+      fg.rotation.z = -a * 0.8 * fg.userData.dir;
+      fg.userData.knuckle.rotation.z = -a * 1.1 * fg.userData.dir;
     });
 
     renderer.render(scene, camera);

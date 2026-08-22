@@ -270,27 +270,6 @@
     });
   });
 
-  /* ---------- modules: vertical scroll drives a horizontal row ---------- */
-  var modSec = document.getElementById("modules");
-  if (modSec) {
-    modSec.classList.add("hscrub");
-    var track = modSec.querySelector(".modules");
-    gsap.to(track, {
-      x: function () { return -(track.scrollWidth - modSec.clientWidth + 60); },
-      /* scrub distance is 0.55x the travel: the row moves faster than the page,
-         so the pin never reads as "scrolling stopped" */
-      ease: "none",
-      scrollTrigger: {
-        trigger: modSec,
-        start: "top top",
-        end: function () { return "+=" + Math.round((track.scrollWidth - modSec.clientWidth) * 0.55 + 200); },
-        pin: true,
-        scrub: 0.5,
-        invalidateOnRefresh: true
-      }
-    });
-  }
-
   /* ---------- THE ROBOT LAB: arm deploys the terminal, then the services ---------- */
   var rlab = document.querySelector(".rlab");
   if (rlab) {
@@ -321,11 +300,26 @@
     gsap.set(rLid, { rotationX: -88 });
     gsap.set([rKpis, rRows], { opacity: 0, y: 12 });
 
+    var slidesWrap = rlab.querySelector(".rslides");
+    var slides = [];
+    document.querySelectorAll("#modules .module").forEach(function (m, i, all) {
+      if (!slidesWrap) { return; }
+      var d = document.createElement("div");
+      d.className = "rslide";
+      var icon = m.querySelector(".m-icon svg");
+      d.innerHTML = '<span class="rs-no">' + String(i + 1).padStart(2, "0") + " / " + all.length + "</span>" +
+        '<span class="rs-icon">' + (icon ? icon.outerHTML : "") + "</span>" +
+        "<h4>" + m.querySelector("h3").textContent + "</h4>" +
+        "<p>" + m.querySelector("p").textContent + "</p>";
+      slidesWrap.appendChild(d);
+      slides.push(d);
+    });
+
     var rtl = gsap.timeline({
       scrollTrigger: {
         trigger: rlab,
         start: "top top",
-        end: "+=420%",
+        end: "+=560%",
         pin: true,
         scrub: 0.5,
         invalidateOnRefresh: true
@@ -360,16 +354,28 @@
        .to(rCaps[1], { opacity: 0, duration: 2 }, 40)
        .to(rCaps[2], { opacity: 1, duration: 3 }, 42.5)
 
-       /* 44–52%: the arm presents; the terminal steps aside */
-       .to(rSh, { rotation: -22, svgOrigin: "836 450", duration: 8 }, 44)
-       .to(rFo, { rotation: 36, svgOrigin: "500 262", duration: 8 }, 44)
-       .to(rHa, { rotation: 4, svgOrigin: "268 470", duration: 8 }, 44)
-       .to(rLap, { x: "-4%", scale: 0.94, duration: 8 }, 44)
-       .to(rCaps[2], { opacity: 0, duration: 2 }, 48)
-       .to(rCaps[3], { opacity: 1, duration: 3 }, 50);
+       /* 44–45%: captions hand over to capabilities */
+       .to(rCaps[2], { opacity: 0, duration: 2 }, 44)
+       .to(rCaps[3], { opacity: 1, duration: 3 }, 45);
+
+    /* 45–70%: the module series plays INSIDE the laptop screen */
+    if (slides.length) {
+      var slot = 25 / slides.length;
+      slides.forEach(function (s, i) {
+        var t = 45 + i * slot;
+        rtl.to(s, { opacity: 1, duration: 0.6 }, t)
+           .to(s, { opacity: 0, duration: 0.6 }, t + slot - 0.6);
+      });
+    }
+
+    /* 70–78%: the arm presents; the terminal steps aside for the big words */
+    rtl.to(rSh, { rotation: -22, svgOrigin: "836 450", duration: 6 }, 70)
+       .to(rFo, { rotation: 36, svgOrigin: "500 262", duration: 6 }, 70)
+       .to(rHa, { rotation: 4, svgOrigin: "268 470", duration: 6 }, 70)
+       .to(rLap, { x: "-4%", scale: 0.94, duration: 6 }, 70);
 
     /* 52–96%: the services light up, one by one */
-    var wStart = 52;
+    var wStart = 78;
     var wSlot = (96 - wStart) / rWords.length;
     rWords.forEach(function (w, i) {
       var at = wStart + i * wSlot;
