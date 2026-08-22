@@ -34,11 +34,11 @@ function vit_kb_facts(): array {
         'bases'    => 'Austin, USA and Karachi, Pakistan',
         'modules'  => 'Accounting, FBR digital invoicing, Inventory, POS, CRM, HR & Payroll',
         'plans'    => [
-            ['name' => 'Starter · Dukaan',    'price' => 'Rs 1,999 per user / month', 'terms' => 'minimum 2 users, billed yearly',
+            ['name' => 'Starter · Dukaan',    'price' => 'Rs 4,999 per user / month', 'terms' => 'minimum 2 users, billed yearly',
              'for'  => 'shops and small traders moving off registers and Excel',
              'has'  => 'Accounting & invoicing, Inventory (1 location), Point of Sale, WhatsApp support in business hours',
              'not'  => 'CRM, HR & Payroll and FBR e-invoicing are NOT in Starter'],
-            ['name' => 'Business · Karobar',  'price' => 'Rs 3,499 per user / month', 'terms' => 'minimum 3 users, billed yearly',
+            ['name' => 'Business · Karobar',  'price' => 'Rs 9,999 per user / month', 'terms' => 'minimum 3 users, billed yearly',
              'for'  => 'growing businesses with a team, a godown and a tax file',
              'has'  => 'everything in Starter plus multi-warehouse inventory, sales & CRM pipeline, HR/attendance/payroll, FBR e-invoicing integration, priority WhatsApp support 7 days',
              'not'  => ''],
@@ -110,7 +110,7 @@ PRICING — these are the only prices you may ever state
 {$f['included']}
 
 THE ONE PRICING MISTAKE THAT MATTERS
-FBR e-invoicing is NOT in the Starter plan. A shop that needs FBR digital invoicing needs Business (Rs 3,499) or Enterprise. If someone on a Starter budget asks about FBR, say plainly that FBR invoicing starts at the Business plan — do not soften it and do not imply Starter covers it. Telling them otherwise wins the conversation and loses the customer when they find out. CRM, HR and Payroll are likewise Business and above.
+FBR e-invoicing is NOT in the Starter plan. A shop that needs FBR digital invoicing needs Business (Rs 9,999) or Enterprise. If someone on a Starter budget asks about FBR, say plainly that FBR invoicing starts at the Business plan — do not soften it and do not imply Starter covers it. Telling them otherwise wins the conversation and loses the customer when they find out. CRM, HR and Payroll are likewise Business and above.
 
 THE DEMO
 Anyone can open {$f['demo']} with no sign-up and no form. They pick the counter closest to their business ({$f['demo_tracks']}), type their own business name, and it prints on a real sales tax invoice. Recommend it early — it converts far better than description.

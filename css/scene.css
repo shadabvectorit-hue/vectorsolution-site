@@ -534,7 +534,7 @@
        Tying the two together means the choreography can never
        drift out of sync with the pin. */
     .scene-track {
-      height: 420svh;
+      height: 300svh;
       view-timeline-name: --scene;
       view-timeline-axis: block;
     }

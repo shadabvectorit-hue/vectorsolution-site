@@ -118,7 +118,7 @@
      anchors:true makes same-page #links scroll through Lenis instead of
      fighting it — without it, clicking "Pricing" in the nav snaps back. */
   if (typeof window.Lenis !== "undefined") {
-    var lenis = new Lenis({ lerp: 0.12, anchors: true });
+    var lenis = new Lenis({ lerp: 0.25, anchors: true });
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
     gsap.ticker.lagSmoothing(0);
