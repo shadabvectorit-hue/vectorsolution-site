@@ -726,3 +726,6 @@ body.has-cursor, body.has-cursor a, body.has-cursor button { cursor: none; }
   .ra-live::before, .ra-glow { animation: none; }
   .mote { display: none; }
 }
+
+/* when the 3D arm is live, the flat SVG arm in the lab stands down */
+body.has-arm3d .rarm { display: none !important; }
