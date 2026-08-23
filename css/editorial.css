@@ -228,6 +228,108 @@ body.editorial {
 .ed-collab .ed-links a:hover { color: var(--blue); border-color: var(--blue); }
 .ed-collab .ed-links .arrow { font-family: var(--serif); font-size: 1.6em; color: var(--blue); border: 0; }
 
+/* ---------- laptop chapter: the demo playing screen by screen ---------- */
+/* Tall section; the inner pin stays stuck while scroll drives the slides. */
+.ed-lab { height: 520svh; border-top: 1px solid var(--line); }
+.ed-lab-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.ed-lab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: center;
+  /* no width here — .wrap's own min() width must survive, or the grid goes full-bleed */
+  flex: 0 0 auto;
+}
+.ed-laptop { margin: 0; min-width: 0; }
+.ed-lap-lid {
+  border: 2px solid var(--ink);
+  border-bottom-width: 0;
+  border-radius: 14px 14px 0 0;
+  padding: clamp(8px, 1vw, 14px);
+  background: var(--ink);
+}
+.ed-lap-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+}
+.ed-lap-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transform: scale(1.015);
+  transition: opacity 0.45s ease, transform 0.6s ease;
+}
+.ed-lap-screen img.on { opacity: 1; transform: scale(1); }
+.ed-lap-base {
+  height: clamp(10px, 1.2vw, 16px);
+  background: var(--ink);
+  border-radius: 0 0 14px 14px;
+  margin: 0 -2.5%;
+}
+.ed-lab-names { min-width: 0; }
+.ed-lab-names ol {
+  list-style: none;
+  margin: 22px 0 26px;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.ed-lab-names li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line-soft);
+  counter-increment: labname;
+  opacity: 0.34;
+  transform: translateX(0);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.ed-lab-names li::before {
+  content: counter(labname, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+.ed-lab-names li b {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 1.7vw, 1.45rem);
+  white-space: nowrap;
+}
+.ed-lab-names li span {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.ed-lab-names li.on { opacity: 1; transform: translateX(10px); }
+.ed-lab-names li.on b { font-style: italic; color: var(--blue); }
+.ed-lab-names li.on span { opacity: 1; }
+.ed-lab-names li.seen { opacity: 0.72; }
+.ed-lab-now { display: none; }
+.ed-lab-cta { display: inline-block; }
+.ed-lab-cta::after { transform: scaleX(1); }
+.ed-lab-cta:hover { color: var(--blue); }
+
 /* editorial passes over shared components */
 .editorial .plan, .editorial .card, .editorial .compare, .editorial .faq details {
   background: transparent;
@@ -246,8 +348,23 @@ body.editorial {
   .ed-row-img { display: block; grid-column: 1 / -1; border-radius: 6px; border: 1px solid var(--line); width: 100%; }
   .ed-nums { grid-template-columns: 1fr 1fr; }
   .ed-mods { columns: 1; }
+  /* laptop chapter: full-width laptop, one live caption instead of the list */
+  .ed-lab { height: 420svh; }
+  .ed-lab-grid { grid-template-columns: 1fr; gap: 20px; align-content: center; }
+  .ed-lab-names ol { display: none; }
+  .ed-lab-cta { display: inline-block; } /* survives the .ed-view mobile hide */
+  .ed-lab-now {
+    display: block;
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 6vw, 2.1rem);
+    font-style: italic;
+    color: var(--blue);
+    margin: 4px 0 10px;
+    min-height: 1.3em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ed-title, .ed-view::after { transition: none; }
+  .ed-lap-screen img, .ed-lab-names li, .ed-lab-names li span { transition: none; }
 }

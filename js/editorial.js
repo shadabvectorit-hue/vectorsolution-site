@@ -59,4 +59,45 @@
       });
     });
   }
+
+  /* ---------- laptop chapter: scroll drives the demo screens ---------- */
+  /* The section is tall; the pin sticks; progress through the section picks
+   * the slide. Native scroll only — no lerp, no scroll hijack. */
+  var lab = document.querySelector(".ed-lab");
+  if (lab) {
+    var slides = lab.querySelectorAll(".ed-lap-screen img");
+    var names = lab.querySelectorAll(".ed-lab-names li");
+    var now = lab.querySelector(".ed-lab-now");
+    var current = -1, waiting = false;
+
+    var setSlide = function (i) {
+      if (i === current) { return; }
+      current = i;
+      slides.forEach(function (im, k) { im.classList.toggle("on", k === i); });
+      names.forEach(function (li, k) {
+        li.classList.toggle("on", k === i);
+        li.classList.toggle("seen", k < i);
+      });
+      if (now && names[i]) {
+        now.textContent = names[i].querySelector("b").textContent;
+      }
+    };
+
+    var onScroll = function () {
+      if (waiting) { return; }
+      waiting = true;
+      requestAnimationFrame(function () {
+        waiting = false;
+        var r = lab.getBoundingClientRect();
+        var span = r.height - window.innerHeight;
+        if (span <= 0) { setSlide(0); return; }
+        var p = Math.min(0.999, Math.max(0, -r.top / span));
+        setSlide(Math.floor(p * slides.length));
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
+  }
 })();
