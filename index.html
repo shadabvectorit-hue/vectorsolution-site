@@ -20,11 +20,10 @@
   <meta property="og:locale" content="en_US">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css?v=20260809b">
   <link rel="stylesheet" href="css/product.css?v=20260809a">
-  <link rel="stylesheet" href="css/story.css?v=20260823h">
-  <link rel="stylesheet" href="css/dark.css?v=20260823g">
+  <link rel="stylesheet" href="css/editorial.css?v=20260823a">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -126,7 +125,7 @@
   }
   </script>
 </head>
-<body class="home-dark">
+<body class="editorial">
 
   <header class="site-header">
     <div class="wrap nav-bar">
@@ -159,582 +158,108 @@
   </header>
 
   <main>
-    <!-- ============ PRODUCT HERO ============ -->
-    <section class="p-hero">
-      <div class="ghost-type" aria-hidden="true">VECTOR<br>ERP</div>
-      <svg class="plotter" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-        <circle data-draw cx="30" cy="34" r="8" stroke="#2E5BDB" stroke-width="3"/>
-        <path data-draw d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path data-draw d="M91 32 L91.6 50.3 L75.6 42.1 Z" stroke="#2E5BDB" stroke-width="3" stroke-linejoin="round"/>
-      </svg>
-      <div class="wrap p-hero-grid">
-        <div>
-          <p class="hero-eyebrow"><span class="dot"></span> VectorERP · Austin, TX &amp; Karachi</p>
-          <h1 class="kin"><span class="w">Run</span> <span class="w">your</span> <span class="w">whole</span> <span class="w">business</span> <span class="w">on</span> <span class="w" style="color:var(--blue)">one&nbsp;screen.</span></h1>
-          <p class="urdu" style="font-size:1.15rem;color:var(--faint);margin-bottom:18px">آپ کا کاروبار، آپ کا کنٹرول — ایک اسکرین پر</p>
-          <p class="lede">Accounting, FBR-ready invoicing, inventory, sales, and payroll — in one platform your team learns in a day. Deployed for enterprises serving OGDC, PPL and Engro, and for shops on a single counter.</p>
-          <div class="hero-ctas">
-            <a class="btn btn-primary" href="/contact">Book a free demo
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
-            </a>
-            <a class="btn btn-ghost" href="demo/">Try the live demo →</a>
-          </div>
-          <p style="margin-top:20px;font-size:.88rem;color:var(--muted)">Built on the same engine as the <strong style="color:var(--ink)">dual-entity ERP we run for GenCom Compression Services</strong> across Karachi and Dubai — plus systems live at <strong style="color:var(--ink)">Karachi Institute of Heart Diseases</strong> and <strong style="color:var(--ink)">Prime Nexus Logistics</strong> (Austin, TX). <a href="/work" style="color:var(--blue);font-weight:600">See the case studies →</a></p>
-          <div class="replaces">
-            <b>Replaces</b>
-            <span>Excel registers</span><span>Separate accounting software</span><span>WhatsApp order lists</span><span>The diary on the counter</span>
-          </div>
-          <p class="hero-cue">Scroll — the story draws itself</p>
-        </div>
-        <a class="ring-badge" href="demo/" aria-label="Open the live demo — no sign-up">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <defs><path id="rb-circle" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
-            <text><textPath href="#rb-circle">OPEN THE LIVE DEMO · NO SIGN-UP · FREE ·&#160;</textPath></text>
-          </svg>
-          <span class="rb-core" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
+    <!-- ============ EDITORIAL HERO ============ -->
+    <section class="ed-hero">
+      <div class="wrap">
+        <h1>
+          <span class="ed-line"><span>Software that</span></span>
+          <span class="ed-line"><span>runs your <em>whole</em></span></span>
+          <span class="ed-line"><span>business — counter</span></span>
+          <span class="ed-line"><span>to <em>FBR</em> — on</span></span>
+          <span class="ed-line"><span>one screen.</span></span>
+        </h1>
+        <p class="ed-scroll-cue">SCROLL TO EXPLORE</p>
+      </div>
+    </section>
+
+    <!-- ============ THE INDEX ============ -->
+    <section class="ed-index" aria-label="What we build">
+      <div class="wrap">
+        <a class="ed-row" href="demo/" data-preview="assets/previews/erp.png">
+          <span class="ed-no">01</span>
+          <span>
+            <span class="ed-title">VectorERP</span>
+            <span class="ed-tags"><span>Accounting</span><span>Inventory</span><span>CRM</span><span>Payroll</span></span>
+            <img class="ed-row-img" src="assets/previews/erp.png" alt="VectorERP dashboard — live demo" loading="lazy">
           </span>
+          <span class="ed-view">OPEN THE LIVE DEMO</span>
         </a>
-
-        <!-- dashboard mockup -->
-        <div class="mock-wrap reveal tilt3d">
-          <div class="float-card fc-1">
-            <div class="f-label">Cash position</div>
-            <div class="f-val">Rs 12,84,500 <em>▲ 8.2%</em></div>
-          </div>
-          <div class="float-card fc-2">
-            <div class="f-label">FBR e-invoice</div>
-            <div class="f-val" style="color:#178A50">✓ Submitted</div>
-          </div>
-          <div class="browser" role="img" aria-label="VectorERP dashboard preview">
-            <div class="browser-top">
-              <i></i><i></i><i></i>
-              <span class="browser-url"><b>🔒</b> app.vectorsolution.it/dashboard</span>
-            </div>
-            <div class="app">
-              <div class="app-side">
-                <span class="app-logo">
-                  <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#5B8CFF"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#5B8CFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#5B8CFF"/></svg>
-                  VectorERP
-                </span>
-                <span class="side-item active"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboard</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg> Accounting</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 3h9l4 4v14H6zM14 3v5h5"/></svg> Invoices</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg> Inventory</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M16 21v-2a4 4 0 00-8 0v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg> Sales / CRM</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> HR &amp; Payroll</span>
-                <span class="side-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3v18h18M8 16v-5M13 16V8M18 16v-9"/></svg> Reports</span>
-              </div>
-              <div class="app-main">
-                <div class="app-topbar">
-                  <div>
-                    <div class="t-title">Good morning, Shadab</div>
-                    <div class="t-sub">SAT 02 AUG · KARACHI HQ</div>
-                  </div>
-                  <div class="app-user"><span class="avatar">MS</span> Muhammad S.</div>
-                </div>
-                <div class="kpis">
-                  <div class="kpi"><div class="k-label">Sales (Aug)</div><div class="k-val">Rs 42,60,000</div><div class="k-delta up">▲ 12.4% vs Jul</div></div>
-                  <div class="kpi"><div class="k-label">Receivables</div><div class="k-val">Rs 9,15,200</div><div class="k-delta down">14 invoices due</div></div>
-                  <div class="kpi"><div class="k-label">Stock value</div><div class="k-val">Rs 1.86 Cr</div><div class="k-delta up">3 warehouses</div></div>
-                  <div class="kpi"><div class="k-label">Orders today</div><div class="k-val">37</div><div class="k-delta up">▲ 9 since 11am</div></div>
-                </div>
-                <div class="panel">
-                  <div class="p-title">Recent invoices <span>View all →</span></div>
-                  <table class="mini-table">
-                    <thead><tr><th>Invoice</th><th>Customer</th><th class="num">Amount</th><th>Status</th></tr></thead>
-                    <tbody>
-                      <tr><td>INV-2041</td><td>Karachi Textiles</td><td class="num">Rs 3,85,000</td><td><span class="pill paid">Paid</span></td></tr>
-                      <tr><td>INV-2040</td><td>Indus Foods (Pvt)</td><td class="num">Rs 1,42,600</td><td><span class="pill due">Due 05 Aug</span></td></tr>
-                      <tr><td>INV-2039</td><td>Sialkot Sports Co.</td><td class="num">Rs 6,90,150</td><td><span class="pill paid">Paid</span></td></tr>
-                      <tr><td>INV-2038</td><td>Multan Traders</td><td class="num">Rs 88,400</td><td><span class="pill overdue">Overdue</span></td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="ed-row" href="/fbr" data-preview="assets/previews/fbr.png">
+          <span class="ed-no">02</span>
+          <span>
+            <span class="ed-title">FBR Digital Invoicing</span>
+            <span class="ed-tags"><span>SRO 69(I)/2025</span><span>QR on every invoice</span><span>72-hour window</span></span>
+            <img class="ed-row-img" src="assets/previews/fbr.png" alt="FBR digital invoicing integration" loading="lazy">
+          </span>
+          <span class="ed-view">VIEW SERVICE</span>
+        </a>
+        <a class="ed-row" href="demo/index.php?track=pos" data-preview="assets/previews/pos.png">
+          <span class="ed-no">03</span>
+          <span>
+            <span class="ed-title">Point of Sale</span>
+            <span class="ed-tags"><span>Retail</span><span>Restaurant — SRB</span><span>Pharmacy — FEFO</span></span>
+            <img class="ed-row-img" src="assets/previews/pos.png" alt="VectorERP point of sale" loading="lazy">
+          </span>
+          <span class="ed-view">TRY THE TILL</span>
+        </a>
+        <a class="ed-row" href="/services" data-preview="assets/previews/work.png">
+          <span class="ed-no">04</span>
+          <span>
+            <span class="ed-title">Custom Software</span>
+            <span class="ed-tags"><span>Web &amp; mobile</span><span>Integrations</span><span>Legacy rescue</span></span>
+            <img class="ed-row-img" src="assets/previews/work.png" alt="Custom software case studies" loading="lazy">
+          </span>
+          <span class="ed-view">SEE SERVICES</span>
+        </a>
+        <a class="ed-row" href="/blog/" data-preview="assets/previews/blog.png">
+          <span class="ed-no">05</span>
+          <span>
+            <span class="ed-title">FBR Answers</span>
+            <span class="ed-tags"><span>Deadlines</span><span>Penalties</span><span>Sourced</span></span>
+            <img class="ed-row-img" src="assets/previews/blog.png" alt="FBR Answers — the VectorIT blog" loading="lazy">
+          </span>
+          <span class="ed-view">READ THE BLOG</span>
+        </a>
+      </div>
+      <div class="ed-preview" aria-hidden="true">
+        <img data-for="assets/previews/erp.png" src="assets/previews/erp.png" alt="">
+        <img data-for="assets/previews/fbr.png" src="assets/previews/fbr.png" alt="">
+        <img data-for="assets/previews/pos.png" src="assets/previews/pos.png" alt="">
+        <img data-for="assets/previews/work.png" src="assets/previews/work.png" alt="">
+        <img data-for="assets/previews/blog.png" src="assets/previews/blog.png" alt="">
       </div>
     </section>
 
-    <!-- ============ WORK MARQUEE ============ -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee-track">
-        <div class="marquee-row">
-          <span>GenCom Compression Services — dual-entity ERP</span>
-          <span>Karachi Institute of Heart Diseases</span>
-          <span>Prime Nexus Logistics · Austin, TX</span>
-          <span>FBR digital invoicing — live</span>
-          <span>VB6-to-web legacy rescue</span>
-          <span>Hospital booking portal</span>
-          <span>Field-staff expense app · PK &amp; Dubai</span>
-        </div>
-        <div class="marquee-row">
-          <span>GenCom Compression Services — dual-entity ERP</span>
-          <span>Karachi Institute of Heart Diseases</span>
-          <span>Prime Nexus Logistics · Austin, TX</span>
-          <span>FBR digital invoicing — live</span>
-          <span>VB6-to-web legacy rescue</span>
-          <span>Hospital booking portal</span>
-          <span>Field-staff expense app · PK &amp; Dubai</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ THE OLD WAY, STRUCK OUT ============ -->
-    <section class="oldway" id="oldway" aria-label="What VectorERP replaces">
+    <!-- ============ MODULES, PRINTED ============ -->
+    <section class="ed-band" id="modules">
       <div class="wrap">
-        <p class="oldway-line">
-          <span class="strike">Excel registers.<i></i></span>
-          <span class="strike">The counter diary.<i></i></span>
-          <span class="strike">WhatsApp order lists.<i></i></span>
-          <span class="strike">Loose parchis.<i></i></span>
-          <span class="strike">Five softwares.<i></i></span>
-          <span class="keep">One screen.</span>
-        </p>
-        <p class="after">Every one of them almost works — until the day they disagree with each other. Keep scrolling: this is what replacing the pile actually looks like.</p>
-      </div>
-    </section>
-    <!-- ============ THE ROBOT LAB ============ -->
-    <section class="rlab" id="lab" aria-labelledby="rlab-h">
-      <h2 id="rlab-h" class="sr-only">A robotic arm deploys VectorERP, then presents everything we build</h2>
-      <div class="rlab-pin">
-        <div class="rlab-stage">
-
-
-
-          <div class="rlap" aria-hidden="true">
-            <div class="rlap-lid">
-              <div class="rlap-screen">
-                <div class="rscr-app">
-                  <div class="ra-top">
-                    <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#5B8CFF"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#5B8CFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#5B8CFF"/></svg>
-                    <b>Vector<em>ERP</em></b>
-                    <span class="ra-live">LIVE</span>
-                  </div>
-                  <div class="ra-kpis">
-                    <div><i>Sales — Aug</i><b>Rs 42,60,000</b></div>
-                    <div><i>Receivables</i><b>Rs 9,15,200</b></div>
-                    <div><i>Stock</i><b>Rs 1.86 Cr</b></div>
-                  </div>
-                  <div class="ra-rows">
-                    <div><span>INV-2041 · Karachi Textiles</span><em class="ok">FBR ✓</em></div>
-                    <div><span>INV-2040 · Indus Foods</span><em class="due">DUE</em></div>
-                    <div><span>INV-2039 · Sialkot Sports</span><em class="ok">FBR ✓</em></div>
-                  </div>
-                </div>
-                <div class="rscr-boot">
-                  <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#5B8CFF"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#5B8CFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#5B8CFF"/></svg>
-                  <span>VectorERP</span>
-                  <i class="rb-bar"><u></u></i>
-                </div>
-                <div class="rslides" aria-hidden="true"></div>
-                <div class="rlap-glare"></div>
-              </div>
-            </div>
-            <div class="rlap-base"></div>
-          </div>
-
-          <div class="rwords">
-            <span class="rw">Accounting</span>
-            <span class="rw">Invoicing</span>
-            <span class="rw">Inventory</span>
-            <span class="rw">Sales&nbsp;&amp;&nbsp;CRM</span>
-            <span class="rw">Purchases</span>
-            <span class="rw">Point&nbsp;of&nbsp;Sale</span>
-            <span class="rw">HR&nbsp;&amp;&nbsp;Payroll</span>
-            <span class="rw">Manufacturing</span>
-            <span class="rw">Projects</span>
-            <span class="rw">E-commerce</span>
-            <span class="rw">Reports</span>
-            <span class="rw">Helpdesk</span>
-            <span class="rw rw-final">+&nbsp;Custom&nbsp;Software</span>
-          </div>
-          <p class="rlab-tail">Anything your business needs — <a href="/services">see every service</a> or <a href="demo/">open the live demo</a>.</p>
-
-          <div class="rlab-caps" aria-hidden="true">
-            <span class="rcap">UNIT 01 — DEPLOYING TERMINAL</span>
-            <span class="rcap">BOOT — VECTORERP OS</span>
-            <span class="rcap">LIVE — YOUR BUSINESS, ONE SCREEN</span>
-            <span class="rcap">CAPABILITIES —</span>
-          </div>
-
-          <i class="mote m1"></i><i class="mote m2"></i><i class="mote m3"></i><i class="mote m4"></i><i class="mote m5"></i>
+        <p class="ed-kicker">EVERY DEPARTMENT — ONE DATABASE</p>
+        <h2 class="sr-only">Accounting to Point of Sale. Actually connected.</h2>
+        <div class="ed-mods">
+          <div><b>Accounting</b><span>double-entry ledger, bank reconciliation, tax reports</span></div>
+          <div><b>Invoicing</b><span>FBR-ready sales tax invoices with QR, sent by WhatsApp</span></div>
+          <div><b>Inventory</b><span>live stock across godowns, batch &amp; expiry</span></div>
+          <div><b>Sales &amp; CRM</b><span>leads, follow-ups, quotations in a pipeline</span></div>
+          <div><b>Purchases</b><span>POs, supplier ledgers, landed cost</span></div>
+          <div><b>Point of Sale</b><span>fast counter billing, offline-tolerant</span></div>
+          <div><b>HR &amp; Payroll</b><span>attendance, advances, EOBI, salary slips</span></div>
+          <div><b>Manufacturing</b><span>BOMs, production orders, wastage</span></div>
+          <div><b>Projects</b><span>tasks, timelines, billing for services</span></div>
+          <div><b>E-commerce</b><span>Daraz and website orders in the same stock</span></div>
+          <div><b>Reports</b><span>P&amp;L, aging, valuation — live, not month-end</span></div>
+          <div><b>Helpdesk</b><span>complaints tracked to resolution</span></div>
         </div>
       </div>
     </section>
 
-    <!-- ============ CORPORATE CREDENTIALS ============ -->
-    <section style="border-block:1px solid var(--line-soft);background:var(--card)">
-      <div class="wrap" style="display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,3vw,40px);padding-block:26px">
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px">Registered presence</p>
-          <p style="font-weight:600;font-size:.95rem">Austin, Texas &amp; Karachi</p>
-        </div>
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px">Sectors delivered</p>
-          <p style="font-weight:600;font-size:.95rem">Oil &amp; gas · Healthcare · Logistics · Manufacturing</p>
-        </div>
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px">Compliance</p>
-          <p style="font-weight:600;font-size:.95rem">FBR digital invoicing · NDA &amp; IP transfer standard</p>
-        </div>
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:5px">Engagement</p>
-          <p style="font-weight:600;font-size:.95rem">Fixed scope · Written price &amp; date</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ MODULE GRID ============ -->
-    <section class="section" id="modules">
+    <!-- ============ NUMBERS ============ -->
+    <section class="ed-band" aria-label="VectorERP in numbers">
       <div class="wrap">
-        <div class="section-head reveal">
-          <p class="fig">Modules <span class="fig-dim">— one platform, every department</span></p>
-          <h2>Accounting to Point of Sale. <span class="drafted">Actually connected.<svg viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><path d="M2 6 Q 30 2 55 5 T 98 4"/></svg></span></h2>
-          <p class="lede">Start with what you need today, switch on more when you grow. Every module shares one database — enter data once, see it everywhere.</p>
-        </div>
-        <div class="modules">
-          <article class="module reveal"><div class="m-icon hue-acc"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round"><path d="M4 4h16v16H4zM4 9h16M9 9v11"/></svg></div><h3>Accounting</h3><p>Double-entry ledger, bank reconciliation, and tax reports your accountant will approve of.</p></article>
-          <article class="module reveal"><div class="m-icon hue-inv"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/></svg></div><h3>Invoicing</h3><p>FBR-ready sales tax invoices with QR codes, sent by email or WhatsApp in one click.</p></article>
-          <article class="module reveal"><div class="m-icon hue-stk"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg></div><h3>Inventory</h3><p>Live stock across godowns and shops, low-stock alerts, batch and expiry tracking.</p></article>
-          <article class="module reveal"><div class="m-icon hue-crm"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9.5 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><h3>Sales &amp; CRM</h3><p>Leads, follow-ups, and quotations in a pipeline — so no inquiry dies in a WhatsApp chat.</p></article>
-          <article class="module reveal"><div class="m-icon hue-pur"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9h-12zM6 6L5 2H2M8 21a1 1 0 100-2 1 1 0 000 2zM18 21a1 1 0 100-2 1 1 0 000 2z"/></svg></div><h3>Purchases</h3><p>Purchase orders, supplier ledgers, and landed-cost tracking for imported goods.</p></article>
-          <article class="module reveal"><div class="m-icon hue-pos"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10M12 16v4"/></svg></div><h3>Point of Sale</h3><p>Fast counter billing that keeps working when the internet doesn't, synced to stock.</p></article>
-          <article class="module reveal"><div class="m-icon hue-hr"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-8 0v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><h3>HR &amp; Payroll</h3><p>Attendance, advances, EOBI, and salary slips — payroll done before lunch, not over a weekend.</p></article>
-          <article class="module reveal"><div class="m-icon hue-mfg"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a7.97 7.97 0 00.1-6l-2.1.6a6 6 0 00-1.5-1.5l.6-2.1a8 8 0 00-6 0l.6 2.1a6 6 0 00-1.5 1.5L7 9a8 8 0 000 6l2.1-.6a6 6 0 001.5 1.5l-.6 2.1a8 8 0 006 0l-.6-2.1a6 6 0 001.5-1.5z"/></svg></div><h3>Manufacturing</h3><p>Bills of materials, production orders, and wastage tracking for factories and units.</p></article>
-          <article class="module reveal"><div class="m-icon hue-prj"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Projects</h3><p>Tasks, timelines, and billing for service businesses that sell hours, not boxes.</p></article>
-          <article class="module reveal"><div class="m-icon hue-ecm"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.6 12.4a2 2 0 002 1.6h8.8a2 2 0 002-1.6L22 7H6"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg></div><h3>E-commerce</h3><p>Your Daraz and website orders land in the same stock and accounting as the shop counter.</p></article>
-          <article class="module reveal"><div class="m-icon hue-rpt"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 16v-5M13 16V8M18 16v-9"/></svg></div><h3>Reports</h3><p>Profit &amp; loss, aging, stock valuation, salesman performance — live, not month-end.</p></article>
-          <article class="module reveal"><div class="m-icon hue-hlp"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-9 8.36 8.5 8.5 0 01-3.4-.66L3 21l1.8-5.6A8.38 8.38 0 013.5 11.5a8.5 8.5 0 018.5-8.5 8.5 8.5 0 019 8.5z"/></svg></div><h3>Helpdesk</h3><p>Customer complaints tracked to resolution — with the full sales history beside every ticket.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ REAL NUMBERS ============ -->
-    <section class="counters" aria-label="VectorERP in numbers">
-      <div class="wrap">
-        <div class="counter">
-          <b data-tick="18">18<sub>%</sub></b>
-          <span>sales tax calculated, printed and reconciled the FBR way — Third Schedule and exemptions included</span>
-        </div>
-        <div class="counter">
-          <b data-tick="4999">4,999<sub>Rs</sub></b>
-          <span>per user per month on Starter — setup, migration and training included</span>
-        </div>
-        <div class="counter">
-          <b data-tick="12">12<sub>modules</sub></b>
-          <span>on one shared database — enter data once, see it everywhere</span>
-        </div>
-        <div class="counter">
-          <b data-tick="72">72<sub>hrs</sub></b>
-          <span>the FBR correction window, tracked on every filed invoice</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ FBR CHAPTER — THE DARK ROOM ============ -->
-    <section class="fbr-cinema" aria-labelledby="fbrc-h">
-      <div class="wrap">
-        <p class="fig">Chapter <span class="fig-dim">— FBR digital invoicing</span></p>
-        <h2 id="fbrc-h">The 6pm rejected invoice, ended.</h2>
-        <p class="lede" style="max-width:62ch">Since 31 December 2025, every sales-tax-registered business files invoices with FBR in real time. This is the moment a business goes compliant — and what staying compliant looks like afterwards.</p>
-        <div class="fbr-stage">
-          <div class="fbr-wave-wrap">
-            <p class="fbr-wave-label"><span>A day at the counter</span><span>without → with VectorERP</span></p>
-            <svg class="fbr-wave" viewBox="0 0 600 220" fill="none" aria-hidden="true">
-              <path class="jag" d="M0 120 L40 60 L70 170 L110 40 L150 150 L190 70 L230 190 L270 55 L310 160 L350 30 L390 170 L430 80 L470 150 L510 50 L560 130 L600 90" stroke-width="3"/>
-              <path class="flat" d="M0 110 L600 110" stroke-width="3"/>
-            </svg>
-          </div>
-          <div class="fbr-doc">
-            <span class="fbr-stamp">FILED</span>
-            <div class="d-head"><b>Sales Tax Invoice</b><span>INV-2041</span></div>
-            <div class="d-row"><span>Value excluding tax</span><b>Rs 385,000</b></div>
-            <div class="d-row"><span>Sales tax @ 18%</span><b>Rs 69,300</b></div>
-            <div class="d-row"><span>Total payable</span><b>Rs 454,300</b></div>
-            <div class="d-fbr">FBR 7000007DI17541… · QR printed</div>
-          </div>
-        </div>
-        <div class="fbr-facts">
-          <div class="fbr-fact">
-            <b>72-hour window</b>
-            <span>A filed invoice can be corrected within 72 hours. VectorERP tracks the window on every invoice, so a 6pm mistake is fixed before it hardens into the return.</span>
-          </div>
-          <div class="fbr-fact">
-            <b>When FBR is down</b>
-            <span>Invoices mark themselves offline and upload within 24 hours of service coming back. Your counter never stops billing.</span>
-          </div>
-          <div class="fbr-fact">
-            <b>Section 64D credit</b>
-            <span>Finance Act 2026 gives a 10% tax credit on what you spend to integrate — claimed in the year of installation. Keep the invoices; your consultant does the rest.</span>
-          </div>
-        </div>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="/fbr">How we get you FBR-ready</a>
-          <a class="btn btn-ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.35)" href="/blog/who-must-use-fbr-digital-invoicing">Who must comply — with sources</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ FEATURE: INVOICING ============ -->
-    <section class="section section-alt" id="why">
-      <div class="wrap">
-        <div class="feature-row">
-          <div class="f-copy reveal">
-            <p class="fig">Invoicing <span class="fig-dim">— FBR ready</span></p>
-            <h2>Sales tax invoices the FBR way — without the headache</h2>
-            <p>Digital invoicing rules keep tightening. VectorERP generates compliant sales tax invoices with QR codes and submits them digitally, so an audit is a filter-and-export, not a week of panic.</p>
-            <ul class="f-points">
-              <li>FBR digital invoicing integration, QR on every invoice</li>
-              <li>Send by email or straight to the customer's WhatsApp</li>
-              <li>Automatic payment reminders for overdue invoices</li>
-              <li>Multi-currency for importers and exporters</li>
-            </ul>
-            <div style="margin-top:24px">
-              <a class="btn btn-ghost btn-sm" href="/fbr">FBR integration service →</a>
-            </div>
-          </div>
-          <div class="f-mock reveal reveal-delay-1">
-            <div class="doc" role="img" aria-label="Sample FBR-compliant sales tax invoice">
-              <div class="doc-head">
-                <div>
-                  <div class="d-brand">
-                    <svg viewBox="0 0 120 120" fill="none"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB"/></svg>
-                    Karachi Textiles (Pvt) Ltd
-                  </div>
-                  <div style="font-size:9px;color:var(--muted);margin-top:4px">STRN 32-77-8842-991-73 · NTN 7702451-8</div>
-                  <span class="fbr-chip">FBR E-INVOICE SUBMITTED</span>
-                </div>
-                <div class="doc-meta">
-                  <b>SALES TAX INVOICE</b><br>
-                  INV-2041 · 02 AUG 2026<br>
-                  DUE: 16 AUG 2026
-                </div>
-              </div>
-              <table class="doc-table">
-                <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr></thead>
-                <tbody>
-                  <tr><td>Cotton fabric — 40s count (than)</td><td class="num">120</td><td class="num">2,450</td><td class="num">2,94,000</td></tr>
-                  <tr><td>Polyester blend — grey (than)</td><td class="num">35</td><td class="num">1,860</td><td class="num">65,100</td></tr>
-                  <tr><td>Stitching service — bulk order</td><td class="num">1</td><td class="num">25,900</td><td class="num">25,900</td></tr>
-                </tbody>
-              </table>
-              <div style="display:flex;justify-content:space-between;align-items:flex-end">
-                <div class="doc-qr" aria-hidden="true"></div>
-                <div>
-                  <div class="doc-total"><span style="color:var(--muted)">Subtotal</span><span class="num">Rs 3,85,000</span></div>
-                  <div class="doc-total"><span style="color:var(--muted)">Sales tax (18%)</span><span class="num">Rs 69,300</span></div>
-                  <div class="doc-total dt-final"><span>Total</span><span>Rs 4,54,300</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ============ FEATURE: INVENTORY ============ -->
-        <div class="feature-row flip">
-          <div class="f-copy reveal">
-            <p class="fig">Inventory <span class="fig-dim">— every godown, live</span></p>
-            <h2>Know your stock without calling the godown</h2>
-            <p>Karachi shop, Lahore warehouse, factory store — one live stock view. When the counter sells the last carton, purchasing already knows.</p>
-            <ul class="f-points">
-              <li>Multi-warehouse with transfers and approval trail</li>
-              <li>Low-stock alerts to WhatsApp before you run out</li>
-              <li>Batch, expiry, and serial number tracking</li>
-              <li>Stock audit mode — count on a phone, variance report out</li>
-            </ul>
-          </div>
-          <div class="f-mock reveal reveal-delay-1">
-            <div class="browser" role="img" aria-label="VectorERP inventory screen">
-              <div class="browser-top"><i></i><i></i><i></i><span class="browser-url"><b>🔒</b> app.vectorsolution.it/inventory</span></div>
-              <div style="padding:14px;background:#F7F9FC">
-                <div class="panel">
-                  <div class="p-title">Stock levels — all locations <span>Filters ▾</span></div>
-                  <table class="mini-table">
-                    <thead><tr><th>Item</th><th>Location</th><th class="num">On hand</th><th class="num">Reorder</th><th>Status</th></tr></thead>
-                    <tbody>
-                      <tr><td>Cotton 40s (than)</td><td>Karachi — Godown A</td><td class="num">1,240</td><td class="num">400</td><td><span class="pill ok">OK</span></td></tr>
-                      <tr><td>Poly blend grey</td><td>Lahore — Warehouse</td><td class="num">312</td><td class="num">300</td><td><span class="pill due">Near</span></td></tr>
-                      <tr><td>Dye — Navy #204</td><td>Factory store</td><td class="num">18</td><td class="num">50</td><td><span class="pill low">Low</span></td></tr>
-                      <tr><td>Packing cartons L</td><td>Karachi — Shop</td><td class="num">2,900</td><td class="num">500</td><td><span class="pill ok">OK</span></td></tr>
-                      <tr><td>Thread white 5000m</td><td>Factory store</td><td class="num">64</td><td class="num">80</td><td><span class="pill low">Low</span></td></tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="panel">
-                  <div class="p-title">Alerts</div>
-                  <div style="font-size:10.5px;color:var(--muted);line-height:1.8">
-                    🔔 Dye — Navy #204 below reorder level · <b style="color:var(--blue)">Create PO</b><br>
-                    🔔 Transfer #TR-118 (Karachi → Lahore) awaiting approval
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ============ FEATURE: CRM ============ -->
-        <div class="feature-row">
-          <div class="f-copy reveal">
-            <p class="fig">Sales &amp; CRM <span class="fig-dim">— no lead left behind</span></p>
-            <h2>Every inquiry tracked from first call to payment</h2>
-            <p>Leads from phone calls, Facebook, and walk-ins go into one pipeline. Follow-up reminders make sure the quotation sent on Tuesday gets chased on Friday.</p>
-            <ul class="f-points">
-              <li>Pipeline view — see every deal and its next step</li>
-              <li>Quotations that convert to invoices in one click</li>
-              <li>Salesman targets and commission reports</li>
-              <li>Customer ledger and history on one screen</li>
-            </ul>
-          </div>
-          <div class="f-mock reveal reveal-delay-1">
-            <div class="browser" role="img" aria-label="VectorERP sales pipeline">
-              <div class="browser-top"><i></i><i></i><i></i><span class="browser-url"><b>🔒</b> app.vectorsolution.it/crm</span></div>
-              <div style="padding:14px;background:#F7F9FC">
-                <div class="kanban">
-                  <div class="kcol">
-                    <div class="k-head"><span>New inquiry</span><span>4</span></div>
-                    <div class="kcard"><b>Faisalabad Fabrics</b><span>Bulk grey cloth — call rec'd</span><span class="k-amt">Rs 8,50,000</span></div>
-                    <div class="kcard"><b>Hyderabad Mart</b><span>Retail supply inquiry</span><span class="k-amt">Rs 2,10,000</span></div>
-                  </div>
-                  <div class="kcol">
-                    <div class="k-head"><span>Quoted</span><span>3</span></div>
-                    <div class="kcard"><b>Sialkot Sports Co.</b><span>QT-402 sent · follow up Mon</span><span class="k-amt">Rs 6,90,000</span></div>
-                    <div class="kcard"><b>Indus Foods (Pvt)</b><span>QT-399 — negotiating rate</span><span class="k-amt">Rs 3,40,000</span></div>
-                  </div>
-                  <div class="kcol">
-                    <div class="k-head"><span>Won ✓</span><span>2</span></div>
-                    <div class="kcard"><b>Karachi Textiles</b><span>PO received → INV-2041</span><span class="k-amt">Rs 4,54,300</span></div>
-                    <div class="kcard"><b>Multan Traders</b><span>Advance received 50%</span><span class="k-amt">Rs 1,76,800</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ PAKISTAN BAND ============ -->
-    <section class="section">
-      <div class="wrap">
-        <div class="pk-band reveal">
-          <p class="fig">Made for Pakistan <span class="fig-dim">— not adapted for it</span></p>
-          <h2>Software that understands how business runs here</h2>
-          <p class="lede">Global ERPs are built for markets with stable internet, card payments, and English-only teams. We built for the market we actually serve.</p>
-          <div class="pk-grid">
-            <div class="pk-item"><h3>PKR-native, lakh &amp; crore</h3><p>Amounts read the way you say them. No mental conversion from millions.</p></div>
-            <div class="pk-item"><h3>FBR compliance built in</h3><p>Digital invoicing, sales tax returns data, and WHT handling — ready for your tax consultant.</p></div>
-            <div class="pk-item"><h3>Works on weak internet</h3><p>Light pages, offline-tolerant POS, and no giant downloads. Load-shedding tested.</p></div>
-            <div class="pk-item"><h3>Support on WhatsApp</h3><p>Real humans, Urdu or English, same day. No ticket queue in another timezone.</p></div>
-            <div class="pk-item"><h3>Local payment rails</h3><p>Record JazzCash, Easypaisa, bank transfer, and cash — the way customers actually pay.</p></div>
-            <div class="pk-item"><h3>Your data, your choice</h3><p>Our cloud, or your own server on your premises. Either way, the data belongs to you.</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ DATA TRUST ============ -->
-    <section class="section" style="padding-top:0">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="fig">Your data <span class="fig-dim">— the question everyone asks quietly</span></p>
-          <p class="urdu" style="font-size:1.5rem;color:var(--ink);font-weight:600;margin-bottom:6px">آپ کا ڈیٹا صرف آپ کا ہے</p>
-          <h2>Your data is only yours</h2>
-          <p class="lede">Every owner asks this — usually not out loud. So here it is in writing.</p>
-        </div>
-        <div class="trust-strip reveal">
-          <div class="trust-item">
-            <div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
-            <div><b>FBR sees invoices. Nothing else.</b><p>Only the legally required invoice fields go to FBR. Your costs, margins, ledgers, and party balances never leave your system.</p></div>
-          </div>
-          <div class="trust-item">
-            <div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9.5 11a4 4 0 100-8 4 4 0 000 8zM22 11l-3 3-2-2"/></svg></div>
-            <div><b>Staff see only what you allow</b><p>Owner-controlled permissions: the counter boy sees billing, the munshi sees ledgers, and only you see everything.</p></div>
-          </div>
-          <div class="trust-item">
-            <div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="12" rx="2"/><path d="M6 20h12M12 16v4M7 10h4M7 13h7"/></svg></div>
-            <div><b>Your own server? No problem.</b><p>Keep the whole system on a computer in your own office if you prefer. Cloud is optional, never forced.</p></div>
-          </div>
-          <div class="trust-item">
-            <div class="t-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></div>
-            <div><b>Export everything, any day</b><p>One click gives you your complete data in Excel. If you ever leave us, you leave with everything. No hostage situations.</p></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ PROOF OF WORK ============ -->
-    <section class="section section-alt" style="padding-block:clamp(60px,9vh,90px)">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="fig">Proof <span class="fig-dim">— systems in production</span></p>
-          <h2>Built for hospitals, oil &amp; gas, and logistics — before your project</h2>
-        </div>
-        <div class="card-grid">
-          <a class="card reveal" href="/work#gencom" style="display:block">
-            <p class="fig" style="margin-bottom:12px">Flagship ERP <span class="fig-dim">— Karachi · Dubai</span></p>
-            <h3 style="margin-bottom:8px">A two-country ERP, built from scratch</h3>
-            <p>GenCom Work Portal — sales, field services, full general ledger, HR and payroll across a Pakistani company and a Dubai FZCO, each with its own tax regime and fiscal year.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">Read the case study →</p>
-          </a>
-          <a class="card reveal reveal-delay-1" href="/work#kihd" style="display:block">
-            <p class="fig" style="margin-bottom:12px">Healthcare <span class="fig-dim">— Karachi</span></p>
-            <h3 style="margin-bottom:8px">Hospital appointments, on the patient's phone</h3>
-            <p>Karachi Institute of Heart Diseases — bilingual hospital website, online appointment booking with WhatsApp confirmations, and an Android app.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">Read the case study →</p>
-          </a>
-          <a class="card reveal reveal-delay-2" href="/work#pnl" style="display:block">
-            <p class="fig" style="margin-bottom:12px">Logistics <span class="fig-dim">— Austin, USA</span></p>
-            <h3 style="margin-bottom:8px">A US logistics firm's digital front door</h3>
-            <p>Prime Nexus Logistics — live site and quote pipeline built to US market standards. Click through and judge it yourself.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">Read the case study →</p>
-          </a>
-        </div>
-
-        <figure class="reveal" style="margin-top:26px;background:var(--card);border:1px solid var(--line-soft);border-left:4px solid var(--blue);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow-sm);display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-          <blockquote style="flex:1;min-width:min(260px,100%);font-family:var(--font-display);font-stretch:106%;font-size:1.05rem;font-weight:600;line-height:1.5;color:var(--ink)">
-            "For the first time the books of both our companies agree to the rupee. I did not believe we could run without Excel — I was wrong."
-          </blockquote>
-          <figcaption style="display:flex;align-items:center;gap:12px">
-            <span style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-soft));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:.9rem">IA</span>
-            <span>
-              <b style="display:block;font-size:.92rem">Irfan Ali Shaikh</b>
-              <span style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">General Manager · GenCom Compression Services</span>
-            </span>
-          </figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <!-- ============ BEYOND ERP ============ -->
-    <section class="section" style="padding-top:0">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="fig">Beyond the ERP <span class="fig-dim">— we are a software house</span></p>
-          <h2>Need a website or a mobile app instead?</h2>
-          <p class="lede">VectorERP is our product, but it isn't all we do. The same team builds websites, Android and iOS apps, and custom software — and has shipped all three.</p>
-        </div>
-        <div class="card-grid">
-          <a class="card reveal" href="/services#web" style="display:block">
-            <div class="card-icon hue-acc" style="background:var(--blue-tint)"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 9h20M6 21h12"/></svg></div>
-            <h3>Websites</h3>
-            <p>Business sites that load fast on mobile data and turn visitors into enquiries — like the hospital site and US logistics platform in our portfolio.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">See web development →</p>
-          </a>
-          <a class="card reveal reveal-delay-1" href="/services#mobile" style="display:block">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18.5h2"/></svg></div>
-            <h3>Mobile apps</h3>
-            <p>Android and iOS apps from one codebase. We've delivered a patient appointments app for a Karachi hospital and a field-staff app that reads receipts from a photo.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">See mobile development →</p>
-          </a>
-          <a class="card reveal reveal-delay-2" href="/services#custom" style="display:block">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6M13.5 4l-3 16"/></svg></div>
-            <h3>Custom software</h3>
-            <p>When nothing off the shelf fits. We rebuilt a twenty-year-old desktop accounting system for the web without losing a single ledger entry.</p>
-            <p style="margin-top:14px;color:var(--blue);font-weight:600;font-size:.9rem">See custom development →</p>
-          </a>
+        <div class="ed-nums">
+          <div><b>18<sub>%</sub></b><span>sales tax calculated and reconciled the FBR way</span></div>
+          <div><b>Rs 4,999</b><span>per user per month on Starter — setup and training included</span></div>
+          <div><b>12</b><span>modules on one shared database</span></div>
+          <div><b>72<sub>hrs</sub></b><span>the FBR correction window, tracked on every invoice</span></div>
         </div>
       </div>
     </section>
@@ -872,20 +397,16 @@
       </div>
     </section>
 
-    <!-- ============ CTA ============ -->
-    <section class="section">
+    <!-- ============ COLLABORATE ============ -->
+    <section class="ed-collab">
       <div class="wrap">
-        <div class="cta-band reveal">
-          <p class="fig">Next step <span class="fig-dim">— 30 minutes, no obligation</span></p>
-          <h2>See your business running on VectorERP</h2>
-          <p class="urdu" style="font-size:1.15rem;color:rgba(233,238,249,.85);margin-bottom:14px">پہلے دیکھیں، پھر فیصلہ کریں — ڈیمو بالکل مفت ہے</p>
-          <p class="lede">Book a free demo — we'll set it up with your own products and parties, so you're looking at your business, not a sample company. And if you want to verify us first: ask for client references. We give them happily.</p>
-          <div class="hero-ctas">
-            <a class="btn btn-primary" href="/contact">Book a free demo
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg>
-            </a>
-            <a class="btn btn-ghost" href="https://wa.me/923022219093" target="_blank" rel="noopener">WhatsApp us</a>
-          </div>
+        <p class="ed-kicker">NEXT STEP — 30 MINUTES, NO OBLIGATION</p>
+        <h2>Let’s put <em>your</em> business on one screen.</h2>
+        <div class="ed-links">
+          <span class="arrow">↳</span>
+          <a href="https://wa.me/923022219093?text=Assalam%20o%20Alaikum%2C%20I%20want%20to%20see%20VectorERP%20for%20my%20business." target="_blank" rel="noopener">WhatsApp — +92 302 2219093</a>
+          <a href="/contact">Book a free demo</a>
+          <a href="mailto:shadab@vectorsolution.it">shadab@vectorsolution.it</a>
         </div>
       </div>
     </section>
@@ -951,18 +472,8 @@
     <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.5-.3-4.9.9 1-4.7-.3-.5c-.9-1.5-1.4-3.2-1.4-4.9 0-5.2 4.3-9.5 9.6-9.5s9.6 4.3 9.6 9.5-4.3 9.8-9.6 9.8zm5.3-7.2c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
     <span>WhatsApp us</span>
   </a>
-  <div class="sticky-cta" role="complementary" aria-label="Quick actions">
-    <span class="s-txt">Free live demo — no sign-up<em>Rs 4,999 / user · FBR-ready</em></span>
-    <a class="btn-sm" href="demo/">Open the demo</a>
-    <a class="s-wa" href="https://wa.me/923022219093?text=Assalam%20o%20Alaikum%2C%20I%20am%20looking%20at%20VectorERP%20—%20can%20we%20talk%3F" target="_blank" rel="noopener" aria-label="WhatsApp us">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.5-.3-4.9.9 1-4.7-.3-.5c-.9-1.5-1.4-3.2-1.4-4.9 0-5.2 4.3-9.5 9.6-9.5s9.6 4.3 9.6 9.5-4.3 9.8-9.6 9.8zm5.3-7.2c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
-    </a>
-  </div>
-
   <script src="js/main.js?v=20260809a"></script>
   <script src="js/bot.js?v=20260809b" defer></script>
-  <script src="js/vendor/gsap.min.js?v=20260823a" defer></script>
-  <script src="js/vendor/ScrollTrigger.min.js?v=20260823a" defer></script>
-  <script src="js/story.js?v=20260823l" defer></script>
+  <script src="js/editorial.js?v=20260823a" defer></script>
 </body>
 </html>
