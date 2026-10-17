@@ -368,3 +368,45 @@ body.editorial {
   .ed-title, .ed-view::after { transition: none; }
   .ed-lap-screen img, .ed-lab-names li, .ed-lab-names li span { transition: none; }
 }
+
+/* ---------- clients line under the hero (Oct 2026) ---------- */
+.ed-clients { margin-top: clamp(28px, 5vh, 56px); padding-top: 22px; border-top: 1px solid var(--line); }
+.ed-clients .ed-kicker { margin-bottom: 14px; }
+.ed-clients ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 38px; }
+.ed-clients li { display: flex; align-items: baseline; gap: 9px; }
+.ed-clients a {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 1.9vw, 1.6rem);
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ed-clients a:hover { color: var(--blue); border-color: var(--blue); font-style: italic; }
+.ed-clients small { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+/* ---------- selected work index (Oct 2026) ---------- */
+.ed-work .ed-work-head { padding: clamp(50px, 9vh, 100px) 0 clamp(10px, 2vh, 20px); }
+.ed-work .ed-work-head h2 { font-size: clamp(2.4rem, 6vw, 5.2rem); line-height: 1; margin: 0; }
+.ed-work .ed-row .ed-title { font-size: clamp(1.8rem, 4.2vw, 3.6rem); }
+.ed-work .ed-row:first-of-type { border-top: 1px solid var(--line); }
+.ed-work-foot { padding: clamp(22px, 4vh, 40px) 0 clamp(40px, 7vh, 80px); }
+.ed-more {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.ed-more span { display: inline-block; margin-left: 8px; transition: transform 0.25s; }
+.ed-more:hover { color: var(--blue); border-color: var(--blue); }
+.ed-more:hover span { transform: translateX(6px); }
+@media (max-width: 900px) {
+  .ed-clients ul { gap: 8px 22px; }
+  .ed-clients a { font-size: 1.15rem; }
+}

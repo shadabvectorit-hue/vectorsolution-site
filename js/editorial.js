@@ -25,9 +25,10 @@
   /* ---------- index: the preview trails the cursor ---------- */
   var fine = window.matchMedia("(min-width: 901px) and (hover: hover)").matches
     || window.matchMedia("(min-width: 901px)").matches; /* hover MQ lies in some headless/pane envs */
-  var preview = document.querySelector(".ed-preview");
-  var indexEl = document.querySelector(".ed-index");
-  if (preview && indexEl && fine && !reduced) {
+  /* every index section carries its own preview (the product index and the selected-work index) */
+  document.querySelectorAll(".ed-index").forEach(function (indexEl) {
+  var preview = indexEl.querySelector(".ed-preview");
+  if (preview && fine && !reduced) {
     var imgs = preview.querySelectorAll("img");
     var tx = 0, ty = 0, cx = 0, cy = 0, visible = false, raf = null;
 
@@ -59,6 +60,7 @@
       });
     });
   }
+  });
 
   /* ---------- laptop chapter: scroll drives the demo screens ---------- */
   /* The section is tall; the pin sticks; progress through the section picks
