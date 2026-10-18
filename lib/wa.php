@@ -111,13 +111,75 @@ function vit_wa_seen(string $messageId): bool {
     return false;
 }
 
-/** Tell the owner a conversation needs a person. */
+/**
+ * Tell the owner a conversation needs a person.
+ *
+ * A message to the owner's own number is business-initiated, so outside a 24-hour
+ * window Meta only delivers an approved template. The utility template
+ * "handover_alert" (English, 4 body variables: number, reason, message, number for
+ * the wa.me link) is tried first; free text is the fallback, which still lands when
+ * the owner has written to the line in the last 24 hours. Costs one utility message.
+ */
 function vit_wa_alert_owner(string $from, string $why, string $lastMessage): void {
     $owner = preg_replace('/\D+/', '', (string)vit_cfg_get('wa_owner', ''));
     if ($owner === '' || $owner === preg_replace('/\D+/', '', $from)) {
         return;
     }
-    vit_wa_send($owner, "🔔 Handover needed\nFrom: +{$from}\nWhy: {$why}\n\nThey said: \"" . mb_substr($lastMessage, 0, 300) . "\"\n\nOpen: https://wa.me/{$from}");
+    $ok = vit_wa_send_template($owner, (string)vit_cfg_get('wa_handover_template', 'handover_alert'), 'en',
+        [$from, $why, mb_substr($lastMessage, 0, 300), $from]);
+    if (!$ok) {
+        vit_wa_send($owner, "🔔 Handover needed\nFrom: +{$from}\nWhy: {$why}\n\nThey said: \"" . mb_substr($lastMessage, 0, 300) . "\"\n\nOpen: https://wa.me/{$from}");
+    }
+}
+
+/**
+ * Send an approved template with plain text body variables. Meta rejects a variable
+ * containing a newline, a tab or more than four spaces in a row, so each one is
+ * flattened first; an empty variable is also rejected, so it becomes a dash.
+ */
+function vit_wa_send_template(string $to, string $name, string $lang, array $vars): bool {
+    if (!vit_wa_enabled() || !function_exists('curl_init') || $name === '') {
+        return false;
+    }
+    $to = preg_replace('/\D+/', '', $to);
+    if ($to === '') {
+        return false;
+    }
+    $params = [];
+    foreach ($vars as $v) {
+        $v = trim(preg_replace('/\s+/u', ' ', (string)$v));
+        $params[] = ['type' => 'text', 'text' => $v === '' ? '-' : mb_substr($v, 0, 900)];
+    }
+    $url = VIT_WA_GRAPH . rawurlencode((string)vit_cfg_get('wa_phone_id')) . '/messages';
+    $ch  = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_CONNECTTIMEOUT => 6,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . (string)vit_cfg_get('wa_token'),
+        ],
+        CURLOPT_POSTFIELDS     => (string)json_encode([
+            'messaging_product' => 'whatsapp',
+            'to'                => $to,
+            'type'              => 'template',
+            'template'          => [
+                'name'       => $name,
+                'language'   => ['code' => $lang],
+                'components' => [['type' => 'body', 'parameters' => $params]],
+            ],
+        ], JSON_UNESCAPED_UNICODE),
+    ]);
+    $raw  = curl_exec($ch);
+    $code = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+    if ($code !== 200) {
+        vit_audit('wa_template_fail', ['tpl' => $name, 'code' => $code, 'body' => substr((string)$raw, 0, 200)]);
+        return false;
+    }
+    return true;
 }
 
 /**
