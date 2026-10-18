@@ -104,6 +104,7 @@ foreach (($body['entry'] ?? []) as $entry) {
                 // answer — so say so plainly and put a human on it.
                 vit_wa_send($from, "Thanks — I can only read text messages here. Shadab will look at what you sent and reply personally.");
                 vit_wa_alert_owner($from, 'sent a ' . ($type ?: 'non-text') . ' message', '(attachment)');
+                vit_wa_mail_owner($from, '(' . ($type ?: 'non-text') . ' attachment)', '', 'sent a ' . ($type ?: 'non-text') . ' message');
                 continue;
             }
 
@@ -118,6 +119,7 @@ foreach (($body['entry'] ?? []) as $entry) {
             if ($reply['handover'] !== '') {
                 vit_wa_alert_owner($from, $reply['handover'], $text);
             }
+            vit_wa_mail_owner($from, $text, (string)$reply['text'], (string)$reply['handover']);
         }
     }
 }

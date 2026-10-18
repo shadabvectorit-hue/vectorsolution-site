@@ -119,3 +119,31 @@ function vit_wa_alert_owner(string $from, string $why, string $lastMessage): voi
     }
     vit_wa_send($owner, "🔔 Handover needed\nFrom: +{$from}\nWhy: {$why}\n\nThey said: \"" . mb_substr($lastMessage, 0, 300) . "\"\n\nOpen: https://wa.me/{$from}");
 }
+
+/**
+ * Email the owner about every inbound WhatsApp message. The WhatsApp alert to
+ * the owner's own number is a business-initiated message that Meta only sends
+ * with a payment method on file, so it fails silently; email always lands.
+ */
+function vit_wa_mail_owner(string $from, string $text, string $reply, string $handover = ''): void {
+    $when    = date('d M Y H:i');
+    $subject = ($handover !== '' ? '[Handover] ' : '') . 'WhatsApp from +' . $from;
+    $body    = "New WhatsApp message on +92 302 2219093\n\n"
+             . "From:   +{$from}\n"
+             . "When:   {$when} (server time)\n"
+             . ($handover !== '' ? "Needs you: {$handover}\n" : '')
+             . "\nThey wrote:\n" . mb_substr($text, 0, 1500) . "\n"
+             . "\nAssistant replied:\n" . ($reply !== '' ? mb_substr($reply, 0, 1500) : '(nothing)') . "\n"
+             . "\nReply from your phone: https://wa.me/{$from}\n"
+             . "Full conversation: Meta WhatsApp Manager → Inbox\n";
+    $headers = "From: VectorIT Website <shadab@vectorsolution.it>\r\n"
+             . "Reply-To: shadab@vectorsolution.it\r\n"
+             . "Content-Type: text/plain; charset=UTF-8\r\n";
+    $sent = false;
+    foreach (['shadabvectorit@gmail.com', 'shadab@vectorsolution.it'] as $to) {
+        $sent = @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers) || $sent;
+    }
+    if (!$sent) {
+        vit_audit('wa_mail_fail', ['from' => $from]);
+    }
+}
