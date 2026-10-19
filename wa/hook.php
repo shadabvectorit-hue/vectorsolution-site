@@ -18,6 +18,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../lib/cfg.php';
 require_once __DIR__ . '/../lib/wa.php';
 require_once __DIR__ . '/../lib/agent.php';
+require_once __DIR__ . '/../lib/wainbox.php';
 
 @ini_set('display_errors', '0');
 header('X-Robots-Tag: noindex, nofollow');
@@ -83,6 +84,12 @@ foreach (($body['entry'] ?? []) as $entry) {
     foreach (($entry['changes'] ?? []) as $change) {
         $value = $change['value'] ?? [];
 
+        // WhatsApp sends the customer's profile name beside the messages.
+        $names = [];
+        foreach (($value['contacts'] ?? []) as $ct) {
+            $names[preg_replace('/\D+/', '', (string)($ct['wa_id'] ?? ''))] = (string)($ct['profile']['name'] ?? '');
+        }
+
         // Delivery receipts and read markers arrive on the same webhook. They are
         // not messages and must not be answered.
         foreach (($value['messages'] ?? []) as $msg) {
@@ -102,7 +109,15 @@ foreach (($body['entry'] ?? []) as $entry) {
                 // Images, audio, documents, location. The assistant cannot read
                 // them, and pretending otherwise produces a confident wrong
                 // answer — so say so plainly and put a human on it.
-                vit_wa_send($from, "Thanks — I can only read text messages here. Shadab will look at what you sent and reply personally.");
+                vit_wa_log($from, 'in', '[' . ($type ?: 'attachment') . ']', $names[$from] ?? '');
+                if (vit_wa_human_active($from)) {
+                    vit_wa_mail_owner($from, '(' . ($type ?: 'non-text') . ' attachment)', '', 'sent a ' . ($type ?: 'non-text') . ' message');
+                    continue;
+                }
+                $holdMsg = "Thanks — I can only read text messages here. Shadab will look at what you sent and reply personally.";
+                if (vit_wa_send($from, $holdMsg)) {
+                    vit_wa_log($from, 'bot', $holdMsg);
+                }
                 vit_wa_alert_owner($from, 'sent a ' . ($type ?: 'non-text') . ' message', '(attachment)');
                 vit_wa_mail_owner($from, '(' . ($type ?: 'non-text') . ' attachment)', '', 'sent a ' . ($type ?: 'non-text') . ' message');
                 continue;
@@ -111,10 +126,20 @@ foreach (($body['entry'] ?? []) as $entry) {
             if (trim($text) === '') {
                 continue;
             }
+            vit_wa_log($from, 'in', $text, $names[$from] ?? '');
+
+            // The owner is answering this customer from the inbox: the assistant
+            // stays out of it, the owner just gets the email.
+            if (vit_wa_human_active($from)) {
+                vit_wa_mail_owner($from, $text, '(assistant paused — you are replying from the inbox)', '');
+                continue;
+            }
 
             $reply = vit_agent_reply($from, $text, 'whatsapp');
             if (trim($reply['text']) !== '') {
-                vit_wa_send($from, $reply['text']);
+                if (vit_wa_send($from, $reply['text'])) {
+                    vit_wa_log($from, 'bot', $reply['text']);
+                }
             }
             if ($reply['handover'] !== '') {
                 vit_wa_alert_owner($from, $reply['handover'], $text);

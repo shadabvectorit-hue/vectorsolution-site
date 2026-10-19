@@ -196,8 +196,8 @@ function vit_wa_mail_owner(string $from, string $text, string $reply, string $ha
              . ($handover !== '' ? "Needs you: {$handover}\n" : '')
              . "\nThey wrote:\n" . mb_substr($text, 0, 1500) . "\n"
              . "\nAssistant replied:\n" . ($reply !== '' ? mb_substr($reply, 0, 1500) : '(nothing)') . "\n"
-             . "\nReply from your phone: https://wa.me/{$from}\n"
-             . "Full conversation: Meta WhatsApp Manager → Inbox\n";
+             . "\nReply as +92 302 2219093: https://vectorsolution.it/wa/inbox.php?c={$from}\n"
+             . "Reply from your own phone: https://wa.me/{$from}\n";
     $headers = "From: VectorIT Website <shadab@vectorsolution.it>\r\n"
              . "Reply-To: shadab@vectorsolution.it\r\n"
              . "Content-Type: text/plain; charset=UTF-8\r\n";
