@@ -90,10 +90,25 @@ ServerSignature Off
   </FilesMatch>
 </IfModule>
 
-# Basic caching for static assets
+# Compression: HTML, CSS, JS, SVG and JSON go out gzipped (smaller = faster = better Core Web Vitals).
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml application/ld+json
+</IfModule>
+
+# Caching. CSS and JS are versioned with ?v= so they can be cached hard; HTML stays fresh.
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresByType text/css "access plus 7 days"
-  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresDefault "access plus 1 hour"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 30 days"
+  ExpiresByType application/javascript "access plus 30 days"
+  ExpiresByType text/javascript "access plus 30 days"
   ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/xml "access plus 1 hour"
+  ExpiresByType text/plain "access plus 1 hour"
 </IfModule>

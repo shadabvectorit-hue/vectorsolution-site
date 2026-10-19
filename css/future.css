@@ -280,3 +280,6 @@ body.no3d .fx-cue { display: none; }
   .st-rail { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .fx-cue i { animation: none; } .st-card { transition: none; } }
+
+/* ---------- footer with the Solutions column (SEO, Oct 2026) ---------- */
+@media (min-width: 1021px) { .footer-grid { grid-template-columns: 1.3fr 1fr 1.1fr 1fr 1.2fr; gap: 32px; } }

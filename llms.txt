@@ -1,0 +1,28 @@
+# VectorIT
+
+> VectorIT is a software company with engineering in Karachi, Pakistan and a US entity in Austin, Texas. It builds VectorERP (accounting, inventory, sales, payroll, point of sale and FBR digital invoicing for Pakistani businesses), custom software, websites and digital marketing.
+
+Contact: shadab@vectorsolution.it · WhatsApp +92 302 2219093 · +1 (512) 355-5462 · 5900 Balcones Drive Suite 100, Austin, TX 78731.
+Pricing: VectorERP Starter (Dukaan) Rs 4,999 per user per month, Business (Karobar) Rs 9,999 per user per month, Enterprise (Idara) custom. Live demo: https://vectorsolution.it/demo/
+
+## Products and services
+- [ERP software in Pakistan](https://vectorsolution.it/erp-software-pakistan): VectorERP modules, what every plan includes, pricing
+- [FBR digital invoicing](https://vectorsolution.it/fbr): SRO 69(I)/2025 integration for any ERP or POS
+- [POS software](https://vectorsolution.it/pos-software-pakistan): retail, restaurant and pharmacy counters, offline billing
+- [Import, export and LC software](https://vectorsolution.it/import-export-software): letters of credit, landed cost, multi-currency
+- [Software house in Karachi](https://vectorsolution.it/software-house-karachi): custom software, ERP, mobile apps
+- [Website development](https://vectorsolution.it/website-development-karachi)
+- [Digital marketing](https://vectorsolution.it/digital-marketing-karachi): LinkedIn, CVs, Facebook and Instagram, video, brand design
+- [All services](https://vectorsolution.it/services)
+
+## Proof
+- [Case studies](https://vectorsolution.it/work): M. Ejaz Industries (Karachi manufacturer, FBR digital invoicing live), Alliance Traders (paper trading ERP), Mazwah Corporation (Liberia website)
+- [Leadership](https://vectorsolution.it/leadership): Muhammad Shadab, founder and lead engineer
+
+## FBR guides
+- [Who must use FBR digital invoicing](https://vectorsolution.it/blog/who-must-use-fbr-digital-invoicing)
+- [Penalties](https://vectorsolution.it/blog/fbr-digital-invoicing-penalties)
+- [Rejected invoice or system down](https://vectorsolution.it/blog/fbr-invoice-rejected-or-system-down)
+- [Integration cost and tax credit](https://vectorsolution.it/blog/fbr-integration-cost-and-tax-credit)
+- [PRAL or a licensed integrator](https://vectorsolution.it/blog/pral-or-licensed-integrator)
+- [Digital invoicing vs Tier-1 POS](https://vectorsolution.it/blog/fbr-digital-invoicing-vs-pos-integration)
