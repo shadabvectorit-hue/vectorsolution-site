@@ -220,7 +220,10 @@ body.stage-dark .site-header .brand-name { color: #fff; }
 body.stage-dark .site-header .nav-toggle span { background: #fff; }
 #vit3d { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 1; transition: opacity .45s ease; }
 body.has3d .fx-hero .fx-field, body.has3d .fx-arrow { opacity: 0.55; }
-body.has3d .fx-hero { background: transparent; overflow: visible; }
+body.has3d .fx-hero { background: transparent; overflow: hidden; }
+/* Clip sideways only: the decorative arrow sits past the right edge and must never widen the page
+   (that zoomed phones out and made the page wobble sideways while scrolling). */
+@supports (overflow: clip) { body.has3d .fx-hero { overflow-x: clip; overflow-y: visible; } }
 body.no3d #story { display: none; }
 .fx-anchor { position: relative; aspect-ratio: 3 / 2; }
 body.no3d .fx-fallback { display: block !important; }
@@ -283,3 +286,33 @@ body.no3d .fx-cue { display: none; }
 
 /* ---------- footer with the Solutions column (SEO, Oct 2026) ---------- */
 @media (min-width: 1021px) { .footer-grid { grid-template-columns: 1.3fr 1fr 1.1fr 1fr 1.2fr; gap: 32px; } }
+
+/* ---------- phones & tablets: readable small labels (Oct 2026) ---------- */
+@media (max-width: 1199px) {
+  .st-chips li, .ed-row-tags span, .ed-tags span { font-size: 0.74rem; }
+}
+
+/* ---------- phones & tablets: header over the dark 3D stage (Oct 2026) ---------- */
+body.stage-dark .site-header .nav-toggle { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.28); }
+@media (max-width: 1023px) {
+  body.stage-dark .site-header .nav-links { background: rgba(15, 27, 51, 0.97); border-bottom-color: rgba(255,255,255,.08); }
+  body.stage-dark .site-header .nav-links li a:not(.btn) { color: #E6ECF8; }
+  body.stage-dark .site-header .nav-links li + li { border-color: rgba(255,255,255,.08); }
+  .st-card .fx-label { font-size: 0.7rem; letter-spacing: .14em; }
+}
+
+/* ---------- the 3D story on a phone held sideways (short, wide screen) ---------- */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 560px) {
+  .st { height: 520vh; }
+  .st-grid { grid-template-columns: minmax(260px, 46%) 1fr; grid-template-rows: 1fr; align-items: center; padding: 64px 0 10px; }
+  .st-anchor { grid-row: 1; grid-column: 2; height: calc(100vh - 90px); height: calc(100svh - 90px); aspect-ratio: auto; max-height: none; }
+  .st-cards { grid-row: 1; grid-column: 1; height: calc(100vh - 90px); height: calc(100svh - 90px); min-height: 0; }
+  .st-card { top: 50%; bottom: auto; transform: translateY(calc(-50% + 14px)); padding: 14px 16px; max-height: 100%; overflow: auto; }
+  .st-card.on { transform: translateY(-50%); }
+  .st-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
+  .st-card p { font-size: .84rem; }
+  .st-card .fx-label { margin-bottom: 8px; }
+  .st-track { gap: 2px; } .st-track li { font-size: .8rem; } .st-track li span { display: none; }
+  .st-layers { gap: 6px; } .st-layers small { display: none; }
+  .st-chips { margin-top: 10px; } .st-card .fx-ctas { margin-top: 12px; }
+}

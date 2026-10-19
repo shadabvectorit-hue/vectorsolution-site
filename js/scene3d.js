@@ -262,6 +262,15 @@
     return { x: nx * halfW, y: ny * halfH, s: clamp(wW / 4.6, 0.42, 1.15) };
   }
 
+  // On phones and tablets the hero column sits ABOVE the story, so by the time the story
+  // starts the hero anchor has scrolled off the top and the laptop flew out of view.
+  // Keep the hero position inside the visible area (below the header) instead.
+  function onScreen(r) {
+    var head = 72, h = Math.min(r.height, H - head - 20), top = r.top;
+    top = Math.max(top, head);   // only stop it leaving through the top
+    return { left: r.left, width: r.width, top: top, height: h };
+  }
+
   var target = 0, cur = 0, step = -1, shown = -1;
   function progress() {
     var top = story.getBoundingClientRect().top + window.scrollY, len = story.offsetHeight - H;
@@ -307,7 +316,7 @@
     document.body.classList.toggle('stage-dark', dark > 0.45);
 
     /* anchor: hero column -> story column */
-    var ra = rectToWorld(heroAnchor.getBoundingClientRect()), rb = rectToWorld(storyAnchor.getBoundingClientRect());
+    var ra = rectToWorld(onScreen(heroAnchor.getBoundingClientRect())), rb = rectToWorld(storyAnchor.getBoundingClientRect());
     anchor.x = lerp(ra.x, rb.x, toStory); anchor.y = lerp(ra.y, rb.y, toStory); anchor.s = lerp(ra.s, rb.s, toStory);
     world.position.set(anchor.x, anchor.y - 0.35 * anchor.s + (1 - intro) * 2.2, 0);
     world.scale.setScalar(anchor.s * lerp(0.86, 1, intro));
