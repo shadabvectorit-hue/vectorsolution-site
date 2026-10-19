@@ -33,6 +33,8 @@
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.6));
   renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setClearColor(C.paper, 1);
   var scene = new THREE.Scene();
   scene.fog = new THREE.Fog(C.paper, 11, 22);
@@ -42,7 +44,8 @@
 
   /* ---------- lights: a bright room that can dim to a studio ---------- */
   var hemi = new THREE.HemisphereLight(0xffffff, 0xdfe6f5, 1.05); scene.add(hemi);
-  var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(4, 6, 6); scene.add(key);
+  var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(4, 7, 5); key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024); key.shadow.camera.left = key.shadow.camera.bottom = -6; key.shadow.camera.right = key.shadow.camera.top = 6; key.shadow.camera.near = 1; key.shadow.camera.far = 30; key.shadow.radius = 4; key.shadow.bias = -0.0008; scene.add(key);
   var rim = new THREE.DirectionalLight(C.signal, 0); rim.position.set(-5, 2, -4); scene.add(rim);
   var fill = new THREE.PointLight(C.soft, 0.25, 24); fill.position.set(-4, 1, 5); scene.add(fill);
   var under = new THREE.PointLight(C.blue, 0, 10); under.position.set(0, -1.2, 1.5); scene.add(under);
@@ -81,7 +84,7 @@
   });
   var keysTex = tex(1024, 680, function (g, w, h) {
     var cols = 14, kw = 62, gap = 8, x0 = (w - (cols * kw + (cols - 1) * gap)) / 2;
-    for (var r = 0; r < 5; r++) for (var c = 0; c < cols; c++) { g.fillStyle = "#C8CFDB"; rr(g, x0 + c * (kw + gap), 40 + r * (kw - 6 + gap), kw, kw - 6, 7); g.fill(); }
+    for (var r = 0; r < 5; r++) for (var c = 0; c < cols; c++) { var kx = x0 + c * (kw + gap), ky = 40 + r * (kw - 6 + gap); g.fillStyle = "#B9C2D0"; rr(g, kx, ky + 2, kw, kw - 6, 7); g.fill(); g.fillStyle = "#D2D8E3"; rr(g, kx, ky, kw, kw - 8, 7); g.fill(); g.fillStyle = "rgba(255,255,255,.35)"; rr(g, kx + 4, ky + 3, kw - 8, 14, 5); g.fill(); }
     g.fillStyle = "rgba(190,198,212,.55)"; rr(g, w / 2 - 170, 400, 340, 220, 16); g.fill();
   });
   var phoneTex = tex(420, 860, function (g, w, h) {
@@ -136,9 +139,19 @@
     loader.load("assets/laptop/" + n + ".jpg", function (t) { t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); screens[i] = t; });
   });
 
+  /* ---------- environment: a soft studio for reflections ---------- */
+  function envFace(top, bottom) { var c = document.createElement("canvas"); c.width = c.height = 64; var g = c.getContext("2d"); var gr = g.createLinearGradient(0, 0, 0, 64); gr.addColorStop(0, top); gr.addColorStop(1, bottom); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return c; }
+  var envCube = new THREE.CubeTexture([
+    envFace("#ffffff", "#d9e0ee"), envFace("#f7f9ff", "#cfd7e6"),   // +x -x
+    envFace("#ffffff", "#ffffff"), envFace("#9aa4b5", "#6f7886"),   // +y (ceiling light) -y (floor)
+    envFace("#ffffff", "#dde3ef"), envFace("#eef2fa", "#c9d2e3")    // +z -z
+  ]); envCube.encoding = THREE.sRGBEncoding; envCube.needsUpdate = true;
+  scene.environment = envCube;
+
   /* ---------- materials ---------- */
-  var alu = new THREE.MeshStandardMaterial({ color: C.alu, metalness: 0.65, roughness: 0.32 });
-  var graphite = new THREE.MeshStandardMaterial({ color: 0x1D2535, metalness: 0.6, roughness: 0.35 });
+  var alu = new THREE.MeshStandardMaterial({ color: 0xC9D0DC, metalness: 0.92, roughness: 0.34, envMapIntensity: 1.0 });
+  var graphite = new THREE.MeshStandardMaterial({ color: 0x1D2535, metalness: 0.7, roughness: 0.3, envMapIntensity: 0.9 });
+  var rubber = new THREE.MeshStandardMaterial({ color: 0x2B3140, metalness: 0.1, roughness: 0.9 });
   var black = new THREE.MeshBasicMaterial({ color: 0x05070a });
   var emblemMat = new THREE.MeshStandardMaterial({ color: C.blue, emissive: C.blue, emissiveIntensity: 0.35, metalness: 0.3, roughness: 0.35 });
 
@@ -148,16 +161,23 @@
 
   // laptop
   var laptop = new THREE.Group(); rig.add(laptop);
-  var base = new THREE.Mesh(rbox(3.2, 2.2, 0.12, 0.14), alu); base.rotation.x = -Math.PI / 2; laptop.add(base);
+  var base = new THREE.Mesh(rbox(3.2, 2.2, 0.1, 0.14), alu); base.rotation.x = -Math.PI / 2; base.castShadow = true; laptop.add(base);
+  var hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 2.6, 24).rotateZ(Math.PI / 2), graphite); hinge.position.set(0, 0.07, -1.08); hinge.castShadow = true; laptop.add(hinge);
+  [[-1.3, -0.85], [1.3, -0.85], [-1.3, 0.85], [1.3, 0.85]].forEach(function (f) { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 16), rubber); m.position.set(f[0], -0.06, f[1]); laptop.add(m); });
+  var pad = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.68), new THREE.MeshStandardMaterial({ color: 0xBEC6D4, metalness: 0.5, roughness: 0.5 })); pad.rotation.x = -Math.PI / 2; pad.position.set(0, 0.056, 0.62); laptop.add(pad);
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ opacity: 0.22 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.08; ground.receiveShadow = true; rig.add(ground);
   var keys = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 2.0), new THREE.MeshBasicMaterial({ map: keysTex, transparent: true }));
   keys.rotation.x = -Math.PI / 2; keys.position.set(0, 0.062, 0); laptop.add(keys);
   var pivot = new THREE.Group(); pivot.position.set(0, 0.07, -1.1); laptop.add(pivot);
-  var lid = new THREE.Mesh(rbox(3.2, 2.1, 0.07, 0.14), alu); lid.rotation.x = -Math.PI / 2; lid.position.set(0, 0.035, 1.05); pivot.add(lid);
+  var lid = new THREE.Mesh(rbox(3.2, 2.1, 0.055, 0.14), alu); lid.rotation.x = -Math.PI / 2; lid.position.set(0, 0.035, 1.05); lid.castShadow = true; pivot.add(lid);
   var bezel = new THREE.Mesh(new THREE.PlaneGeometry(3.08, 1.98), black); bezel.rotation.x = Math.PI / 2; bezel.position.set(0, -0.001, 1.05); pivot.add(bezel);
   var screenA = new THREE.Mesh(new THREE.PlaneGeometry(2.92, 1.82), new THREE.MeshBasicMaterial({ map: waitTex, toneMapped: false }));
   screenA.rotation.x = Math.PI / 2; screenA.position.set(0, -0.003, 1.07); pivot.add(screenA);
   var screenB = new THREE.Mesh(new THREE.PlaneGeometry(2.92, 1.82), new THREE.MeshBasicMaterial({ map: waitTex, toneMapped: false, transparent: true, opacity: 0 }));
   screenB.rotation.x = Math.PI / 2; screenB.position.set(0, -0.005, 1.07); pivot.add(screenB);
+  var sheenTex = tex(256, 256, function (g, w, h) { var gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, "rgba(255,255,255,.28)"); gr.addColorStop(0.42, "rgba(255,255,255,.04)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  var sheen = new THREE.Mesh(new THREE.PlaneGeometry(2.92, 1.82), new THREE.MeshBasicMaterial({ map: sheenTex, transparent: true, depthWrite: false }));
+  sheen.rotation.x = Math.PI / 2; sheen.position.set(0, -0.007, 1.07); pivot.add(sheen);
 
   // the V emblem on the lid: dot, two strokes, arrowhead — the logo, extruded
   var emblem = new THREE.Group();
@@ -187,7 +207,8 @@
 
   // phone
   var phone = new THREE.Group(); rig.add(phone);
-  phone.add(new THREE.Mesh(rbox(0.92, 1.9, 0.09, 0.14), graphite));
+  var pbody = new THREE.Mesh(rbox(0.92, 1.9, 0.08, 0.16), graphite); pbody.castShadow = true; phone.add(pbody);
+  var pcam = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.01, 16).rotateX(Math.PI / 2), black); pcam.position.set(0, 0.84, 0.046); phone.add(pcam);
   var pscreen = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 1.8), new THREE.MeshBasicMaterial({ map: phoneTex, toneMapped: false }));
   pscreen.position.z = 0.047; phone.add(pscreen);
   // the FBR badge that floats beside the phone
@@ -258,7 +279,7 @@
   function frame() {
     requestAnimationFrame(frame);
     var t = clock.getElapsedTime();
-    cur = reduce ? target : cur + (target - cur) * 0.09;
+    cur = reduce ? target : cur + (target - cur) * 0.13;
     var s = clamp(cur, -1, 1);
     // past the story: hide the stage entirely and stop drawing
     var past = cur > 1.02 || (story.getBoundingClientRect().top > H + 10 && hero.getBoundingClientRect().bottom < -10);
@@ -268,6 +289,8 @@
 
     mx += (tmx - mx) * 0.05; my += (tmy - my) * 0.05;
     var idle = reduce ? 0 : Math.sin(t * 0.7) * 0.05;
+    var intro = reduce ? 1 : ease(clamp((t - 0.15) / 1.5, 0, 1));
+    var pulse = reduce ? 0 : (Math.sin(t * 1.6) * 0.5 + 0.5);
 
     /* timing */
     var toStory = ease(seg(s, 0.0, 0.13));          // hero -> stage
@@ -286,8 +309,8 @@
     /* anchor: hero column -> story column */
     var ra = rectToWorld(heroAnchor.getBoundingClientRect()), rb = rectToWorld(storyAnchor.getBoundingClientRect());
     anchor.x = lerp(ra.x, rb.x, toStory); anchor.y = lerp(ra.y, rb.y, toStory); anchor.s = lerp(ra.s, rb.s, toStory);
-    world.position.set(anchor.x, anchor.y - 0.35 * anchor.s, 0);
-    world.scale.setScalar(anchor.s);
+    world.position.set(anchor.x, anchor.y - 0.35 * anchor.s + (1 - intro) * 2.2, 0);
+    world.scale.setScalar(anchor.s * lerp(0.86, 1, intro));
     rig.rotation.x = 0.42 - 0.12 * open;             // tilt the desk toward the viewer
     rig.rotation.y = mx * 0.08;
 
@@ -296,9 +319,10 @@
     renderer.setClearColor(bg, 1); scene.fog.color.copy(bg);
     hemi.color.copy(mixCol(0xffffff, 0xcfd8ff, dark)); hemi.groundColor.copy(mixCol(0xdfe6f5, 0x101318, dark)); hemi.intensity = lerp(1.05, 0.55, dark);
     key.intensity = lerp(0.9, 1.15, dark); rim.intensity = 0.95 * dark; fill.intensity = lerp(0.25, 0.65, dark); under.intensity = 0.9 * dark * open;
-    shadow.material.opacity = 1 - dark; glow.material.opacity = dark; dust.material.opacity = 0.75 * dark;
+    glow.material.opacity = dark; ground.material.opacity = 0.22 * (1 - dark) * intro; alu.envMapIntensity = lerp(1.0, 0.55, dark); graphite.envMapIntensity = lerp(0.9, 0.5, dark); dust.material.opacity = 0.75 * dark;
     dust.rotation.y = reduce ? 0 : t * 0.012; dust.position.y = reduce ? 0 : Math.sin(t * 0.3) * 0.2;
-    emblemMat.emissiveIntensity = lerp(0.35, 1.1, dark) * (1 - open) + 0.2; emblemGlow.material.opacity = lerp(0.55, 0.9, dark) * (1 - open);
+    emblemMat.emissiveIntensity = (lerp(0.35, 1.1, dark) + pulse * 0.25) * (1 - open) * intro + 0.15; emblemGlow.material.opacity = (lerp(0.5, 0.9, dark) + pulse * 0.15) * (1 - open) * intro;
+    shadow.material.opacity = (1 - dark) * intro;
 
     /* laptop: closed and angled, then opens and faces you; returns and closes at the end */
     var lidOpen = open * (1 - back);
