@@ -24,7 +24,8 @@
   <link rel="stylesheet" href="css/main.css?v=20260809b">
   <link rel="stylesheet" href="css/product.css?v=20260809a">
   <link rel="stylesheet" href="css/editorial.css?v=20261017a">
-  <link rel="stylesheet" href="css/future.css?v=20261018c">
+  <link rel="stylesheet" href="css/future.css?v=20261019a">
+  <link rel="preload" as="image" href="assets/laptop/dashboard.jpg">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -158,6 +159,7 @@
     </div>
   </header>
 
+  <canvas id="vit3d" aria-hidden="true"></canvas>
   <main>
     <!-- ============ HERO ============ -->
     <section class="fx-hero" aria-label="VectorIT">
@@ -179,15 +181,73 @@
             <a class="btn btn-ghost" href="https://wa.me/923022219093?text=Assalam%20o%20Alaikum%2C%20I%20want%20to%20talk%20about%20software%20for%20my%20business." target="_blank" rel="noopener">WhatsApp us</a>
           </div>
           <div class="fx-trust"><span>Pakistan</span><span>USA</span><span>West Africa</span><span>FBR digital invoicing live</span></div>
+          <p class="fx-cue"><i></i>Scroll — watch it open</p>
         </div>
-        <div class="fx-scene">
-          <div class="fx-frame">
+        <div class="fx-scene fx-anchor" id="heroAnchor">
+          <div class="fx-frame fx-fallback">
             <img src="assets/art/hero.jpg" alt="A laptop and a phone showing VectorERP analytics dashboards on a desk" width="1400" height="933" fetchpriority="high"><span class="fx-stamp" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="30" cy="34" r="8" fill="#2E5BDB"/><path d="M30 34 L60 92 L81.5 50.5" stroke="#2E5BDB" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M91 32 L91.6 50.3 L75.6 42.1 Z" fill="#2E5BDB" stroke="#2E5BDB" stroke-width="6" stroke-linejoin="round"/></svg>Vector<em>IT</em></span>
           </div>
           <div class="fx-chip c1"><i><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg></i><span><b>Invoice #1001</b><small>Printed in 2 seconds</small></span></div>
           <div class="fx-chip c2"><i><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></i><span><b>FBR verified</b><small>QR on every copy</small></span></div>
           <div class="fx-chip c3"><i><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></i><span><b>Live P&amp;L</b><small>Not month-end</small></span></div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ THE 3D STORY ============ -->
+    <section class="st" id="story" aria-label="VectorERP, running">
+      <div class="st-pin">
+        <div class="wrap st-grid">
+          <div class="st-cards">
+            <article class="st-card on">
+              <p class="fx-label"><b>01</b> / The demo, running</p>
+              <h2>Software you can <em>see</em> working.</h2>
+              <p>Scroll. The laptop opens on VectorERP's real screens — the live demo, not mock-ups.</p>
+            </article>
+            <article class="st-card">
+              <p class="fx-label"><b>02</b> / Nine real screens</p>
+              <h2>Nine screens. <em>One</em> database.</h2>
+              <ol class="st-track">
+                <li><b>Dashboard</b><span>the day at a glance</span></li>
+                <li><b>Accounting</b><span>a trial balance that ties</span></li>
+                <li><b>Invoicing</b><span>FBR number on every invoice</span></li>
+                <li><b>Inventory</b><span>stock across godowns</span></li>
+                <li><b>Sales &amp; CRM</b><span>follow-ups in a pipeline</span></li>
+                <li><b>HR &amp; Payroll</b><span>attendance to salary slip</span></li>
+                <li><b>Point of Sale</b><span>barcode till, thermal receipt</span></li>
+                <li><b>Restaurant</b><span>tables and kitchen tickets</span></li>
+                <li><b>Pharmacy</b><span>batches, expiries, FEFO</span></li>
+              </ol>
+            </article>
+            <article class="st-card">
+              <p class="fx-label"><b>03</b> / FBR digital invoicing</p>
+              <h2>Every invoice reported to FBR <em>as it is saved.</em></h2>
+              <p>SRO 69(I)/2025, built in. The FBR number and QR print on every copy; the 72-hour correction window is tracked on each invoice. Already live for a Karachi manufacturer.</p>
+              <ul class="st-chips"><li>Sandbox → production</li><li>IP whitelisting</li><li>QR on print</li><li>WhatsApp the invoice</li></ul>
+            </article>
+            <article class="st-card">
+              <p class="fx-label"><b>04</b> / How we build</p>
+              <h2>Engineered in <em>layers.</em></h2>
+              <ul class="st-layers">
+                <li><b>01</b><span>Interface<small>Web, Android and point-of-sale screens your staff actually like</small></span></li>
+                <li><b>02</b><span>Logic<small>Your rules, approvals and taxes — FBR e-invoicing included</small></span></li>
+                <li><b>03</b><span>Data<small>MariaDB or SQL Server, daily backups, full Excel export — the data is yours</small></span></li>
+              </ul>
+            </article>
+            <article class="st-card">
+              <p class="fx-label"><b>05</b> / See it running</p>
+              <h2>Your business on one screen — <em>in two weeks.</em></h2>
+              <p>Tell us how your business runs today. We show you a working demo with your own names on it.</p>
+              <div class="fx-ctas">
+                <a class="btn btn-primary" href="demo/">Open the live demo
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 3.5 13.5 8 9 12.5"/></svg></a>
+                <a class="btn btn-ghost st-ghost" href="https://wa.me/923022219093?text=Assalam%20o%20Alaikum%2C%20I%20want%20to%20see%20VectorERP%20for%20my%20business." target="_blank" rel="noopener">WhatsApp us</a>
+              </div>
+            </article>
+          </div>
+          <div class="st-anchor" id="storyAnchor" aria-hidden="true"></div>
+        </div>
+        <nav class="st-rail" aria-label="Story progress"><a class="on" aria-label="The demo"></a><a aria-label="Screens"></a><a aria-label="FBR"></a><a aria-label="Layers"></a><a aria-label="See it"></a></nav>
       </div>
     </section>
 
@@ -262,47 +322,6 @@
         </div>
       </div>
       <div class="fx-lb" role="dialog" aria-label="Pamphlet"><button class="fx-lb-x" aria-label="Close">×</button><img src="" alt=""><a class="fx-lb-dl" href="#" download>Download this pamphlet</a></div>
-    </section>
-
-    <!-- ============ LAPTOP — THE DEMO, RUNNING ============ -->
-    <section class="ed-lab" id="lab" aria-label="VectorERP running — screen by screen">
-      <div class="ed-lab-pin">
-        <div class="wrap ed-lab-grid">
-          <figure class="ed-laptop">
-            <div class="ed-lap-lid">
-              <div class="ed-lap-screen">
-                <img src="assets/laptop/dashboard.jpg" alt="VectorERP dashboard — today's sales, receivables, stock alerts" class="on" decoding="async">
-                <img src="assets/laptop/accounts.jpg" alt="Accounts sheet — profit in plain words and a trial balance that ties" loading="lazy" decoding="async">
-                <img src="assets/laptop/invoices.jpg" alt="Sales tax invoices with FBR numbers and QR" loading="lazy" decoding="async">
-                <img src="assets/laptop/inventory.jpg" alt="Live stock across godowns with low-stock flags" loading="lazy" decoding="async">
-                <img src="assets/laptop/crm.jpg" alt="Sales pipeline — leads and follow-ups on a kanban" loading="lazy" decoding="async">
-                <img src="assets/laptop/payroll.jpg" alt="Payroll with attendance and EOBI" loading="lazy" decoding="async">
-                <img src="assets/laptop/pos.jpg" alt="Retail point of sale — barcode till with thermal receipts" loading="lazy" decoding="async">
-                <img src="assets/laptop/resto.jpg" alt="Restaurant counter — tables, kitchen tickets, SRB tax" loading="lazy" decoding="async">
-                <img src="assets/laptop/pharma.jpg" alt="Pharmacy counter — batches, expiries, FEFO picking" loading="lazy" decoding="async">
-              </div>
-            </div>
-            <div class="ed-lap-base"></div>
-          </figure>
-          <div class="ed-lab-names">
-            <p class="ed-kicker">THE DEMO, RUNNING — SCROLL</p>
-            <h2 class="sr-only">Every screen of VectorERP, one login</h2>
-            <ol>
-              <li class="on"><b>Dashboard</b><span>the day at a glance</span></li>
-              <li><b>Accounting</b><span>a trial balance that ties</span></li>
-              <li><b>Invoicing</b><span>FBR number on every invoice</span></li>
-              <li><b>Inventory</b><span>stock across godowns</span></li>
-              <li><b>Sales &amp; CRM</b><span>follow-ups in a pipeline</span></li>
-              <li><b>HR &amp; Payroll</b><span>attendance to salary slip</span></li>
-              <li><b>Point of Sale</b><span>barcode till, thermal receipt</span></li>
-              <li><b>Restaurant</b><span>tables and kitchen tickets</span></li>
-              <li><b>Pharmacy</b><span>batches, expiries, FEFO</span></li>
-            </ol>
-            <p class="ed-lab-now" aria-hidden="true"></p>
-            <a class="ed-view ed-lab-cta" href="demo/">OPEN THE LIVE DEMO</a>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ============ SELECTED WORK ============ -->
@@ -606,5 +625,7 @@
   <script src="js/bot.js?v=20260809b" defer></script>
   <script src="js/editorial.js?v=20261017a" defer></script>
   <script src="js/future.js?v=20261018a" defer></script>
+  <script src="js/vendor/three.min.js" defer></script>
+  <script src="js/scene3d.js?v=20261019a" defer></script>
 </body>
 </html>
